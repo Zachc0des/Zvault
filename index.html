@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Z VALT — visual artifact archive</title>
-<meta name="description" content="Z VALT — a collection of visual artifacts, filed by concept.">
+<title>Z VAULT — visual artifact archive</title>
+<meta name="description" content="Z VAULT — a collection of visual artifacts, filed by concept.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -193,7 +193,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 <body>
 
 <header class="bar">
-  <a class="mark" href="#/">Z VALT</a>
+  <a class="mark" href="#/">Z VAULT</a>
   <span class="crumb" id="crumb"></span>
   <span class="spacer"></span>
   <button id="mode" type="button" aria-label="Switch between white and black">Invert</button>
@@ -203,7 +203,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
 <script>
 /* ============================================================
-   Z VALT — data
+   Z VAULT — data
    Edit the two arrays below to change what the vault holds.
    Full field reference lives in README.md.
    ============================================================ */
@@ -257,11 +257,11 @@ const fmtDate = d => {
 
 /* --- mode --- */
 const root = document.documentElement;
-try{ if(localStorage.getItem("zvalt-mode")==="inverted") root.dataset.mode="inverted"; }catch(e){}
+try{ if(localStorage.getItem("zvault-mode")==="inverted") root.dataset.mode="inverted"; }catch(e){}
 document.getElementById("mode").addEventListener("click",()=>{
   const next = root.dataset.mode==="inverted" ? "" : "inverted";
   if(next) root.dataset.mode = next; else root.removeAttribute("data-mode");
-  try{ localStorage.setItem("zvalt-mode",next||"normal"); }catch(e){}
+  try{ localStorage.setItem("zvault-mode",next||"normal"); }catch(e){}
 });
 
 /* --- views --- */
@@ -275,7 +275,7 @@ function viewIndex(query=""){
 
   return `
   <section class="hero">
-    <h1 class="reveal">Z&nbsp;<em>Valt</em></h1>
+    <h1 class="reveal">Z&nbsp;<em>Vault</em></h1>
     <p class="lede reveal" style="animation-delay:.08s">Welcome in. A collection of visual artifacts, filed by concept — pick a shelf and have a look around.</p>
     <div class="meta mono reveal" style="animation-delay:.14s">
       <span>${CATEGORIES.length} shelves</span>
@@ -412,7 +412,7 @@ function colophon(){
   return `
   <footer class="colophon">
     <div>
-      <h4>Z Valt</h4>
+      <h4>Z Vault</h4>
       <p>Visual artifacts, kept in one place and filed by concept. Built as a single static page.</p>
     </div>
     <div>
@@ -441,7 +441,7 @@ function render(){
   else { html=viewIndex(searchQuery); crumb="Index"; }
   app.innerHTML = html;
   crumbEl.textContent = crumb;
-  document.title = crumb==="Index" ? "Z VALT — visual artifact archive" : "Z VALT — "+crumb;
+  document.title = crumb==="Index" ? "Z VAULT — visual artifact archive" : "Z VAULT — "+crumb;
   wire();
   window.scrollTo(0,0);
 }
