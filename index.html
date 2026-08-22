@@ -1,3861 +1,488 @@
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zachary Frederic — IT Management, Development & Design</title>
-  <meta name="description" content="Zachary Frederic — IT professional, developer, and creative technologist based in Palm Beach & Orlando, FL." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #ffffff;
-      --ink: #0a0a0a;
-      --grey: #4a4a4a;
-      --dim: #9a9a9a;
-      --accent: #1a1a1a;
-      --border: rgba(0,0,0,0.12);
-      --hair: rgba(0,0,0,0.07);
-      --card-bg: #f6f5f3;
-      --card-hover: #efedea;
-      --nav-bg: rgba(255,255,255,0.82);
-      --tag-border: #c4c4c4;
-      --tag-color: #555;
-      --iron: #8b2c2c;
-      --cobalt: #1e44c2;
-      --cobalt-dark: #142e8a;
-      --green: #1c7a45;
-      --green-dark: #10552e;
-      --amber: #a16207;
-      --amber-dark: #7a4a05;
-      --violet: #5b21b6;
-      --violet-dark: #3f1580;
-      --ease: cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--ink);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 13px;
-      line-height: 1.8;
-      cursor: crosshair;
-      overflow-x: hidden;
-    }
-
-    /* ─── LIVE WAVE FIELD (signature) ─── */
-    #waves {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    /* ─── NOISE OVERLAY ─── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.35;
-    }
-
-    a:focus-visible, button:focus-visible {
-      outline: 1px solid var(--ink);
-      outline-offset: 4px;
-    }
-
-    /* ─── NAV ─── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-      padding: 20px 48px;
-      background: var(--nav-bg);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav-logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 18px;
-      font-weight: 300;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--ink);
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 30px;
-      list-style: none;
-      align-items: center;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .nav-links a {
-      color: var(--grey);
-      text-decoration: none;
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      transition: color 0.3s var(--ease);
-      position: relative;
-      white-space: nowrap;
-    }
-
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -4px; left: 0;
-      width: 0; height: 1px;
-      background: var(--ink);
-      transition: width 0.35s var(--ease);
-    }
-
-    .nav-links a:hover { color: var(--ink); }
-    .nav-links a:hover::after { width: 100%; }
-
-    .nav-links a.health-link { color: var(--iron); }
-    .nav-links a.health-link::after { background: var(--iron); }
-    .nav-links a.health-link:hover { color: #6b1a1a; }
-
-    .nav-links a.study-link { color: var(--cobalt); }
-    .nav-links a.study-link::after { background: var(--cobalt); }
-    .nav-links a.study-link:hover { color: var(--cobalt-dark); }
-
-    .nav-links a.concepts-link { color: var(--amber); }
-    .nav-links a.concepts-link::after { background: var(--amber); }
-    .nav-links a.concepts-link:hover { color: var(--amber-dark); }
-
-    .nav-links a.cards-link { color: var(--green); }
-    .nav-links a.cards-link::after { background: var(--green); }
-    .nav-links a.cards-link:hover { color: var(--green-dark); }
-
-    .nav-links a.vault-link { color: var(--violet); }
-    .nav-links a.vault-link::after { background: var(--violet); }
-    .nav-links a.vault-link:hover { color: var(--violet-dark); }
-
-    /* ─── HERO ─── */
-    #home {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 140px 48px 90px;
-      position: relative;
-      max-width: 1100px;
-      margin: 0 auto;
-      z-index: 1;
-    }
-
-    .hero-tag {
-      font-size: 10px;
-      letter-spacing: 0.4em;
-      color: var(--grey);
-      text-transform: uppercase;
-      margin-bottom: 26px;
-      animation: fadeUp 0.9s var(--ease) both;
-    }
-
-    .status-dot {
-      display: inline-block;
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--ink);
-      margin-right: 8px;
-      vertical-align: middle;
-      animation: blink 2.4s ease-in-out infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.18; }
-    }
-
-    .hero-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(60px, 8.5vw, 124px);
-      font-weight: 300;
-      line-height: 0.94;
-      letter-spacing: -0.025em;
-      margin-bottom: 30px;
-      animation: fadeUp 0.9s 0.1s var(--ease) both;
-    }
-
-    .hero-name em {
-      font-style: italic;
-      color: var(--grey);
-    }
-
-    .hero-desc {
-      max-width: 460px;
-      color: var(--grey);
-      font-size: 12px;
-      line-height: 2.1;
-      letter-spacing: 0.05em;
-      margin-bottom: 44px;
-      animation: fadeUp 0.9s 0.2s var(--ease) both;
-    }
-
-    .hero-links {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      animation: fadeUp 0.9s 0.3s var(--ease) both;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 12px 28px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      text-decoration: none;
-      transition: all 0.35s var(--ease);
-      cursor: crosshair;
-      background: transparent;
-    }
-
-    .btn-outline {
-      border: 1px solid var(--ink);
-      color: var(--ink);
-    }
-
-    .btn-outline:hover {
-      background: var(--ink);
-      color: var(--bg);
-    }
-
-    .btn-ghost {
-      border: 1px solid var(--tag-border);
-      color: var(--grey);
-    }
-
-    .btn-ghost:hover {
-      border-color: var(--ink);
-      color: var(--ink);
-    }
-
-    .btn-iron {
-      border: 1px solid var(--iron);
-      color: var(--iron);
-    }
-
-    .btn-iron:hover {
-      background: var(--iron);
-      color: #fff;
-    }
-
-    .btn-cobalt {
-      border: 1px solid var(--cobalt);
-      color: var(--cobalt);
-    }
-
-    .btn-cobalt:hover {
-      background: var(--cobalt);
-      color: #fff;
-    }
-
-    .btn-green {
-      border: 1px solid var(--green);
-      color: var(--green);
-    }
-
-    .btn-green:hover {
-      background: var(--green);
-      color: #fff;
-    }
-
-    .btn-amber {
-      border: 1px solid var(--amber);
-      color: var(--amber);
-    }
-
-    .btn-amber:hover {
-      background: var(--amber);
-      color: #fff;
-    }
-
-    .btn-violet {
-      border: 1px solid var(--violet);
-      color: var(--violet);
-    }
-
-    .btn-violet:hover {
-      background: var(--violet);
-      color: #fff;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(22px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ─── TICKER ─── */
-    .ticker {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      overflow: hidden;
-      white-space: nowrap;
-      padding: 12px 0;
-      position: relative;
-      z-index: 1;
-      background: rgba(255,255,255,0.55);
-    }
-
-    .ticker-track {
-      display: inline-block;
-      animation: scroll-left 38s linear infinite;
-    }
-
-    .ticker-track span {
-      font-size: 10px;
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      color: var(--dim);
-      padding: 0 22px;
-    }
-
-    .ticker-track span::before {
-      content: '◦ ';
-      color: var(--tag-border);
-    }
-
-    @keyframes scroll-left {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-
-    /* ─── SECTIONS ─── */
-    section {
-      padding: 100px 48px;
-      border-top: 1px solid var(--hair);
-      max-width: 1100px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
-
-    .section-label {
-      font-size: 10px;
-      letter-spacing: 0.4em;
-      color: var(--grey);
-      text-transform: uppercase;
-      margin-bottom: 56px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .section-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-      max-width: 90px;
-    }
-
-    /* ─── ABOUT ─── */
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-    }
-
-    .about-heading {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 38px;
-      font-weight: 300;
-      line-height: 1.2;
-      margin-bottom: 28px;
-      letter-spacing: -0.01em;
-    }
-
-    .about-heading em { font-style: italic; color: var(--grey); }
-
-    .about-text {
-      color: var(--grey);
-      font-size: 12px;
-      line-height: 2.1;
-      letter-spacing: 0.04em;
-    }
-
-    .about-text + .about-text { margin-top: 22px; }
-
-    .about-facts { display: flex; flex-direction: column; }
-
-    .fact-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 20px;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .fact-key {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--dim);
-      white-space: nowrap;
-    }
-
-    .fact-val {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 16px;
-      font-weight: 300;
-      color: var(--accent);
-      text-align: right;
-      line-height: 1.6;
-    }
-
-    /* ─── CARD GRIDS (shared) ─── */
-    /* Hairlines are drawn per-cell so leftover grid cells stay empty
-       instead of rendering as a grey box. */
-    .grid-frame {
-      display: grid;
-      gap: 1px;
-      background: transparent;
-      border: 0;
-    }
-
-    .cols-2 { grid-template-columns: repeat(2, 1fr); }
-    .cols-3 { grid-template-columns: repeat(3, 1fr); }
-    .cols-auto { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
-
-    .cell {
-      background: var(--card-bg);
-      box-shadow: 0 0 0 1px var(--border);
-      transition: background 0.35s var(--ease);
-    }
-
-    .cell:hover { background: var(--card-hover); }
-
-    /* ─── SKILLS ─── */
-    .skill-card {
-      padding: 36px 32px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .skill-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 2px; height: 0;
-      background: var(--ink);
-      transition: height 0.45s var(--ease);
-    }
-
-    .skill-card:hover::before { height: 100%; }
-
-    .skill-cat {
-      font-size: 9px;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--dim);
-      margin-bottom: 14px;
-    }
-
-    .skill-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 22px;
-      font-weight: 300;
-      margin-bottom: 14px;
-      color: var(--ink);
-    }
-
-    .card-copy {
-      color: var(--grey);
-      font-size: 11px;
-      line-height: 1.95;
-    }
-
-    .skill-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 16px;
-    }
-
-    .tag {
-      font-size: 9px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border: 1px solid var(--tag-border);
-      color: var(--tag-color);
-      transition: all 0.25s var(--ease);
-    }
-
-    .cell:hover .tag {
-      border-color: var(--grey);
-      color: var(--accent);
-    }
-
-    /* ─── TOOLS ─── */
-    .tools-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 28px;
-    }
-
-    .tool-chip {
-      padding: 8px 16px;
-      border: 1px solid var(--tag-border);
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      color: var(--grey);
-      transition: all 0.28s var(--ease);
-      cursor: default;
-    }
-
-    .tool-chip:hover {
-      border-color: var(--ink);
-      color: var(--ink);
-      transform: translateY(-2px);
-    }
-
-    .tools-section-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 16px;
-      font-weight: 300;
-      color: var(--grey);
-      margin: 36px 0 16px;
-      letter-spacing: 0.05em;
-    }
-
-    /* ─── PROJECTS ─── */
-    .projects-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-    }
-
-    .project-item {
-      background: var(--card-bg);
-      padding: 44px 40px;
-      display: grid;
-      grid-template-columns: 60px 1fr auto;
-      gap: 32px;
-      align-items: start;
-      transition: background 0.35s var(--ease);
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .project-item:hover { background: var(--card-hover); }
-
-    .project-num {
-      font-size: 11px;
-      color: var(--dim);
-      letter-spacing: 0.1em;
-      padding-top: 6px;
-    }
-
-    .project-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 28px;
-      font-weight: 300;
-      margin-bottom: 10px;
-      line-height: 1.2;
-    }
-
-    .project-desc {
-      color: var(--grey);
-      font-size: 11px;
-      line-height: 1.95;
-      max-width: 580px;
-      margin-bottom: 18px;
-    }
-
-    .project-stack {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .project-arrow {
-      font-size: 20px;
-      color: var(--dim);
-      transition: all 0.35s var(--ease);
-      align-self: center;
-    }
-
-    .project-item:hover .project-arrow {
-      color: var(--ink);
-      transform: translateX(5px);
-    }
-
-    /* ─── AI STACK ─── */
-    .ai-card { padding: 44px 36px; }
-
-    .ai-icon {
-      font-size: 26px;
-      margin-bottom: 18px;
-      display: block;
-      color: var(--accent);
-    }
-
-    .ai-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 26px;
-      font-weight: 300;
-      margin-bottom: 14px;
-    }
-
-    .ai-uses {
-      color: var(--grey);
-      font-size: 11px;
-      line-height: 2;
-    }
-
-    .ai-use-item {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      padding: 3px 0;
-    }
-
-    .ai-use-item::before {
-      content: '—';
-      color: var(--dim);
-      font-size: 10px;
-    }
-
-    .ai-credential {
-      margin-top: 20px;
-      padding-top: 18px;
-      border-top: 1px solid var(--border);
-    }
-
-    .ai-credential-label {
-      font-size: 9px;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--dim);
-      margin-bottom: 10px;
-    }
-
-    /* ─── CERTIFICATIONS ─── */
-    .cert-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-    }
-
-    .cert-item {
-      background: var(--card-bg);
-      padding: 30px 34px;
-      display: grid;
-      grid-template-columns: 160px 1fr;
-      gap: 28px;
-      align-items: start;
-      transition: background 0.35s var(--ease);
-    }
-
-    .cert-item:hover { background: var(--card-hover); }
-
-    .cert-issuer {
-      font-size: 10px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--dim);
-      padding-top: 6px;
-    }
-
-    .cert-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 21px;
-      font-weight: 300;
-      line-height: 1.35;
-      margin-bottom: 8px;
-      color: var(--accent);
-    }
-
-    .cert-detail {
-      color: var(--grey);
-      font-size: 11px;
-      line-height: 1.95;
-      max-width: 620px;
-    }
-
-    /* ─── FITNESS ─── */
-    .fitness-intro {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: end;
-      margin-bottom: 44px;
-    }
-
-    .fitness-card { padding: 40px 36px; }
-
-    .fitness-card-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 20px;
-      font-weight: 300;
-      margin-bottom: 16px;
-      color: var(--accent);
-    }
-
-    .fitness-text {
-      color: var(--grey);
-      font-size: 11px;
-      line-height: 2;
-    }
-
-    .fitness-stat { padding: 28px 32px; }
-
-    .fitness-stat-label {
-      font-size: 9px;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--dim);
-      margin-bottom: 10px;
-    }
-
-    .fitness-stat-value {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 24px;
-      font-weight: 300;
-      color: var(--accent);
-    }
-
-    /* ─── ZJIM / FEATURED CALLOUTS ─── */
-    .zjim {
-      margin-top: 1px;
-      border: 1px solid var(--border);
-      background: var(--card-bg);
-      padding: 52px 44px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 44px;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
-      transition: background 0.35s var(--ease);
-    }
-
-    .zjim:hover { background: var(--card-hover); }
-
-    .zjim::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: var(--iron);
-      transform: scaleY(0);
-      transform-origin: top;
-      transition: transform 0.5s var(--ease);
-    }
-
-    .zjim:hover::before { transform: scaleY(1); }
-
-    .zjim-eyebrow {
-      font-size: 9px;
-      letter-spacing: 0.4em;
-      text-transform: uppercase;
-      color: var(--iron);
-      margin-bottom: 14px;
-    }
-
-    .zjim-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 40px;
-      font-weight: 300;
-      line-height: 1.05;
-      margin-bottom: 16px;
-      letter-spacing: -0.01em;
-    }
-
-    .zjim-title em { font-style: italic; color: var(--grey); }
-
-    .zjim-desc {
-      color: var(--grey);
-      font-size: 12px;
-      line-height: 2;
-      max-width: 520px;
-    }
-
-    .zjim-cta { text-align: right; }
-
-    .zjim-cta .btn { padding: 16px 34px; }
-
-    .zjim-url {
-      display: block;
-      margin-top: 12px;
-      font-size: 9px;
-      letter-spacing: 0.18em;
-      color: var(--dim);
-    }
-
-    /* Cobalt variant — Zach/C0des study library callout */
-    .zjim.zcodes { margin-top: 44px; scroll-margin-top: 100px; }
-    .zjim.zcodes::before { background: var(--cobalt); }
-    .zjim.zcodes .zjim-eyebrow { color: var(--cobalt); }
-
-    /* Amber variant — Z Concepts callout */
-    .zjim.zconcepts { margin-top: 44px; scroll-margin-top: 100px; }
-    .zjim.zconcepts::before { background: var(--amber); }
-    .zjim.zconcepts .zjim-eyebrow { color: var(--amber); }
-
-    /* Green variant — Six Cards callout */
-    .zjim.sixcards { margin-top: 44px; scroll-margin-top: 100px; }
-    .zjim.sixcards::before { background: var(--green); }
-    .zjim.sixcards .zjim-eyebrow { color: var(--green); }
-
-    /* Violet variant — Z Vault callout */
-    .zjim.zvault { margin-top: 44px; scroll-margin-top: 100px; }
-    .zjim.zvault::before { background: var(--violet); }
-    .zjim.zvault .zjim-eyebrow { color: var(--violet); }
-
-    /* ─── CONTACT ─── */
-    .contact-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 32px;
-    }
-
-    .contact-heading {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(36px, 5vw, 64px);
-      font-weight: 300;
-      line-height: 1.1;
-    }
-
-    .contact-heading em { font-style: italic; color: var(--grey); }
-
-    .contact-links {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      align-items: flex-end;
-    }
-
-    .contact-link {
-      color: var(--grey);
-      text-decoration: none;
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      transition: color 0.25s var(--ease);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .contact-link:hover { color: var(--ink); }
-    .contact-link span { color: var(--dim); }
-
-    /* ─── FOOTER ─── */
-    footer {
-      padding: 32px 48px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1100px;
-      margin: 0 auto;
-      color: var(--dim);
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      position: relative;
-      z-index: 1;
-      background: rgba(255,255,255,0.6);
-    }
-
-    footer a { color: var(--dim); text-decoration: none; }
-    footer a:hover { color: var(--ink); }
-
-    /* ─── SCROLLBAR ─── */
-    ::-webkit-scrollbar { width: 2px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--dim); }
-
-    /* ─── RESPONSIVE ─── */
-    @media (max-width: 1180px) {
-      nav { padding: 16px 32px; }
-      .nav-links { gap: 20px; }
-    }
-
-    @media (max-width: 900px) {
-      .cols-3 { grid-template-columns: 1fr; }
-      .fitness-intro { grid-template-columns: 1fr; gap: 32px; }
-      .zjim { grid-template-columns: 1fr; gap: 28px; padding: 40px 30px; }
-      .zjim-cta { text-align: left; }
-      .cert-item { grid-template-columns: 1fr; gap: 10px; }
-      .cert-issuer { padding-top: 0; }
-    }
-
-    @media (max-width: 768px) {
-      nav { padding: 16px 22px; flex-wrap: wrap; gap: 12px; }
-      .nav-links { gap: 14px; flex-wrap: wrap; }
-      #home { padding: 130px 22px 70px; }
-      section { padding: 70px 22px; }
-      .about-grid { grid-template-columns: 1fr; gap: 48px; }
-      .cols-2 { grid-template-columns: 1fr; }
-      .project-item { grid-template-columns: 40px 1fr; padding: 34px 24px; gap: 18px; }
-      .project-arrow { display: none; }
-      .fact-row { flex-direction: column; align-items: flex-start; gap: 6px; }
-      .fact-val { text-align: left; }
-      .contact-row { flex-direction: column; align-items: flex-start; }
-      .contact-links { align-items: flex-start; }
-      footer { flex-direction: column; gap: 12px; text-align: center; padding: 28px 22px; }
-      .zjim-title { font-size: 32px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      *, *::before, *::after {
-        animation-duration: 0.001ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.001ms !important;
-      }
-      #waves { display: none; }
-      .ticker-track { animation: none; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Z VAULT — visual artifact archive</title>
+<meta name="description" content="Z VAULT — a collection of visual artifacts, filed by concept.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff;
+  --ink:#0b0b0b;
+  --shelf:#f4f4f4;
+  --rule:#d8d8d8;
+  --muted:#767676;
+  --plate-fg:#0b0b0b;
+  --plate-bg:#ffffff;
+  --display:"Cormorant Garamond",Georgia,serif;
+  --mono:"Share Tech Mono",ui-monospace,monospace;
+  --gut:clamp(20px,5vw,64px);
+}
+html[data-mode="inverted"]{
+  --paper:#0b0b0b;
+  --ink:#f6f6f6;
+  --shelf:#141414;
+  --rule:#2e2e2e;
+  --muted:#8b8b8b;
+  --plate-fg:#f6f6f6;
+  --plate-bg:#0b0b0b;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--display);font-weight:300;
+  font-size:clamp(16px,1.05vw,18px);line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.mono{font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;font-size:.7rem}
+
+/* ---------- chrome ---------- */
+.bar{
+  position:sticky;top:0;z-index:60;background:var(--paper);
+  border-bottom:1px solid var(--rule);
+  display:flex;align-items:center;gap:16px;
+  padding:10px var(--gut);
+}
+.bar .mark{font-family:var(--mono);font-size:.78rem;letter-spacing:.34em;text-transform:uppercase}
+.bar .crumb{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .spacer{flex:1}
+.bar button{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--rule);padding:5px 10px;transition:color .2s,border-color .2s}
+.bar button:hover{color:var(--ink);border-color:var(--ink)}
+
+/* ---------- hero ---------- */
+.hero{padding:clamp(56px,11vw,140px) var(--gut) clamp(36px,6vw,72px);border-bottom:1px solid var(--rule)}
+.hero h1{
+  margin:0;font-weight:300;line-height:.86;letter-spacing:-.02em;
+  font-size:clamp(74px,20vw,260px);
+}
+.hero h1 em{font-style:italic;letter-spacing:-.01em}
+.hero .lede{
+  margin:clamp(20px,3vw,32px) 0 0;max-width:46ch;
+  font-size:clamp(19px,1.7vw,26px);line-height:1.4;color:var(--ink);
+}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:clamp(24px,4vw,44px);color:var(--muted)}
+
+/* ---------- search ---------- */
+.finder{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--ink);
+  max-width:520px;margin-top:clamp(28px,4vw,44px);padding-bottom:8px}
+.finder input{
+  flex:1;border:0;background:none;font-family:var(--mono);font-size:.82rem;letter-spacing:.06em;
+  color:var(--ink);padding:0;min-width:0;
+}
+.finder input::placeholder{color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-size:.72rem}
+.finder input:focus{outline:none}
+.finder .key{color:var(--muted);border:1px solid var(--rule);padding:2px 6px;font-size:.6rem}
+
+/* ---------- plates ---------- */
+.section{padding:clamp(40px,6vw,80px) var(--gut)}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+  border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:clamp(24px,4vw,44px);color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.plate{background:var(--paper);padding:0;display:block;position:relative;transition:background .25s}
+.plate:hover{background:var(--shelf)}
+.plate .face{
+  position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--plate-bg);
+  border-bottom:1px solid var(--rule);
+}
+.plate .face::before,.plate .face::after{
+  content:"";position:absolute;inset:-40%;
+  transition:transform .9s cubic-bezier(.2,.7,.2,1),opacity .5s;
+}
+.plate:hover .face::after{transform:rotate(var(--tilt,6deg)) scale(1.06)}
+.plate .body{padding:16px 18px 20px}
+.plate .code{color:var(--muted);display:block}
+.plate .name{font-size:clamp(21px,2vw,27px);line-height:1.15;margin:6px 0 8px;font-weight:400}
+.plate .blurb{color:var(--muted);font-size:.95rem;line-height:1.4;margin:0}
+.plate .count{position:absolute;top:10px;right:12px;z-index:2;background:var(--paper);
+  border:1px solid var(--rule);padding:3px 7px;color:var(--muted)}
+
+/* moiré plate patterns — pure black on white */
+.pt{--a:0deg;--g:6px}
+.pt .face::before{background:var(--plate-bg)}
+.pt1 .face::after{background:repeating-linear-gradient(38deg,var(--plate-fg) 0 1px,transparent 1px 7px)}
+.pt2 .face::after{background:repeating-radial-gradient(circle at 30% 40%,var(--plate-fg) 0 1px,transparent 1px 9px)}
+.pt3 .face::after{background:
+  repeating-linear-gradient(0deg,var(--plate-fg) 0 1px,transparent 1px 11px),
+  repeating-linear-gradient(90deg,var(--plate-fg) 0 1px,transparent 1px 11px)}
+.pt4 .face::after{background:repeating-conic-gradient(from 12deg at 62% 38%,var(--plate-fg) 0 1.4deg,transparent 1.4deg 9deg)}
+.pt5 .face::after{background:
+  repeating-linear-gradient(-52deg,var(--plate-fg) 0 2px,transparent 2px 14px),
+  repeating-linear-gradient(52deg,var(--plate-fg) 0 1px,transparent 1px 14px)}
+.pt6 .face::after{background:repeating-linear-gradient(90deg,var(--plate-fg) 0 3px,transparent 3px 16px)}
+.pt7 .face::after{background:
+  repeating-radial-gradient(circle at 50% 50%,var(--plate-fg) 0 1px,transparent 1px 14px),
+  repeating-linear-gradient(0deg,var(--plate-fg) 0 1px,transparent 1px 28px)}
+.pt8 .face::after{background:repeating-linear-gradient(74deg,var(--plate-fg) 0 1px,transparent 1px 5px)}
+
+/* ---------- register (category view) ---------- */
+.page-head{padding:clamp(48px,8vw,110px) var(--gut) clamp(28px,4vw,52px);border-bottom:1px solid var(--rule)}
+.page-head h2{margin:10px 0 0;font-weight:300;font-size:clamp(40px,7vw,86px);line-height:1;letter-spacing:-.015em}
+.page-head p{margin:18px 0 0;max-width:52ch;color:var(--muted);font-size:1.05rem}
+.back{color:var(--muted);display:inline-block;margin-bottom:6px}
+.back:hover{color:var(--ink)}
+
+.rows{border-top:1px solid var(--rule)}
+.row{display:grid;grid-template-columns:96px 1.6fr 1fr 110px;gap:20px;align-items:baseline;
+  padding:18px 0;border-bottom:1px solid var(--rule);transition:padding-left .25s}
+.row:hover{padding-left:10px}
+.row .t{font-size:1.3rem;line-height:1.25}
+.row .s{color:var(--muted);font-size:.95rem}
+.row .acc,.row .d{color:var(--muted)}
+.row .d{text-align:right}
+@media(max-width:720px){
+  .row{grid-template-columns:1fr;gap:6px}
+  .row .d{text-align:left}
+}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.thumb{background:var(--paper);display:block}
+.thumb .shot{position:relative;aspect-ratio:16/10;overflow:hidden;border-bottom:1px solid var(--rule);background:var(--plate-bg)}
+.thumb .shot iframe,.thumb .shot img{position:absolute;top:0;left:0;border:0;transform-origin:top left;pointer-events:none}
+.thumb .shot img{width:100%;height:100%;object-fit:cover;transform:none}
+.thumb .cap{padding:14px 16px 18px}
+.thumb .cap .t{font-size:1.25rem;margin:6px 0 0;line-height:1.2}
+
+/* ---------- empty ---------- */
+.empty{border:1px solid var(--rule);padding:clamp(28px,5vw,56px);background:var(--shelf)}
+.empty h3{margin:0 0 10px;font-weight:400;font-size:clamp(24px,3vw,34px)}
+.empty p{margin:0 0 18px;max-width:56ch;color:var(--muted)}
+.empty pre{margin:0;overflow-x:auto;background:var(--paper);border:1px solid var(--rule);
+  padding:16px;font-family:var(--mono);font-size:.72rem;line-height:1.7;color:var(--ink)}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:1px;background:var(--rule);
+  border:1px solid var(--rule);margin-top:24px}
+.slot{background:var(--paper);aspect-ratio:1;display:grid;place-items:center;color:var(--rule);font-family:var(--mono);font-size:.7rem}
+
+/* ---------- viewer ---------- */
+.viewer{display:grid;grid-template-columns:1fr 300px;min-height:calc(100vh - 43px)}
+.viewer .stage{border-right:1px solid var(--rule);background:var(--shelf);display:grid;place-items:center;padding:clamp(16px,3vw,40px)}
+.viewer .stage iframe,.viewer .stage img{width:100%;height:100%;min-height:70vh;border:1px solid var(--rule);background:var(--plate-bg)}
+.viewer .stage img{object-fit:contain;min-height:0;height:auto}
+.viewer .side{padding:clamp(24px,3vw,36px) var(--gut) 60px 28px}
+.viewer .side h2{font-weight:300;font-size:clamp(28px,3vw,40px);line-height:1.05;margin:12px 0 0}
+.viewer dl{margin:28px 0 0;border-top:1px solid var(--rule)}
+.viewer dt{color:var(--muted);padding-top:12px}
+.viewer dd{margin:2px 0 12px;border-bottom:1px solid var(--rule);padding-bottom:12px}
+@media(max-width:900px){
+  .viewer{grid-template-columns:1fr}
+  .viewer .stage{border-right:0;border-bottom:1px solid var(--rule)}
+  .viewer .side{padding:28px var(--gut) 60px}
+}
+
+/* ---------- colophon ---------- */
+.colophon{border-top:1px solid var(--rule);padding:clamp(40px,6vw,72px) var(--gut);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:28px 40px;color:var(--muted)}
+.colophon h4{margin:0 0 8px;color:var(--ink);font-weight:400;font-size:1.15rem}
+.colophon p{margin:0;font-size:.95rem;line-height:1.5}
+.colophon code{font-family:var(--mono);font-size:.72rem;color:var(--ink)}
+
+.reveal{opacity:0;transform:translateY(10px);animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001s!important;transition-duration:.001s!important}
+}
+</style>
 </head>
 <body>
 
-<canvas id="waves" aria-hidden="true"></canvas>
+<header class="bar">
+  <a class="mark" href="#/">Z VAULT</a>
+  <span class="crumb" id="crumb"></span>
+  <span class="spacer"></span>
+  <button id="mode" type="button" aria-label="Switch between white and black">Invert</button>
+</header>
 
-<!-- NAV -->
-<nav>
-  <a href="#home" class="nav-logo">Z.Frederic</a>
-  <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#skills">Skills</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#ai">AI Stack</a></li>
-    <li><a href="#certifications">Certifications</a></li>
-    <li><a href="#fitness" class="health-link">Health &amp; Fitness</a></li>
-    <li><a href="#study-library" class="study-link">Study Library</a></li>
-    <li><a href="#z-concepts" class="concepts-link">Z Concepts</a></li>
-    <li><a href="#six-cards" class="cards-link">Six Cards</a></li>
-    <li><a href="#z-vault" class="vault-link">Z Vault</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-</nav>
-
-<!-- HERO -->
-<div id="home">
-  <p class="hero-tag"><span class="status-dot"></span>Palm Beach &amp; Orlando, FL &nbsp;·&nbsp; IT Management &nbsp;·&nbsp; Open to opportunities</p>
-  <h1 class="hero-name">Zachary<br /><em>Frederic</em></h1>
-  <p class="hero-desc">
-    IT professional, developer, and creative technologist.<br />
-    Building at the intersection of systems, design, and data.
-  </p>
-  <div class="hero-links">
-    <a href="#projects" class="btn btn-outline">View Work</a>
-    <a href="https://zachc0des.github.io/zjim/" target="_blank" rel="noopener" class="btn btn-iron">Z.JIM — Training Log ↗</a>
-    <a href="https://zachc0des.github.io/Zachc0des-Portfolio/#/" target="_blank" rel="noopener" class="btn btn-cobalt">Zach/C0des — Study Library ↗</a>
-    <a href="https://zachc0des.github.io/zconcepts/" target="_blank" rel="noopener" class="btn btn-amber">Z Concepts — Markets ↗</a>
-    <a href="https://zachc0des.github.io/sixcards/" target="_blank" rel="noopener" class="btn btn-green">Six Cards — Business Cards ↗</a>
-    <a href="https://zachc0des.github.io/Zvault/" target="_blank" rel="noopener" class="btn btn-violet">Z Vault — Visual Archive ↗</a>
-    <a href="https://github.com/Zachc0des" target="_blank" rel="noopener" class="btn btn-ghost">GitHub ↗</a>
-  </div>
-</div>
-
-<!-- TICKER -->
-<div class="ticker" aria-hidden="true">
-  <div class="ticker-track">
-    <span>Technical Support</span><span>Cybersecurity</span><span>Python</span><span>Linux</span><span>Salesforce</span><span>Hardware Repair</span><span>Graphic Design</span><span>Data Entry</span><span>Video Production</span><span>Content Creation</span><span>Networking</span><span>Strength Training</span>
-    <span>Technical Support</span><span>Cybersecurity</span><span>Python</span><span>Linux</span><span>Salesforce</span><span>Hardware Repair</span><span>Graphic Design</span><span>Data Entry</span><span>Video Production</span><span>Content Creation</span><span>Networking</span><span>Strength Training</span>
-  </div>
-</div>
-
-<!-- ABOUT -->
-<section id="about">
-  <div class="section-label">01 — About</div>
-  <div class="about-grid">
-    <div class="about-block">
-      <h2 class="about-heading">Technologist<br /><em>by design.</em></h2>
-      <p class="about-text">
-        I'm a 23-year-old IT professional and self-directed learner based in Palm Beach &amp; Orlando, FL —
-        currently pursuing a B.S. in Information Technology Management through WGU.
-      </p>
-      <p class="about-text">
-        My background spans customer operations, airline systems, CRM platforms, and
-        cybersecurity fundamentals. I thrive where technical precision meets
-        human communication — whether that's resolving a complex support case,
-        automating a workflow, or designing a visual identity for a small business.
-      </p>
-      <p class="about-text">
-        Outside of work and study, I repair phones, lift weights, edit video, and
-        build tools for problems I actually have. I gravitate toward systems thinking —
-        understanding how things connect before deciding how to change them.
-      </p>
-    </div>
-
-    <div class="about-facts">
-      <div class="fact-row">
-        <span class="fact-key">Location</span>
-        <span class="fact-val">Palm Beach, FL &nbsp;|&nbsp; Orlando, FL</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-key">Education</span>
-        <span class="fact-val">B.S. IT Management — WGU (In Progress)</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-key">Certifications</span>
-        <span class="fact-val">Google Cybersecurity ·<br />Google Technical Support ·<br />IBM SkillsBuild Data ·<br />Anthropic AI Fluency ·<br />OSHA 10-Hour</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-key">Recent Roles</span>
-        <span class="fact-val">
-          Sales &amp; Support Specialist — VXI Technology<br /><br />
-          Support Representative — Southern Airways Express / Mokulele Airlines<br /><br />
-          Front Desk Associate — Planet Fitness
-        </span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-key">MBTI</span>
-        <span class="fact-val">INTP</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-key">Focus Areas</span>
-        <span class="fact-val">Technical Support · Cybersecurity · Data Entry · Design · Analytics · Software Development · Content Creation</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-key">GitHub</span>
-        <span class="fact-val">github.com/Zachc0des</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SKILLS -->
-<section id="skills">
-  <div class="section-label">02 — Skills &amp; Interests</div>
-
-  <div class="grid-frame cols-auto">
-    <div class="cell skill-card">
-      <div class="skill-cat">Technical</div>
-      <div class="skill-title">Software &amp; Development</div>
-      <p class="card-copy">
-        Programming, application building, and debugging across multiple languages and environments.
-        Comfortable on Linux, Windows, and macOS.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Python</span>
-        <span class="tag">Java</span>
-        <span class="tag">HTML/CSS</span>
-        <span class="tag">PowerShell</span>
-        <span class="tag">VS Code</span>
-        <span class="tag">Linux</span>
-        <span class="tag">VMware</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Technical</div>
-      <div class="skill-title">Cybersecurity &amp; Networking</div>
-      <p class="card-copy">
-        Foundations in threat modeling, network security, SIEM tools, IDS, and Python automation —
-        backed by Google's Cybersecurity Professional Certificate.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">SIEM</span>
-        <span class="tag">IDS</span>
-        <span class="tag">Linux CLI</span>
-        <span class="tag">SQL</span>
-        <span class="tag">Python</span>
-        <span class="tag">Asset Mgmt</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Creative</div>
-      <div class="skill-title">Graphic &amp; Web Design</div>
-      <p class="card-copy">
-        Crafting visual identities and web experiences for clients, personal projects,
-        and small businesses. From concept to delivery.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Photoshop</span>
-        <span class="tag">Illustrator</span>
-        <span class="tag">Canva</span>
-        <span class="tag">Adobe CC</span>
-        <span class="tag">HTML/CSS</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Creative</div>
-      <div class="skill-title">Video &amp; Film Production</div>
-      <p class="card-copy">
-        Editing and producing content for digital platforms — from raw footage to
-        polished final cuts with motion graphics and audio. Comfortable with OBS for
-        video and game capture setup and management — scene building, source routing,
-        audio mixing, and recording/stream configuration — and with CapCut for fast
-        short-form editing, captions, and transitions.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">OBS Studio</span>
-        <span class="tag">Game Capture</span>
-        <span class="tag">CapCut</span>
-        <span class="tag">Premiere Pro</span>
-        <span class="tag">Canva Video</span>
-        <span class="tag">Motion Graphics</span>
-        <span class="tag">Audio Mix</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Creative</div>
-      <div class="skill-title">Content Creation &amp; Social Media</div>
-      <p class="card-copy">
-        Building and running my own content channels end to end — planning, filming,
-        editing, posting, and reading the numbers afterward. Short-form video for
-        TikTok, Reels, and Shorts, plus the branding, captions, and thumbnails that
-        go with it. I treat a content calendar the same way I treat a project board.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Short-Form Video</span>
-        <span class="tag">TikTok / Reels</span>
-        <span class="tag">Content Strategy</span>
-        <span class="tag">Brand Identity</span>
-        <span class="tag">Thumbnails</span>
-        <span class="tag">Analytics</span>
-        <span class="tag">Streaming</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Data</div>
-      <div class="skill-title">Analytics &amp; Data Literacy</div>
-      <p class="card-copy">
-        IBM-certified in data concepts and applied data science. Experienced with Excel,
-        Salesforce reporting, and flight/operations data in professional environments.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Excel</span>
-        <span class="tag">Salesforce</span>
-        <span class="tag">IBM Cloud</span>
-        <span class="tag">SQL</span>
-        <span class="tag">Data Entry</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Hardware</div>
-      <div class="skill-title">Hardware Repair &amp; Restoration</div>
-      <p class="card-copy">
-        Hands-on repair of computers and iPhones — diagnostics, component replacement,
-        OS installation, and system restoration. MacBook LCD &amp; fan replacement,
-        iPhone LCD repair, and full custom PC builds.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">iPhone LCD Repair</span>
-        <span class="tag">MacBook LCD/Fan</span>
-        <span class="tag">PC Build</span>
-        <span class="tag">Part Replacement</span>
-        <span class="tag">OS Install</span>
-        <span class="tag">Diagnostics</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Research</div>
-      <div class="skill-title">Financial Analysis &amp; Macroeconomics</div>
-      <p class="card-copy">
-        Ongoing study of macro-scale economic development — rates, capital flows, supply chains,
-        and the policy decisions behind them. I build models and write up market research to test
-        whether a narrative actually holds against the numbers.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Macro Trend Analysis</span>
-        <span class="tag">Financial Modeling</span>
-        <span class="tag">Market Research</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Research</div>
-      <div class="skill-title">Technology &amp; Web Evolution</div>
-      <p class="card-copy">
-        Tracking how web infrastructure is changing — the Web2 to Web3 shift, decentralized
-        architecture, and the next generation of digital economies. Less about hype cycles,
-        more about which stack transitions companies are actually committing to.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Web2 → Web3 Architecture</span>
-        <span class="tag">Emerging Tech Trends</span>
-        <span class="tag">Tech Stack Transitions</span>
-        <span class="tag">Decentralized Tech</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- TOOLS -->
-  <div style="margin-top:56px;">
-    <div class="tools-section-title">// Professional Platforms</div>
-    <div class="tools-row">
-      <span class="tool-chip">Salesforce</span>
-      <span class="tool-chip">Zenith Airline Software</span>
-      <span class="tool-chip">TalkDesk</span>
-      <span class="tool-chip">RingCentral</span>
-      <span class="tool-chip">Slack</span>
-      <span class="tool-chip">Microsoft 365</span>
-      <span class="tool-chip">Demandware</span>
-      <span class="tool-chip">FlightAware</span>
-      <span class="tool-chip">Datatrak &amp; Ignite</span>
-      <span class="tool-chip">Yoobic</span>
-      <span class="tool-chip">IBM Cloud</span>
-    </div>
-
-    <div class="tools-section-title">// Personal &amp; Dev Tools</div>
-    <div class="tools-row">
-      <span class="tool-chip">Linux OS</span>
-      <span class="tool-chip">VMware</span>
-      <span class="tool-chip">PowerShell</span>
-      <span class="tool-chip">Visual Studio Code</span>
-      <span class="tool-chip">Adobe Creative Cloud</span>
-      <span class="tool-chip">OBS Studio</span>
-      <span class="tool-chip">CapCut</span>
-      <span class="tool-chip">macOS</span>
-      <span class="tool-chip">Windows OS</span>
-    </div>
-  </div>
-</section>
-
-<!-- PROJECTS -->
-<section id="projects">
-  <div class="section-label">03 — Projects</div>
-
-  <div class="projects-list">
-    <div class="project-item">
-      <span class="project-num">01</span>
-      <div class="project-body">
-        <div class="project-title">Analytic Data Tracker</div>
-        <p class="project-desc">
-          A web scraper and analytics tool that collects, processes, and visualizes structured data from
-          external sources. Built to explore real-world datasets — tracking trends, parsing outputs,
-          and surfacing insights through a clean dashboard interface.
-        </p>
-        <div class="project-stack">
-          <span class="tag">Java</span>
-          <span class="tag">Python</span>
-          <span class="tag">Web Scraping</span>
-          <span class="tag">Data Visualization</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">02</span>
-      <div class="project-body">
-        <div class="project-title">Cisco Packet Tracer — Network Configuration</div>
-        <p class="project-desc">
-          Designed and simulated a multi-device enterprise network topology using Cisco Packet Tracer.
-          Configured routers, switches, and end devices across segmented VLANs with static and dynamic
-          routing (RIP/OSPF). Implemented DHCP, DNS, and basic ACL-based access control policies.
-          Validated end-to-end connectivity through ping and traceroute diagnostics, and documented
-          the full network map with IP addressing schemes and device roles.
-        </p>
-        <div class="project-stack">
-          <span class="tag">Cisco Packet Tracer</span>
-          <span class="tag">VLAN</span>
-          <span class="tag">OSPF / RIP</span>
-          <span class="tag">DHCP / DNS</span>
-          <span class="tag">ACL</span>
-          <span class="tag">Network Topology</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">03</span>
-      <div class="project-body">
-        <div class="project-title">IP Log Pull &amp; Analysis</div>
-        <p class="project-desc">
-          Built a scripted utility to extract, parse, and analyze IP log data from network and system
-          sources. Automated the identification of anomalous traffic patterns, flagged suspicious
-          connections, and generated structured reports for review. Applied to real-world log files
-          to surface unauthorized access attempts and map activity timelines.
-        </p>
-        <div class="project-stack">
-          <span class="tag">Python</span>
-          <span class="tag">Log Parsing</span>
-          <span class="tag">Linux CLI</span>
-          <span class="tag">Network Security</span>
-          <span class="tag">SIEM</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">04</span>
-      <div class="project-body">
-        <div class="project-title">VMware Linux Installation &amp; Configuration</div>
-        <p class="project-desc">
-          Set up and configured a full Linux environment within VMware Workstation — including disk
-          partitioning, network adapter setup, and OS hardening post-install. Used the VM as a
-          development and security testing sandbox, running tools such as Wireshark, Nmap, and
-          custom Python scripts. Documented the full setup process for reproducibility.
-        </p>
-        <div class="project-stack">
-          <span class="tag">VMware</span>
-          <span class="tag">Linux</span>
-          <span class="tag">OS Hardening</span>
-          <span class="tag">Wireshark</span>
-          <span class="tag">Nmap</span>
-          <span class="tag">Virtualization</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">05</span>
-      <div class="project-body">
-        <div class="project-title">iPhone LCD Repair</div>
-        <p class="project-desc">
-          Performed hands-on iPhone screen replacements across multiple models — disassembling units,
-          safely disconnecting display assemblies, and installing aftermarket and OEM LCD panels.
-          Tested touch response, brightness calibration, and True Tone compatibility post-repair.
-          Handled multiple client devices with a clean success rate and zero data loss.
-        </p>
-        <div class="project-stack">
-          <span class="tag">iPhone Repair</span>
-          <span class="tag">LCD Replacement</span>
-          <span class="tag">Hardware Diagnostics</span>
-          <span class="tag">Component Sourcing</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">06</span>
-      <div class="project-body">
-        <div class="project-title">MacBook LCD &amp; Fan Repair</div>
-        <p class="project-desc">
-          Disassembled MacBook Pro and MacBook Air units to replace cracked or failing display panels
-          and worn cooling fans. Navigated Apple's proprietary component layouts, managed thermal
-          paste reapplication, and verified GPU thermal performance post-repair. Restored multiple
-          units to full working condition for personal and client use.
-        </p>
-        <div class="project-stack">
-          <span class="tag">MacBook Repair</span>
-          <span class="tag">LCD Replacement</span>
-          <span class="tag">Fan Replacement</span>
-          <span class="tag">Thermal Management</span>
-          <span class="tag">Apple Hardware</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">07</span>
-      <div class="project-body">
-        <div class="project-title">Computer Building &amp; Part Replacement</div>
-        <p class="project-desc">
-          Planned and assembled custom desktop PCs from scratch — selecting compatible components
-          (CPU, GPU, RAM, storage, PSU, cooling) and managing cable routing and airflow optimization.
-          Also performed targeted part replacements on existing systems: GPU swaps, RAM upgrades,
-          SSD migrations, and PSU replacements. Ran benchmarks and stress tests to validate stability.
-        </p>
-        <div class="project-stack">
-          <span class="tag">Custom PC Build</span>
-          <span class="tag">Component Compatibility</span>
-          <span class="tag">GPU / CPU Swap</span>
-          <span class="tag">SSD Migration</span>
-          <span class="tag">Benchmarking</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">08</span>
-      <div class="project-body">
-        <div class="project-title">Graphic Design — Small Business</div>
-        <p class="project-desc">
-          Brand identity and marketing material design for small businesses — logos, social media assets,
-          flyers, and visual collateral. Focused on clean, impactful visuals that communicate brand
-          personality at a glance.
-        </p>
-        <div class="project-stack">
-          <span class="tag">Canva</span>
-          <span class="tag">Photoshop</span>
-          <span class="tag">Illustrator</span>
-          <span class="tag">Brand Design</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">09</span>
-      <div class="project-body">
-        <div class="project-title">Video &amp; Film Production</div>
-        <p class="project-desc">
-          End-to-end video production for digital content — from scripting and footage editing to
-          motion graphics and final export. Spanning promotional content, personal projects,
-          and client deliverables.
-        </p>
-        <div class="project-stack">
-          <span class="tag">Premiere Pro</span>
-          <span class="tag">Canva Video</span>
-          <span class="tag">Motion Graphics</span>
-          <span class="tag">Audio</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">10</span>
-      <div class="project-body">
-        <div class="project-title">eBay Ecommerce — Collectors Listings</div>
-        <p class="project-desc">
-          Sourced, photographed, listed, and sold collectible electronics, vinyl records, and
-          miscellaneous items on eBay. Managed end-to-end listing workflow — item research,
-          competitive pricing, SEO-optimized descriptions, and buyer communication. Maintained
-          consistent seller ratings through accurate grading and reliable shipping.
-        </p>
-        <div class="project-stack">
-          <span class="tag">eBay</span>
-          <span class="tag">Ecommerce</span>
-          <span class="tag">Product Photography</span>
-          <span class="tag">Collectibles</span>
-          <span class="tag">Electronics</span>
-          <span class="tag">Vinyl / Misc</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-  </div>
-
-  <!-- ZACH/C0DES CALLOUT -->
-  <div class="zjim zcodes" id="study-library">
-    <div>
-      <div class="zjim-eyebrow">Featured Site</div>
-      <h3 class="zjim-title">Zach/<em>C0des</em></h3>
-      <p class="zjim-desc">
-        My public notebook — a searchable library of study guides, references, and tutorials
-        written by hand while working through IT, networking, cybersecurity, and web development.
-        Everything renders straight from markdown: search it, open it, copy what you need.
-        Built and maintained as I learn, free for anyone on the same path.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Study Guides</span>
-        <span class="tag">IT &amp; Networking</span>
-        <span class="tag">Cybersecurity</span>
-        <span class="tag">Web Development</span>
-        <span class="tag">Markdown</span>
-      </div>
-    </div>
-    <div class="zjim-cta">
-      <a href="https://zachc0des.github.io/Zachc0des-Portfolio/#/" target="_blank" rel="noopener" class="btn btn-cobalt">Open Zach/C0des ↗</a>
-      <span class="zjim-url">zachc0des.github.io/Zachc0des-Portfolio</span>
-    </div>
-  </div>
-
-  <!-- Z CONCEPTS CALLOUT -->
-  <div class="zjim zconcepts" id="z-concepts">
-    <div>
-      <div class="zjim-eyebrow">Featured Site</div>
-      <h3 class="zjim-title">Z·<em>Concepts</em></h3>
-      <p class="zjim-desc">
-        A slower, steadier perspective on easing into financial markets — built on six years of
-        study, patience, and knowing when to step away. Covers a personal framework of price
-        action review, back test simulation, order book analysis, and micro/macro analytics.
-        Observe first, simulate second, and only then consider real participation.
-        Educational content only — not financial advice.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Price Action</span>
-        <span class="tag">Back Testing</span>
-        <span class="tag">Order Book</span>
-        <span class="tag">Micro / Macro</span>
-        <span class="tag">Risk Management</span>
-        <span class="tag">Educational Only</span>
-      </div>
-    </div>
-    <div class="zjim-cta">
-      <a href="https://zachc0des.github.io/zconcepts/" target="_blank" rel="noopener" class="btn btn-amber">Open Z Concepts ↗</a>
-      <span class="zjim-url">zachc0des.github.io/zconcepts</span>
-    </div>
-  </div>
-
-  <!-- SIX CARDS CALLOUT -->
-  <div class="zjim sixcards" id="six-cards">
-    <div>
-      <div class="zjim-eyebrow">Featured Site</div>
-      <h3 class="zjim-title">Six·<em>Cards</em></h3>
-      <p class="zjim-desc">
-        Custom business cards that open doors — six signature styles for companies building
-        their brand and people building their careers. Every card ships as double-sided,
-        print-ready 300 DPI files with printing steps included, plus fully custom designs
-        built from scratch on request.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Business Cards</span>
-        <span class="tag">Brand Design</span>
-        <span class="tag">Print-Ready Files</span>
-        <span class="tag">Six Styles</span>
-        <span class="tag">Custom Design</span>
-      </div>
-    </div>
-    <div class="zjim-cta">
-      <a href="https://zachc0des.github.io/sixcards/" target="_blank" rel="noopener" class="btn btn-green">Open Six Cards ↗</a>
-      <span class="zjim-url">zachc0des.github.io/sixcards</span>
-    </div>
-  </div>
-
-  <!-- Z VAULT CALLOUT -->
-  <div class="zjim zvault" id="z-vault">
-    <div>
-      <div class="zjim-eyebrow">Featured Site</div>
-      <h3 class="zjim-title">Z·<em>Vault</em></h3>
-      <p class="zjim-desc">
-        The archive — a collection of visual artifacts filed by concept rather than by date.
-        Charts, dashboards, breakdowns, and reference visuals built while working through
-        markets, technology, and everything else worth mapping out. Open a concept, read
-        the artifact, flip the whole archive light or dark with one toggle.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Visual Artifacts</span>
-        <span class="tag">Filed by Concept</span>
-        <span class="tag">Dashboards</span>
-        <span class="tag">Research Visuals</span>
-        <span class="tag">Archive</span>
-      </div>
-    </div>
-    <div class="zjim-cta">
-      <a href="https://zachc0des.github.io/Zvault/" target="_blank" rel="noopener" class="btn btn-violet">Open Z Vault ↗</a>
-      <span class="zjim-url">zachc0des.github.io/Zvault</span>
-    </div>
-  </div>
-</section>
-
-<!-- AI STACK -->
-<section id="ai">
-  <div class="section-label">04 — AI Stack</div>
-
-  <div class="grid-frame cols-3">
-    <div class="cell ai-card">
-      <span class="ai-icon">◈</span>
-      <div class="ai-name">Claude</div>
-      <div class="ai-uses">
-        <div class="ai-use-item">Media creation &amp; content drafting</div>
-        <div class="ai-use-item">Code &amp; application building</div>
-        <div class="ai-use-item">Document review &amp; analysis</div>
-        <div class="ai-use-item">Debugging &amp; problem-solving</div>
-      </div>
-      <div class="ai-credential">
-        <div class="ai-credential-label">Certified — Anthropic</div>
-        <div class="skill-tags" style="margin-top:0;">
-          <span class="tag">Claude 101</span>
-          <span class="tag">AI Fluency: Framework &amp; Foundations</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="cell ai-card">
-      <span class="ai-icon">◇</span>
-      <div class="ai-name">Google Gemini</div>
-      <div class="ai-uses">
-        <div class="ai-use-item">Project organization &amp; planning</div>
-        <div class="ai-use-item">Data analysis &amp; interpretation</div>
-        <div class="ai-use-item">Code &amp; application building</div>
-        <div class="ai-use-item">Debugging workflows</div>
-      </div>
-    </div>
-
-    <div class="cell ai-card">
-      <span class="ai-icon">○</span>
-      <div class="ai-name">ChatGPT</div>
-      <div class="ai-uses">
-        <div class="ai-use-item">Research &amp; ideation</div>
-        <div class="ai-use-item">Writing assistance</div>
-        <div class="ai-use-item">Code generation &amp; review</div>
-        <div class="ai-use-item">Workflow automation</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CERTIFICATIONS -->
-<section id="certifications">
-  <div class="section-label">05 — Certifications</div>
-
-  <div class="cert-list">
-    <div class="cert-item">
-      <div class="cert-issuer">Anthropic</div>
-      <div>
-        <div class="cert-name">Claude 101 &nbsp;·&nbsp; AI Fluency: Framework &amp; Foundations</div>
-        <p class="cert-detail">
-          Working knowledge of prompting, context management, and applied AI workflows —
-          plus the four-part AI Fluency framework (Delegation, Description, Discernment, Diligence)
-          for using AI systems responsibly in professional settings.
-        </p>
-      </div>
-    </div>
-
-    <div class="cert-item">
-      <div class="cert-issuer">Google</div>
-      <div>
-        <div class="cert-name">Cybersecurity Professional Certificate</div>
-        <p class="cert-detail">
-          Foundations of Cybersecurity · Network Security · Linux &amp; SQL ·
-          Asset, Threat &amp; Vulnerability Management · SIEM &amp; IDS Tools ·
-          Python Automation · Cybersecurity Job Readiness.
-        </p>
-      </div>
-    </div>
-
-    <div class="cert-item">
-      <div class="cert-issuer">Google</div>
-      <div>
-        <div class="cert-name">Technical Support Fundamentals</div>
-        <p class="cert-detail">
-          Operating systems, troubleshooting methodology, customer care, and system administration.
-        </p>
-      </div>
-    </div>
-
-    <div class="cert-item">
-      <div class="cert-issuer">IBM SkillsBuild</div>
-      <div>
-        <div class="cert-name">Introduction to Data Concepts</div>
-        <p class="cert-detail">
-          Core data literacy — data types, structures, storage, and how organizations turn raw data
-          into decisions. Issued 2026.
-        </p>
-      </div>
-    </div>
-
-    <div class="cert-item">
-      <div class="cert-issuer">IBM SkillsBuild</div>
-      <div>
-        <div class="cert-name">Data Science in Our World</div>
-        <p class="cert-detail">
-          Applied data science fundamentals — the data lifecycle, real-world use cases,
-          and how analysis drives outcomes across industries.
-        </p>
-      </div>
-    </div>
-
-    <div class="cert-item">
-      <div class="cert-issuer">OPAC TestGenius</div>
-      <div>
-        <div class="cert-name">Data Entry, Financial Record Keeping &amp; Microsoft Office</div>
-        <p class="cert-detail">
-          Data entry and keyboarding · Financial record keeping (bank deposits, bank reconciliation,
-          petty cash) · Microsoft Office testing — Excel 2019 (Basic &amp; Intermediate) and PowerPoint 2019.
-        </p>
-      </div>
-    </div>
-
-    <div class="cert-item">
-      <div class="cert-issuer">OSHA</div>
-      <div>
-        <div class="cert-name">10-Hour Construction Safety</div>
-        <p class="cert-detail">
-          Hazard recognition, fall protection, electrical safety, and OSHA standards for
-          construction environments.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- HEALTH & FITNESS -->
-<section id="fitness">
-  <div class="section-label">06 — Health &amp; Fitness</div>
-
-  <div class="fitness-intro">
-    <h2 class="about-heading" style="font-size:34px;margin-bottom:0;">Discipline<br /><em>extends beyond the desk.</em></h2>
-    <p class="card-copy" style="font-size:12px;">
-      Same method, different gym. Track the inputs, watch the outputs, adjust, repeat.
-      Training is where I test whether a system actually holds up over months instead of sprints.
-    </p>
-  </div>
-
-  <div class="grid-frame cols-2">
-    <div class="cell fitness-card">
-      <div class="fitness-card-title">Training Philosophy</div>
-      <p class="fitness-text">
-        Fitness has always been a system — inputs, outputs, and iteration.<br /><br />
-        I approach training the same way I approach tech: with consistency,
-        data, and a drive to improve. Former Planet Fitness crew member,
-        now an independent lifter focused on strength and long-term health.
-      </p>
-    </div>
-
-    <div class="cell fitness-card">
-      <div class="fitness-card-title">Active Pursuits</div>
-      <p class="fitness-text">
-        Weightlifting &amp; resistance training<br />
-        Body composition &amp; performance tracking<br />
-        Nutrition awareness &amp; habit building<br />
-        Staying mobile — walks, activity, recovery<br />
-        Health as a long-term investment
-      </p>
-    </div>
-  </div>
-
-  <div class="grid-frame cols-3" style="margin-top:1px;">
-    <div class="cell fitness-stat">
-      <div class="fitness-stat-label">Focus</div>
-      <div class="fitness-stat-value">Strength &amp; Hypertrophy</div>
-    </div>
-    <div class="cell fitness-stat">
-      <div class="fitness-stat-label">Background</div>
-      <div class="fitness-stat-value">Planet Fitness Staff</div>
-    </div>
-    <div class="cell fitness-stat">
-      <div class="fitness-stat-label">Approach</div>
-      <div class="fitness-stat-value">Data-Driven Consistency</div>
-    </div>
-  </div>
-
-  <!-- ZJIM CALLOUT -->
-  <div class="zjim">
-    <div>
-      <div class="zjim-eyebrow">Companion Site</div>
-      <h3 class="zjim-title">Z.<em>JIM</em></h3>
-      <p class="zjim-desc">
-        Everything I lift, film, and steal from Pinterest lives here — gym pics, form breakdowns,
-        the apps I actually use, and the gear worth buying.
-      </p>
-    </div>
-    <div class="zjim-cta">
-      <a href="https://zachc0des.github.io/zjim/" target="_blank" rel="noopener" class="btn btn-iron">Open Z.JIM ↗</a>
-      <span class="zjim-url">zachc0des.github.io/zjim</span>
-    </div>
-  </div>
-</section>
-
-<!-- CONTACT -->
-<section id="contact">
-  <div class="section-label">07 — Contact</div>
-  <div class="contact-row">
-    <div>
-      <h2 class="contact-heading">Let's<br /><em>connect.</em></h2>
-    </div>
-    <div class="contact-links">
-      <a href="mailto:zfrederic00@outlook.com" class="contact-link">
-        <span>EMAIL</span> zfrederic00@outlook.com
-      </a>
-      <a href="tel:4077208907" class="contact-link">
-        <span>PHONE</span> 407-720-8907
-      </a>
-      <a href="https://github.com/Zachc0des" target="_blank" rel="noopener" class="contact-link">
-        <span>GITHUB</span> github.com/Zachc0des
-      </a>
-      <a href="https://zachc0des.github.io/Zachc0des-Portfolio/#/" target="_blank" rel="noopener" class="contact-link">
-        <span>ZACH/C0DES</span> zachc0des.github.io/Zachc0des-Portfolio
-      </a>
-      <a href="https://zachc0des.github.io/zconcepts/" target="_blank" rel="noopener" class="contact-link">
-        <span>Z CONCEPTS</span> zachc0des.github.io/zconcepts
-      </a>
-      <a href="https://zachc0des.github.io/sixcards/" target="_blank" rel="noopener" class="contact-link">
-        <span>SIX CARDS</span> zachc0des.github.io/sixcards
-      </a>
-      <a href="https://zachc0des.github.io/Zvault/" target="_blank" rel="noopener" class="contact-link">
-        <span>Z VAULT</span> zachc0des.github.io/Zvault
-      </a>
-      <a href="https://zachc0des.github.io/zjim/" target="_blank" rel="noopener" class="contact-link">
-        <span>Z.JIM</span> zachc0des.github.io/zjim
-      </a>
-      <span class="contact-link">
-        <span>LOCATION</span> Palm Beach &amp; Orlando, FL
-      </span>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <span>© 2026 Zachary Frederic</span>
-  <span>IT · Design · Development · <a href="https://zachc0des.github.io/Zachc0des-Portfolio/#/" target="_blank" rel="noopener">Zach/C0des</a> · <a href="https://zachc0des.github.io/zconcepts/" target="_blank" rel="noopener">Z Concepts</a> · <a href="https://zachc0des.github.io/sixcards/" target="_blank" rel="noopener">Six Cards</a> · <a href="https://zachc0des.github.io/Zvault/" target="_blank" rel="noopener">Z Vault</a> · <a href="https://zachc0des.github.io/zjim/" target="_blank" rel="noopener">Z.JIM</a></span>
-</footer>
+<main id="app"></main>
 
 <script>
-  /* ─── LIVE WAVE FIELD ─── */
-  (function () {
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const canvas = document.getElementById('waves');
-    if (!canvas || prefersReduced) return;
+/* ============================================================
+   Z VAULT — data
+   Edit the two arrays below to change what the vault holds.
+   Full field reference lives in README.md.
+   ============================================================ */
 
-    const ctx = canvas.getContext('2d');
-    let w = 0, h = 0, dpr = 1, t = 0, raf = null;
-    let pointer = 0.5;
+const CATEGORIES = [
+  { id:"silicon",    code:"ZV-01", name:"Silicon & Compute",     pattern:3, blurb:"Fabs, nodes, accelerators, and the supply chain beneath them." },
+  { id:"protocols",  code:"ZV-02", name:"Protocols & Networks",  pattern:4, blurb:"Chains, rails, standards, and the rules they encode." },
+  { id:"systems",    code:"ZV-03", name:"Systems & Architecture",pattern:5, blurb:"Blueprints, wiring, topologies, and how parts fit." },
+  { id:"ai",         code:"ZV-04", name:"AI Concepts",           pattern:6, blurb:"Models, training, agents, and the infrastructure carrying them." },
+  { id:"interface",  code:"ZV-05", name:"Interface & Type",      pattern:7, blurb:"Layout studies, type specimens, and screen craft." },
+  { id:"management", code:"ZV-06", name:"Business & IT Management", pattern:1, blurb:"Operations, governance, service delivery, and how work is run." },
+  { id:"psychology", code:"ZV-07", name:"Psychology & Health",     pattern:2, blurb:"Mind, behavior, physiology, and what keeps a person running." },
+  { id:"field",      code:"ZV-08", name:"Field Notes",           pattern:8, blurb:"Unfiled work. Everything before it earns a shelf." }
+];
 
-    function resize() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = canvas.clientWidth;
-      h = canvas.clientHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
+/* Artifacts are added here by hand — there is no upload path.
+   Shape:
+   {
+     id:"unique-slug",          // becomes the URL: #/a/unique-slug
+     category:"silicon",        // must match a CATEGORIES id
+     title:"Plate title",
+     date:"2026-08-22",         // YYYY-MM-DD
+     summary:"One line on what this shows.",
+     tags:["one","two"],
+     source:{ type:"file",   path:"artifacts/my-plate.html" }   // local html file
+     // source:{ type:"image",  path:"artifacts/my-chart.png" }  // png / jpg / svg file
+     // source:{ type:"inline", html:"<svg …></svg>" }           // markup written inline
+   }
+*/
+const ARTIFACTS = [];
 
-    const LINES = 7;
+/* ============================================================
+   Below this line is the machine. You shouldn't need to touch it.
+   ============================================================ */
 
-    function draw() {
-      ctx.clearRect(0, 0, w, h);
+const app  = document.getElementById("app");
+const crumbEl = document.getElementById("crumb");
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const cat = id => CATEGORIES.find(c=>c.id===id);
+const inCat = id => ARTIFACTS.filter(a=>a.category===id);
+const accession = a => {
+  const c = cat(a.category);
+  const n = String(inCat(a.category).indexOf(a)+1).padStart(3,"0");
+  return (c?c.code:"ZV-XX")+" · "+n;
+};
+const fmtDate = d => {
+  if(!d) return "undated";
+  const t = new Date(d+"T00:00:00");
+  return isNaN(t) ? esc(d) : t.toLocaleDateString("en-US",{year:"numeric",month:"short",day:"2-digit"});
+};
 
-      for (let i = 0; i < LINES; i++) {
-        const phase = i * 0.55;
-        const amp = 26 + i * 14;
-        const baseY = h * 0.5 + (i - LINES / 2) * (h * 0.055);
-        const drift = (pointer - 0.5) * 40;
+/* --- mode --- */
+const root = document.documentElement;
+try{ if(localStorage.getItem("zvault-mode")==="inverted") root.dataset.mode="inverted"; }catch(e){}
+document.getElementById("mode").addEventListener("click",()=>{
+  const next = root.dataset.mode==="inverted" ? "" : "inverted";
+  if(next) root.dataset.mode = next; else root.removeAttribute("data-mode");
+  try{ localStorage.setItem("zvault-mode",next||"normal"); }catch(e){}
+});
 
-        ctx.beginPath();
-        for (let x = 0; x <= w; x += 8) {
-          const y =
-            baseY +
-            Math.sin(x * 0.0032 + t + phase) * amp +
-            Math.sin(x * 0.0011 - t * 0.65 + phase) * (amp * 0.5) +
-            drift * Math.sin(x * 0.002 + phase);
-          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.strokeStyle = 'rgba(10,10,10,' + (0.055 - i * 0.005).toFixed(3) + ')';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
+/* --- views --- */
+function viewIndex(query=""){
+  const q = query.trim().toLowerCase();
+  const list = q
+    ? CATEGORIES.filter(c=>(c.name+" "+c.code+" "+c.blurb).toLowerCase().includes(q)
+        || inCat(c.id).some(a=>(a.title+" "+(a.tags||[]).join(" ")).toLowerCase().includes(q)))
+    : CATEGORIES;
+  const total = ARTIFACTS.length;
 
-      t += 0.0035;
-      raf = requestAnimationFrame(draw);
-    }
+  return `
+  <section class="hero">
+    <h1 class="reveal">Z&nbsp;<em>Vault</em></h1>
+    <p class="lede reveal" style="animation-delay:.08s">Welcome in. A collection of visual artifacts, filed by concept — pick a shelf and have a look around.</p>
+    <div class="meta mono reveal" style="animation-delay:.14s">
+      <span>${CATEGORIES.length} shelves</span>
+      <span>${total} ${total===1?"artifact":"artifacts"}</span>
+      <span>Est. ${new Date().getFullYear()}</span>
+    </div>
+    <div class="finder reveal" style="animation-delay:.2s">
+      <span class="mono">Find</span>
+      <input id="q" type="search" placeholder="Shelf, title, or tag" value="${esc(query)}" autocomplete="off">
+      <span class="key mono">/</span>
+    </div>
+  </section>
 
-    window.addEventListener('resize', resize);
-    window.addEventListener('mousemove', (e) => {
-      pointer = e.clientX / window.innerWidth;
-    }, { passive: true });
+  <section class="section">
+    <div class="section-head mono"><span>Shelves</span><span>${list.length} shown</span></div>
+    ${list.length ? `<div class="grid">${list.map(plate).join("")}</div>` : `
+      <div class="empty">
+        <h3>No shelf matches that</h3>
+        <p>Clear the field to see the full index, or add a shelf in the <code>CATEGORIES</code> array.</p>
+      </div>`}
+  </section>
 
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        cancelAnimationFrame(raf);
-      } else {
-        raf = requestAnimationFrame(draw);
-      }
+  ${colophon()}`;
+}
+
+function plate(c){
+  const n = inCat(c.id).length;
+  return `
+  <a class="plate pt pt${c.pattern}" href="#/c/${esc(c.id)}" style="--tilt:${(c.pattern%2?1:-1)*(3+c.pattern)}deg">
+    <span class="count mono">${n}</span>
+    <span class="face" aria-hidden="true"></span>
+    <span class="body">
+      <span class="code mono">${esc(c.code)}</span>
+      <span class="name">${esc(c.name)}</span>
+      <p class="blurb">${esc(c.blurb)}</p>
+    </span>
+  </a>`;
+}
+
+function viewCategory(id){
+  const c = cat(id);
+  if(!c) return viewMissing("That shelf isn't in the index.");
+  const items = inCat(id);
+  return `
+  <section class="page-head">
+    <a class="back mono" href="#/">← Index</a>
+    <div class="mono" style="color:var(--muted)">${esc(c.code)} · ${items.length} ${items.length===1?"artifact":"artifacts"}</div>
+    <h2>${esc(c.name)}</h2>
+    <p>${esc(c.blurb)}</p>
+  </section>
+  <section class="section">
+    ${items.length ? `
+      <div class="section-head mono"><span>Holdings</span><span>Accession · Title · Summary · Date</span></div>
+      <div class="thumbs">${items.map(a=>thumb(a)).join("")}</div>
+    ` : emptyShelf(c)}
+  </section>
+  ${colophon()}`;
+}
+
+function thumb(a){
+  const s = a.source||{};
+  let shot = "";
+  if(s.type==="image") shot = `<img src="${esc(s.path)}" alt="">`;
+  else if(s.type==="file") shot = `<iframe data-scale src="${esc(s.path)}" loading="lazy" tabindex="-1" title=""></iframe>`;
+  else if(s.type==="inline") shot = `<iframe data-scale srcdoc="${esc(s.html)}" loading="lazy" tabindex="-1" title=""></iframe>`;
+  return `
+  <a class="thumb" href="#/a/${esc(a.id)}">
+    <span class="shot">${shot}</span>
+    <span class="cap">
+      <span class="mono" style="color:var(--muted)">${esc(accession(a))} · ${fmtDate(a.date)}</span>
+      <span class="t">${esc(a.title)}</span>
+    </span>
+  </a>`;
+}
+
+function emptyShelf(c){
+  return `
+  <div class="empty">
+    <h3>This shelf is empty</h3>
+    <p>Artifacts are placed by hand. Open <code style="font-family:var(--mono);font-size:.8rem">index.html</code>, find the <code style="font-family:var(--mono);font-size:.8rem">ARTIFACTS</code> array, and add an entry with <code style="font-family:var(--mono);font-size:.8rem">category: "${esc(c.id)}"</code>.</p>
+    <pre>{
+  id: "${esc(c.id)}-001",
+  category: "${esc(c.id)}",
+  title: "Working title",
+  date: "${new Date().toISOString().slice(0,10)}",
+  summary: "One line on what this shows.",
+  tags: ["draft"],
+  source: { type: "file", path: "artifacts/${esc(c.id)}-001.html" }
+}</pre>
+    <div class="slots" aria-hidden="true">
+      ${Array.from({length:8},(_,i)=>`<span class="slot">${String(i+1).padStart(3,"0")}</span>`).join("")}
+    </div>
+  </div>`;
+}
+
+function viewArtifact(id){
+  const a = ARTIFACTS.find(x=>x.id===id);
+  if(!a) return viewMissing("That artifact isn't in the vault.");
+  const c = cat(a.category);
+  const s = a.source||{};
+  let stage = `<div class="mono" style="color:var(--muted)">No source attached</div>`;
+  if(s.type==="image") stage = `<img src="${esc(s.path)}" alt="${esc(a.title)}">`;
+  else if(s.type==="file") stage = `<iframe src="${esc(s.path)}" title="${esc(a.title)}"></iframe>`;
+  else if(s.type==="inline") stage = `<iframe srcdoc="${esc(s.html)}" title="${esc(a.title)}"></iframe>`;
+  return `
+  <section class="viewer">
+    <div class="stage">${stage}</div>
+    <aside class="side">
+      <a class="back mono" href="#/c/${esc(a.category)}">← ${esc(c?c.name:"Index")}</a>
+      <div class="mono" style="color:var(--muted);margin-top:10px">${esc(accession(a))}</div>
+      <h2>${esc(a.title)}</h2>
+      <dl>
+        <dt class="mono">Shelf</dt><dd>${esc(c?c.name:"Unfiled")}</dd>
+        <dt class="mono">Dated</dt><dd>${fmtDate(a.date)}</dd>
+        <dt class="mono">Summary</dt><dd>${esc(a.summary||"—")}</dd>
+        <dt class="mono">Tags</dt><dd>${(a.tags&&a.tags.length)?a.tags.map(t=>esc(t)).join(", "):"—"}</dd>
+        <dt class="mono">Source</dt><dd style="font-family:var(--mono);font-size:.72rem;word-break:break-all">${esc(s.path||s.type||"—")}</dd>
+      </dl>
+    </aside>
+  </section>`;
+}
+
+function viewMissing(msg){
+  return `
+  <section class="page-head">
+    <a class="back mono" href="#/">← Index</a>
+    <h2>Not found</h2>
+    <p>${esc(msg)} Check the id in the address, or return to the index.</p>
+  </section>
+  ${colophon()}`;
+}
+
+function colophon(){
+  return `
+  <footer class="colophon">
+    <div>
+      <h4>Z Vault</h4>
+      <p>Visual artifacts, kept in one place and filed by concept. Built as a single static page.</p>
+    </div>
+    <div>
+      <h4>Adding work</h4>
+      <p>Entries are written into the <code>ARTIFACTS</code> array in <code>index.html</code>. There is no upload form by design.</p>
+    </div>
+    <div>
+      <h4>Shortcuts</h4>
+      <p><code>/</code> jump to find · <code>Esc</code> clear find · <code>Invert</code> flips the page</p>
+    </div>
+    <div>
+      <h4>Set in</h4>
+      <p>Cormorant Garamond &amp; Share Tech Mono. Two values only: paper and ink.</p>
+    </div>
+  </footer>`;
+}
+
+/* --- router --- */
+let searchQuery = "";
+function render(){
+  const h = (location.hash||"#/").replace(/^#/,"");
+  const parts = h.split("/").filter(Boolean);
+  let html, crumb;
+  if(parts[0]==="c" && parts[1]){ const c=cat(parts[1]); html=viewCategory(parts[1]); crumb=c?`${c.code} / ${c.name}`:"Not found"; }
+  else if(parts[0]==="a" && parts[1]){ const a=ARTIFACTS.find(x=>x.id===parts[1]); html=viewArtifact(parts[1]); crumb=a?a.title:"Not found"; }
+  else { html=viewIndex(searchQuery); crumb="Index"; }
+  app.innerHTML = html;
+  crumbEl.textContent = crumb;
+  document.title = crumb==="Index" ? "Z VAULT — visual artifact archive" : "Z VAULT — "+crumb;
+  wire();
+  window.scrollTo(0,0);
+}
+
+function wire(){
+  const q = document.getElementById("q");
+  if(q){
+    q.addEventListener("input",e=>{
+      searchQuery = e.target.value;
+      const pos = e.target.selectionStart;
+      render();
+      const nq = document.getElementById("q");
+      if(nq){ nq.focus(); try{ nq.setSelectionRange(pos,pos); }catch(_){} }
     });
-
-    resize();
-    draw();
-  })();
-
-  /* ─── SCROLL REVEAL ─── */
-  (function () {
-    const items = document.querySelectorAll(
-      '.skill-card, .project-item, .ai-card, .fitness-card, .fitness-stat, .fact-row, .cert-item, .zjim'
-    );
-
-    if (!('IntersectionObserver' in window)) return;
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry, i) => {
-        if (entry.isIntersecting) {
-          entry.target.style.animation = 'fadeUp 0.6s ' + (i * 0.05) + 's cubic-bezier(0.22,1,0.36,1) both';
-          entry.target.style.opacity = '1';
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.08 });
-
-    items.forEach((el) => {
-      el.style.opacity = '0';
-      observer.observe(el);
-    });
-  })();
-
-  /* ─── ACTIVE NAV LINK ─── */
-  (function () {
-    const sections = document.querySelectorAll('section, #home');
-    const navLinks = document.querySelectorAll('.nav-links a');
-    let ticking = false;
-
-    function update() {
-      let current = '';
-      sections.forEach((sec) => {
-        if (window.scrollY >= sec.offsetTop - 120) current = sec.id;
-      });
-      navLinks.forEach((a) => {
-        const isActive = a.getAttribute('href') === '#' + current;
-        if (a.classList.contains('health-link')) {
-          a.style.color = isActive ? '#6b1a1a' : '';
-        } else {
-          a.style.color = isActive ? 'var(--ink)' : '';
-        }
-      });
-      ticking = false;
-    }
-
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        window.requestAnimationFrame(update);
-        ticking = true;
-      }
-    }, { passive: true });
-  })();
-</script>
-</body>
-</html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zachary Frederic — IT Management, Development & Design</title>
-  <meta name="description" content="Zachary Frederic — IT professional, developer, and creative technologist based in Palm Beach & Orlando, FL." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #ffffff;
-      --ink: #0a0a0a;
-      --grey: #4a4a4a;
-      --dim: #9a9a9a;
-      --accent: #1a1a1a;
-      --border: rgba(0,0,0,0.12);
-      --hair: rgba(0,0,0,0.07);
-      --card-bg: #f6f5f3;
-      --card-hover: #efedea;
-      --nav-bg: rgba(255,255,255,0.82);
-      --tag-border: #c4c4c4;
-      --tag-color: #555;
-      --iron: #8b2c2c;
-      --cobalt: #1e44c2;
-      --cobalt-dark: #142e8a;
-      --green: #1c7a45;
-      --green-dark: #10552e;
-      --amber: #a16207;
-      --amber-dark: #7a4a05;
-      --violet: #5b21b6;
-      --violet-dark: #3f1580;
-      --ease: cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--ink);
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 13px;
-      line-height: 1.8;
-      cursor: crosshair;
-      overflow-x: hidden;
-    }
-
-    /* ─── LIVE WAVE FIELD (signature) ─── */
-    #waves {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    /* ─── NOISE OVERLAY ─── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9999;
-      opacity: 0.35;
-    }
-
-    a:focus-visible, button:focus-visible {
-      outline: 1px solid var(--ink);
-      outline-offset: 4px;
-    }
-
-    /* ─── NAV ─── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-      padding: 20px 48px;
-      background: var(--nav-bg);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav-logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 18px;
-      font-weight: 300;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--ink);
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 30px;
-      list-style: none;
-      align-items: center;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .nav-links a {
-      color: var(--grey);
-      text-decoration: none;
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      transition: color 0.3s var(--ease);
-      position: relative;
-      white-space: nowrap;
-    }
-
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -4px; left: 0;
-      width: 0; height: 1px;
-      background: var(--ink);
-      transition: width 0.35s var(--ease);
-    }
-
-    .nav-links a:hover { color: var(--ink); }
-    .nav-links a:hover::after { width: 100%; }
-
-    .nav-links a.health-link { color: var(--iron); }
-    .nav-links a.health-link::after { background: var(--iron); }
-    .nav-links a.health-link:hover { color: #6b1a1a; }
-
-    .nav-links a.study-link { color: var(--cobalt); }
-    .nav-links a.study-link::after { background: var(--cobalt); }
-    .nav-links a.study-link:hover { color: var(--cobalt-dark); }
-
-    .nav-links a.concepts-link { color: var(--amber); }
-    .nav-links a.concepts-link::after { background: var(--amber); }
-    .nav-links a.concepts-link:hover { color: var(--amber-dark); }
-
-    .nav-links a.cards-link { color: var(--green); }
-    .nav-links a.cards-link::after { background: var(--green); }
-    .nav-links a.cards-link:hover { color: var(--green-dark); }
-
-    .nav-links a.vault-link { color: var(--violet); }
-    .nav-links a.vault-link::after { background: var(--violet); }
-    .nav-links a.vault-link:hover { color: var(--violet-dark); }
-
-    /* ─── HERO ─── */
-    #home {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 140px 48px 90px;
-      position: relative;
-      max-width: 1100px;
-      margin: 0 auto;
-      z-index: 1;
-    }
-
-    .hero-tag {
-      font-size: 10px;
-      letter-spacing: 0.4em;
-      color: var(--grey);
-      text-transform: uppercase;
-      margin-bottom: 26px;
-      animation: fadeUp 0.9s var(--ease) both;
-    }
-
-    .status-dot {
-      display: inline-block;
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--ink);
-      margin-right: 8px;
-      vertical-align: middle;
-      animation: blink 2.4s ease-in-out infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.18; }
-    }
-
-    .hero-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(60px, 8.5vw, 124px);
-      font-weight: 300;
-      line-height: 0.94;
-      letter-spacing: -0.025em;
-      margin-bottom: 30px;
-      animation: fadeUp 0.9s 0.1s var(--ease) both;
-    }
-
-    .hero-name em {
-      font-style: italic;
-      color: var(--grey);
-    }
-
-    .hero-desc {
-      max-width: 460px;
-      color: var(--grey);
-      font-size: 12px;
-      line-height: 2.1;
-      letter-spacing: 0.05em;
-      margin-bottom: 44px;
-      animation: fadeUp 0.9s 0.2s var(--ease) both;
-    }
-
-    .hero-links {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      animation: fadeUp 0.9s 0.3s var(--ease) both;
-    }
-
-    .btn {
-      display: inline-block;
-      padding: 12px 28px;
-      font-family: 'Share Tech Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      text-decoration: none;
-      transition: all 0.35s var(--ease);
-      cursor: crosshair;
-      background: transparent;
-    }
-
-    .btn-outline {
-      border: 1px solid var(--ink);
-      color: var(--ink);
-    }
-
-    .btn-outline:hover {
-      background: var(--ink);
-      color: var(--bg);
-    }
-
-    .btn-ghost {
-      border: 1px solid var(--tag-border);
-      color: var(--grey);
-    }
-
-    .btn-ghost:hover {
-      border-color: var(--ink);
-      color: var(--ink);
-    }
-
-    .btn-iron {
-      border: 1px solid var(--iron);
-      color: var(--iron);
-    }
-
-    .btn-iron:hover {
-      background: var(--iron);
-      color: #fff;
-    }
-
-    .btn-cobalt {
-      border: 1px solid var(--cobalt);
-      color: var(--cobalt);
-    }
-
-    .btn-cobalt:hover {
-      background: var(--cobalt);
-      color: #fff;
-    }
-
-    .btn-green {
-      border: 1px solid var(--green);
-      color: var(--green);
-    }
-
-    .btn-green:hover {
-      background: var(--green);
-      color: #fff;
-    }
-
-    .btn-amber {
-      border: 1px solid var(--amber);
-      color: var(--amber);
-    }
-
-    .btn-amber:hover {
-      background: var(--amber);
-      color: #fff;
-    }
-
-    .btn-violet {
-      border: 1px solid var(--violet);
-      color: var(--violet);
-    }
-
-    .btn-violet:hover {
-      background: var(--violet);
-      color: #fff;
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(22px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ─── TICKER ─── */
-    .ticker {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      overflow: hidden;
-      white-space: nowrap;
-      padding: 12px 0;
-      position: relative;
-      z-index: 1;
-      background: rgba(255,255,255,0.55);
-    }
-
-    .ticker-track {
-      display: inline-block;
-      animation: scroll-left 38s linear infinite;
-    }
-
-    .ticker-track span {
-      font-size: 10px;
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-      color: var(--dim);
-      padding: 0 22px;
-    }
-
-    .ticker-track span::before {
-      content: '◦ ';
-      color: var(--tag-border);
-    }
-
-    @keyframes scroll-left {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-
-    /* ─── SECTIONS ─── */
-    section {
-      padding: 100px 48px;
-      border-top: 1px solid var(--hair);
-      max-width: 1100px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
-
-    .section-label {
-      font-size: 10px;
-      letter-spacing: 0.4em;
-      color: var(--grey);
-      text-transform: uppercase;
-      margin-bottom: 56px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .section-label::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-      max-width: 90px;
-    }
-
-    /* ─── ABOUT ─── */
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-    }
-
-    .about-heading {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 38px;
-      font-weight: 300;
-      line-height: 1.2;
-      margin-bottom: 28px;
-      letter-spacing: -0.01em;
-    }
-
-    .about-heading em { font-style: italic; color: var(--grey); }
-
-    .about-text {
-      color: var(--grey);
-      font-size: 12px;
-      line-height: 2.1;
-      letter-spacing: 0.04em;
-    }
-
-    .about-text + .about-text { margin-top: 22px; }
-
-    .about-facts { display: flex; flex-direction: column; }
-
-    .fact-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 20px;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .fact-key {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--dim);
-      white-space: nowrap;
-    }
-
-    .fact-val {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 16px;
-      font-weight: 300;
-      color: var(--accent);
-      text-align: right;
-      line-height: 1.6;
-    }
-
-    /* ─── CARD GRIDS (shared) ─── */
-    /* Hairlines are drawn per-cell so leftover grid cells stay empty
-       instead of rendering as a grey box. */
-    .grid-frame {
-      display: grid;
-      gap: 1px;
-      background: transparent;
-      border: 0;
-    }
-
-    .cols-2 { grid-template-columns: repeat(2, 1fr); }
-    .cols-3 { grid-template-columns: repeat(3, 1fr); }
-    .cols-auto { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
-
-    .cell {
-      background: var(--card-bg);
-      box-shadow: 0 0 0 1px var(--border);
-      transition: background 0.35s var(--ease);
-    }
-
-    .cell:hover { background: var(--card-hover); }
-
-    /* ─── SKILLS ─── */
-    .skill-card {
-      padding: 36px 32px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .skill-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 2px; height: 0;
-      background: var(--ink);
-      transition: height 0.45s var(--ease);
-    }
-
-    .skill-card:hover::before { height: 100%; }
-
-    .skill-cat {
-      font-size: 9px;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--dim);
-      margin-bottom: 14px;
-    }
-
-    .skill-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 22px;
-      font-weight: 300;
-      margin-bottom: 14px;
-      color: var(--ink);
-    }
-
-    .card-copy {
-      color: var(--grey);
-      font-size: 11px;
-      line-height: 1.95;
-    }
-
-    .skill-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 16px;
-    }
-
-    .tag {
-      font-size: 9px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      padding: 4px 10px;
-      border: 1px solid var(--tag-border);
-      color: var(--tag-color);
-      transition: all 0.25s var(--ease);
-    }
-
-    .cell:hover .tag {
-      border-color: var(--grey);
-      color: var(--accent);
-    }
-
-    /* ─── TOOLS ─── */
-    .tools-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 28px;
-    }
-
-    .tool-chip {
-      padding: 8px 16px;
-      border: 1px solid var(--tag-border);
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      color: var(--grey);
-      transition: all 0.28s var(--ease);
-      cursor: default;
-    }
-
-    .tool-chip:hover {
-      border-color: var(--ink);
-      color: var(--ink);
-      transform: translateY(-2px);
-    }
-
-    .tools-section-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 16px;
-      font-weight: 300;
-      color: var(--grey);
-      margin: 36px 0 16px;
-      letter-spacing: 0.05em;
-    }
-
-    /* ─── PROJECTS ─── */
-    .projects-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-    }
-
-    .project-item {
-      background: var(--card-bg);
-      padding: 44px 40px;
-      display: grid;
-      grid-template-columns: 60px 1fr auto;
-      gap: 32px;
-      align-items: start;
-      transition: background 0.35s var(--ease);
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .project-item:hover { background: var(--card-hover); }
-
-    .project-num {
-      font-size: 11px;
-      color: var(--dim);
-      letter-spacing: 0.1em;
-      padding-top: 6px;
-    }
-
-    .project-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 28px;
-      font-weight: 300;
-      margin-bottom: 10px;
-      line-height: 1.2;
-    }
-
-    .project-desc {
-      color: var(--grey);
-      font-size: 11px;
-      line-height: 1.95;
-      max-width: 580px;
-      margin-bottom: 18px;
-    }
-
-    .project-stack {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .project-arrow {
-      font-size: 20px;
-      color: var(--dim);
-      transition: all 0.35s var(--ease);
-      align-self: center;
-    }
-
-    .project-item:hover .project-arrow {
-      color: var(--ink);
-      transform: translateX(5px);
-    }
-
-    /* ─── AI STACK ─── */
-    .ai-card { padding: 44px 36px; }
-
-    .ai-icon {
-      font-size: 26px;
-      margin-bottom: 18px;
-      display: block;
-      color: var(--accent);
-    }
-
-    .ai-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 26px;
-      font-weight: 300;
-      margin-bottom: 14px;
-    }
-
-    .ai-uses {
-      color: var(--grey);
-      font-size: 11px;
-      line-height: 2;
-    }
-
-    .ai-use-item {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      padding: 3px 0;
-    }
-
-    .ai-use-item::before {
-      content: '—';
-      color: var(--dim);
-      font-size: 10px;
-    }
-
-    .ai-credential {
-      margin-top: 20px;
-      padding-top: 18px;
-      border-top: 1px solid var(--border);
-    }
-
-    .ai-credential-label {
-      font-size: 9px;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--dim);
-      margin-bottom: 10px;
-    }
-
-    /* ─── CERTIFICATIONS ─── */
-    .cert-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-    }
-
-    .cert-item {
-      background: var(--card-bg);
-      padding: 30px 34px;
-      display: grid;
-      grid-template-columns: 160px 1fr;
-      gap: 28px;
-      align-items: start;
-      transition: background 0.35s var(--ease);
-    }
-
-    .cert-item:hover { background: var(--card-hover); }
-
-    .cert-issuer {
-      font-size: 10px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--dim);
-      padding-top: 6px;
-    }
-
-    .cert-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 21px;
-      font-weight: 300;
-      line-height: 1.35;
-      margin-bottom: 8px;
-      color: var(--accent);
-    }
-
-    .cert-detail {
-      color: var(--grey);
-      font-size: 11px;
-      line-height: 1.95;
-      max-width: 620px;
-    }
-
-    /* ─── FITNESS ─── */
-    .fitness-intro {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: end;
-      margin-bottom: 44px;
-    }
-
-    .fitness-card { padding: 40px 36px; }
-
-    .fitness-card-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 20px;
-      font-weight: 300;
-      margin-bottom: 16px;
-      color: var(--accent);
-    }
-
-    .fitness-text {
-      color: var(--grey);
-      font-size: 11px;
-      line-height: 2;
-    }
-
-    .fitness-stat { padding: 28px 32px; }
-
-    .fitness-stat-label {
-      font-size: 9px;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--dim);
-      margin-bottom: 10px;
-    }
-
-    .fitness-stat-value {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 24px;
-      font-weight: 300;
-      color: var(--accent);
-    }
-
-    /* ─── ZJIM / FEATURED CALLOUTS ─── */
-    .zjim {
-      margin-top: 1px;
-      border: 1px solid var(--border);
-      background: var(--card-bg);
-      padding: 52px 44px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 44px;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
-      transition: background 0.35s var(--ease);
-    }
-
-    .zjim:hover { background: var(--card-hover); }
-
-    .zjim::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: var(--iron);
-      transform: scaleY(0);
-      transform-origin: top;
-      transition: transform 0.5s var(--ease);
-    }
-
-    .zjim:hover::before { transform: scaleY(1); }
-
-    .zjim-eyebrow {
-      font-size: 9px;
-      letter-spacing: 0.4em;
-      text-transform: uppercase;
-      color: var(--iron);
-      margin-bottom: 14px;
-    }
-
-    .zjim-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 40px;
-      font-weight: 300;
-      line-height: 1.05;
-      margin-bottom: 16px;
-      letter-spacing: -0.01em;
-    }
-
-    .zjim-title em { font-style: italic; color: var(--grey); }
-
-    .zjim-desc {
-      color: var(--grey);
-      font-size: 12px;
-      line-height: 2;
-      max-width: 520px;
-    }
-
-    .zjim-cta { text-align: right; }
-
-    .zjim-cta .btn { padding: 16px 34px; }
-
-    .zjim-url {
-      display: block;
-      margin-top: 12px;
-      font-size: 9px;
-      letter-spacing: 0.18em;
-      color: var(--dim);
-    }
-
-    /* Cobalt variant — Zach/C0des study library callout */
-    .zjim.zcodes { margin-top: 44px; scroll-margin-top: 100px; }
-    .zjim.zcodes::before { background: var(--cobalt); }
-    .zjim.zcodes .zjim-eyebrow { color: var(--cobalt); }
-
-    /* Amber variant — Z Concepts callout */
-    .zjim.zconcepts { margin-top: 44px; scroll-margin-top: 100px; }
-    .zjim.zconcepts::before { background: var(--amber); }
-    .zjim.zconcepts .zjim-eyebrow { color: var(--amber); }
-
-    /* Green variant — Six Cards callout */
-    .zjim.sixcards { margin-top: 44px; scroll-margin-top: 100px; }
-    .zjim.sixcards::before { background: var(--green); }
-    .zjim.sixcards .zjim-eyebrow { color: var(--green); }
-
-    /* Violet variant — Z VALT callout */
-    .zjim.zvault { margin-top: 44px; scroll-margin-top: 100px; }
-    .zjim.zvault::before { background: var(--violet); }
-    .zjim.zvault .zjim-eyebrow { color: var(--violet); }
-
-    /* ─── CONTACT ─── */
-    .contact-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 32px;
-    }
-
-    .contact-heading {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(36px, 5vw, 64px);
-      font-weight: 300;
-      line-height: 1.1;
-    }
-
-    .contact-heading em { font-style: italic; color: var(--grey); }
-
-    .contact-links {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      align-items: flex-end;
-    }
-
-    .contact-link {
-      color: var(--grey);
-      text-decoration: none;
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      transition: color 0.25s var(--ease);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .contact-link:hover { color: var(--ink); }
-    .contact-link span { color: var(--dim); }
-
-    /* ─── FOOTER ─── */
-    footer {
-      padding: 32px 48px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1100px;
-      margin: 0 auto;
-      color: var(--dim);
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      position: relative;
-      z-index: 1;
-      background: rgba(255,255,255,0.6);
-    }
-
-    footer a { color: var(--dim); text-decoration: none; }
-    footer a:hover { color: var(--ink); }
-
-    /* ─── SCROLLBAR ─── */
-    ::-webkit-scrollbar { width: 2px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--dim); }
-
-    /* ─── RESPONSIVE ─── */
-    @media (max-width: 1180px) {
-      nav { padding: 16px 32px; }
-      .nav-links { gap: 20px; }
-    }
-
-    @media (max-width: 900px) {
-      .cols-3 { grid-template-columns: 1fr; }
-      .fitness-intro { grid-template-columns: 1fr; gap: 32px; }
-      .zjim { grid-template-columns: 1fr; gap: 28px; padding: 40px 30px; }
-      .zjim-cta { text-align: left; }
-      .cert-item { grid-template-columns: 1fr; gap: 10px; }
-      .cert-issuer { padding-top: 0; }
-    }
-
-    @media (max-width: 768px) {
-      nav { padding: 16px 22px; flex-wrap: wrap; gap: 12px; }
-      .nav-links { gap: 14px; flex-wrap: wrap; }
-      #home { padding: 130px 22px 70px; }
-      section { padding: 70px 22px; }
-      .about-grid { grid-template-columns: 1fr; gap: 48px; }
-      .cols-2 { grid-template-columns: 1fr; }
-      .project-item { grid-template-columns: 40px 1fr; padding: 34px 24px; gap: 18px; }
-      .project-arrow { display: none; }
-      .fact-row { flex-direction: column; align-items: flex-start; gap: 6px; }
-      .fact-val { text-align: left; }
-      .contact-row { flex-direction: column; align-items: flex-start; }
-      .contact-links { align-items: flex-start; }
-      footer { flex-direction: column; gap: 12px; text-align: center; padding: 28px 22px; }
-      .zjim-title { font-size: 32px; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      *, *::before, *::after {
-        animation-duration: 0.001ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.001ms !important;
-      }
-      #waves { display: none; }
-      .ticker-track { animation: none; }
-    }
-  </style>
-</head>
-<body>
-
-<canvas id="waves" aria-hidden="true"></canvas>
-
-<!-- NAV -->
-<nav>
-  <a href="#home" class="nav-logo">Z.Frederic</a>
-  <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#skills">Skills</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#ai">AI Stack</a></li>
-    <li><a href="#certifications">Certifications</a></li>
-    <li><a href="#fitness" class="health-link">Health &amp; Fitness</a></li>
-    <li><a href="#study-library" class="study-link">Study Library</a></li>
-    <li><a href="#z-concepts" class="concepts-link">Z Concepts</a></li>
-    <li><a href="#six-cards" class="cards-link">Six Cards</a></li>
-    <li><a href="#z-valt" class="vault-link">Z VALT</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
-</nav>
-
-<!-- HERO -->
-<div id="home">
-  <p class="hero-tag"><span class="status-dot"></span>Palm Beach &amp; Orlando, FL &nbsp;·&nbsp; IT Management &nbsp;·&nbsp; Open to opportunities</p>
-  <h1 class="hero-name">Zachary<br /><em>Frederic</em></h1>
-  <p class="hero-desc">
-    IT professional, developer, and creative technologist.<br />
-    Building at the intersection of systems, design, and data.
-  </p>
-  <div class="hero-links">
-    <a href="#projects" class="btn btn-outline">View Work</a>
-    <a href="https://zachc0des.github.io/zjim/" target="_blank" rel="noopener" class="btn btn-iron">Z.JIM — Training Log ↗</a>
-    <a href="https://zachc0des.github.io/Zachc0des-Portfolio/#/" target="_blank" rel="noopener" class="btn btn-cobalt">Zach/C0des — Study Library ↗</a>
-    <a href="https://zachc0des.github.io/zconcepts/" target="_blank" rel="noopener" class="btn btn-amber">Z Concepts — Markets ↗</a>
-    <a href="https://zachc0des.github.io/sixcards/" target="_blank" rel="noopener" class="btn btn-green">Six Cards — Business Cards ↗</a>
-    <a href="https://zachc0des.github.io/Zvault/" target="_blank" rel="noopener" class="btn btn-violet">Z VALT — Visual Archive ↗</a>
-    <a href="https://github.com/Zachc0des" target="_blank" rel="noopener" class="btn btn-ghost">GitHub ↗</a>
-  </div>
-</div>
-
-<!-- TICKER -->
-<div class="ticker" aria-hidden="true">
-  <div class="ticker-track">
-    <span>Technical Support</span><span>Cybersecurity</span><span>Python</span><span>Linux</span><span>Salesforce</span><span>Hardware Repair</span><span>Graphic Design</span><span>Data Entry</span><span>Video Production</span><span>Content Creation</span><span>Networking</span><span>Strength Training</span>
-    <span>Technical Support</span><span>Cybersecurity</span><span>Python</span><span>Linux</span><span>Salesforce</span><span>Hardware Repair</span><span>Graphic Design</span><span>Data Entry</span><span>Video Production</span><span>Content Creation</span><span>Networking</span><span>Strength Training</span>
-  </div>
-</div>
-
-<!-- ABOUT -->
-<section id="about">
-  <div class="section-label">01 — About</div>
-  <div class="about-grid">
-    <div class="about-block">
-      <h2 class="about-heading">Technologist<br /><em>by design.</em></h2>
-      <p class="about-text">
-        I'm a 23-year-old IT professional and self-directed learner based in Palm Beach &amp; Orlando, FL —
-        currently pursuing a B.S. in Information Technology Management through WGU.
-      </p>
-      <p class="about-text">
-        My background spans customer operations, airline systems, CRM platforms, and
-        cybersecurity fundamentals. I thrive where technical precision meets
-        human communication — whether that's resolving a complex support case,
-        automating a workflow, or designing a visual identity for a small business.
-      </p>
-      <p class="about-text">
-        Outside of work and study, I repair phones, lift weights, edit video, and
-        build tools for problems I actually have. I gravitate toward systems thinking —
-        understanding how things connect before deciding how to change them.
-      </p>
-    </div>
-
-    <div class="about-facts">
-      <div class="fact-row">
-        <span class="fact-key">Location</span>
-        <span class="fact-val">Palm Beach, FL &nbsp;|&nbsp; Orlando, FL</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-key">Education</span>
-        <span class="fact-val">B.S. IT Management — WGU (In Progress)</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-key">Certifications</span>
-        <span class="fact-val">Google Cybersecurity ·<br />Google Technical Support ·<br />IBM SkillsBuild Data ·<br />Anthropic AI Fluency ·<br />OSHA 10-Hour</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-key">Recent Roles</span>
-        <span class="fact-val">
-          Sales &amp; Support Specialist — VXI Technology<br /><br />
-          Support Representative — Southern Airways Express / Mokulele Airlines<br /><br />
-          Front Desk Associate — Planet Fitness
-        </span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-key">MBTI</span>
-        <span class="fact-val">INTP</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-key">Focus Areas</span>
-        <span class="fact-val">Technical Support · Cybersecurity · Data Entry · Design · Analytics · Software Development · Content Creation</span>
-      </div>
-      <div class="fact-row">
-        <span class="fact-key">GitHub</span>
-        <span class="fact-val">github.com/Zachc0des</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SKILLS -->
-<section id="skills">
-  <div class="section-label">02 — Skills &amp; Interests</div>
-
-  <div class="grid-frame cols-auto">
-    <div class="cell skill-card">
-      <div class="skill-cat">Technical</div>
-      <div class="skill-title">Software &amp; Development</div>
-      <p class="card-copy">
-        Programming, application building, and debugging across multiple languages and environments.
-        Comfortable on Linux, Windows, and macOS.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Python</span>
-        <span class="tag">Java</span>
-        <span class="tag">HTML/CSS</span>
-        <span class="tag">PowerShell</span>
-        <span class="tag">VS Code</span>
-        <span class="tag">Linux</span>
-        <span class="tag">VMware</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Technical</div>
-      <div class="skill-title">Cybersecurity &amp; Networking</div>
-      <p class="card-copy">
-        Foundations in threat modeling, network security, SIEM tools, IDS, and Python automation —
-        backed by Google's Cybersecurity Professional Certificate.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">SIEM</span>
-        <span class="tag">IDS</span>
-        <span class="tag">Linux CLI</span>
-        <span class="tag">SQL</span>
-        <span class="tag">Python</span>
-        <span class="tag">Asset Mgmt</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Creative</div>
-      <div class="skill-title">Graphic &amp; Web Design</div>
-      <p class="card-copy">
-        Crafting visual identities and web experiences for clients, personal projects,
-        and small businesses. From concept to delivery.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Photoshop</span>
-        <span class="tag">Illustrator</span>
-        <span class="tag">Canva</span>
-        <span class="tag">Adobe CC</span>
-        <span class="tag">HTML/CSS</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Creative</div>
-      <div class="skill-title">Video &amp; Film Production</div>
-      <p class="card-copy">
-        Editing and producing content for digital platforms — from raw footage to
-        polished final cuts with motion graphics and audio. Comfortable with OBS for
-        video and game capture setup and management — scene building, source routing,
-        audio mixing, and recording/stream configuration — and with CapCut for fast
-        short-form editing, captions, and transitions.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">OBS Studio</span>
-        <span class="tag">Game Capture</span>
-        <span class="tag">CapCut</span>
-        <span class="tag">Premiere Pro</span>
-        <span class="tag">Canva Video</span>
-        <span class="tag">Motion Graphics</span>
-        <span class="tag">Audio Mix</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Creative</div>
-      <div class="skill-title">Content Creation &amp; Social Media</div>
-      <p class="card-copy">
-        Building and running my own content channels end to end — planning, filming,
-        editing, posting, and reading the numbers afterward. Short-form video for
-        TikTok, Reels, and Shorts, plus the branding, captions, and thumbnails that
-        go with it. I treat a content calendar the same way I treat a project board.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Short-Form Video</span>
-        <span class="tag">TikTok / Reels</span>
-        <span class="tag">Content Strategy</span>
-        <span class="tag">Brand Identity</span>
-        <span class="tag">Thumbnails</span>
-        <span class="tag">Analytics</span>
-        <span class="tag">Streaming</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Data</div>
-      <div class="skill-title">Analytics &amp; Data Literacy</div>
-      <p class="card-copy">
-        IBM-certified in data concepts and applied data science. Experienced with Excel,
-        Salesforce reporting, and flight/operations data in professional environments.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Excel</span>
-        <span class="tag">Salesforce</span>
-        <span class="tag">IBM Cloud</span>
-        <span class="tag">SQL</span>
-        <span class="tag">Data Entry</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Hardware</div>
-      <div class="skill-title">Hardware Repair &amp; Restoration</div>
-      <p class="card-copy">
-        Hands-on repair of computers and iPhones — diagnostics, component replacement,
-        OS installation, and system restoration. MacBook LCD &amp; fan replacement,
-        iPhone LCD repair, and full custom PC builds.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">iPhone LCD Repair</span>
-        <span class="tag">MacBook LCD/Fan</span>
-        <span class="tag">PC Build</span>
-        <span class="tag">Part Replacement</span>
-        <span class="tag">OS Install</span>
-        <span class="tag">Diagnostics</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Research</div>
-      <div class="skill-title">Financial Analysis &amp; Macroeconomics</div>
-      <p class="card-copy">
-        Ongoing study of macro-scale economic development — rates, capital flows, supply chains,
-        and the policy decisions behind them. I build models and write up market research to test
-        whether a narrative actually holds against the numbers.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Macro Trend Analysis</span>
-        <span class="tag">Financial Modeling</span>
-        <span class="tag">Market Research</span>
-      </div>
-    </div>
-
-    <div class="cell skill-card">
-      <div class="skill-cat">Research</div>
-      <div class="skill-title">Technology &amp; Web Evolution</div>
-      <p class="card-copy">
-        Tracking how web infrastructure is changing — the Web2 to Web3 shift, decentralized
-        architecture, and the next generation of digital economies. Less about hype cycles,
-        more about which stack transitions companies are actually committing to.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Web2 → Web3 Architecture</span>
-        <span class="tag">Emerging Tech Trends</span>
-        <span class="tag">Tech Stack Transitions</span>
-        <span class="tag">Decentralized Tech</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- TOOLS -->
-  <div style="margin-top:56px;">
-    <div class="tools-section-title">// Professional Platforms</div>
-    <div class="tools-row">
-      <span class="tool-chip">Salesforce</span>
-      <span class="tool-chip">Zenith Airline Software</span>
-      <span class="tool-chip">TalkDesk</span>
-      <span class="tool-chip">RingCentral</span>
-      <span class="tool-chip">Slack</span>
-      <span class="tool-chip">Microsoft 365</span>
-      <span class="tool-chip">Demandware</span>
-      <span class="tool-chip">FlightAware</span>
-      <span class="tool-chip">Datatrak &amp; Ignite</span>
-      <span class="tool-chip">Yoobic</span>
-      <span class="tool-chip">IBM Cloud</span>
-    </div>
-
-    <div class="tools-section-title">// Personal &amp; Dev Tools</div>
-    <div class="tools-row">
-      <span class="tool-chip">Linux OS</span>
-      <span class="tool-chip">VMware</span>
-      <span class="tool-chip">PowerShell</span>
-      <span class="tool-chip">Visual Studio Code</span>
-      <span class="tool-chip">Adobe Creative Cloud</span>
-      <span class="tool-chip">OBS Studio</span>
-      <span class="tool-chip">CapCut</span>
-      <span class="tool-chip">macOS</span>
-      <span class="tool-chip">Windows OS</span>
-    </div>
-  </div>
-</section>
-
-<!-- PROJECTS -->
-<section id="projects">
-  <div class="section-label">03 — Projects</div>
-
-  <div class="projects-list">
-    <div class="project-item">
-      <span class="project-num">01</span>
-      <div class="project-body">
-        <div class="project-title">Analytic Data Tracker</div>
-        <p class="project-desc">
-          A web scraper and analytics tool that collects, processes, and visualizes structured data from
-          external sources. Built to explore real-world datasets — tracking trends, parsing outputs,
-          and surfacing insights through a clean dashboard interface.
-        </p>
-        <div class="project-stack">
-          <span class="tag">Java</span>
-          <span class="tag">Python</span>
-          <span class="tag">Web Scraping</span>
-          <span class="tag">Data Visualization</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">02</span>
-      <div class="project-body">
-        <div class="project-title">Cisco Packet Tracer — Network Configuration</div>
-        <p class="project-desc">
-          Designed and simulated a multi-device enterprise network topology using Cisco Packet Tracer.
-          Configured routers, switches, and end devices across segmented VLANs with static and dynamic
-          routing (RIP/OSPF). Implemented DHCP, DNS, and basic ACL-based access control policies.
-          Validated end-to-end connectivity through ping and traceroute diagnostics, and documented
-          the full network map with IP addressing schemes and device roles.
-        </p>
-        <div class="project-stack">
-          <span class="tag">Cisco Packet Tracer</span>
-          <span class="tag">VLAN</span>
-          <span class="tag">OSPF / RIP</span>
-          <span class="tag">DHCP / DNS</span>
-          <span class="tag">ACL</span>
-          <span class="tag">Network Topology</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">03</span>
-      <div class="project-body">
-        <div class="project-title">IP Log Pull &amp; Analysis</div>
-        <p class="project-desc">
-          Built a scripted utility to extract, parse, and analyze IP log data from network and system
-          sources. Automated the identification of anomalous traffic patterns, flagged suspicious
-          connections, and generated structured reports for review. Applied to real-world log files
-          to surface unauthorized access attempts and map activity timelines.
-        </p>
-        <div class="project-stack">
-          <span class="tag">Python</span>
-          <span class="tag">Log Parsing</span>
-          <span class="tag">Linux CLI</span>
-          <span class="tag">Network Security</span>
-          <span class="tag">SIEM</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">04</span>
-      <div class="project-body">
-        <div class="project-title">VMware Linux Installation &amp; Configuration</div>
-        <p class="project-desc">
-          Set up and configured a full Linux environment within VMware Workstation — including disk
-          partitioning, network adapter setup, and OS hardening post-install. Used the VM as a
-          development and security testing sandbox, running tools such as Wireshark, Nmap, and
-          custom Python scripts. Documented the full setup process for reproducibility.
-        </p>
-        <div class="project-stack">
-          <span class="tag">VMware</span>
-          <span class="tag">Linux</span>
-          <span class="tag">OS Hardening</span>
-          <span class="tag">Wireshark</span>
-          <span class="tag">Nmap</span>
-          <span class="tag">Virtualization</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">05</span>
-      <div class="project-body">
-        <div class="project-title">iPhone LCD Repair</div>
-        <p class="project-desc">
-          Performed hands-on iPhone screen replacements across multiple models — disassembling units,
-          safely disconnecting display assemblies, and installing aftermarket and OEM LCD panels.
-          Tested touch response, brightness calibration, and True Tone compatibility post-repair.
-          Handled multiple client devices with a clean success rate and zero data loss.
-        </p>
-        <div class="project-stack">
-          <span class="tag">iPhone Repair</span>
-          <span class="tag">LCD Replacement</span>
-          <span class="tag">Hardware Diagnostics</span>
-          <span class="tag">Component Sourcing</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">06</span>
-      <div class="project-body">
-        <div class="project-title">MacBook LCD &amp; Fan Repair</div>
-        <p class="project-desc">
-          Disassembled MacBook Pro and MacBook Air units to replace cracked or failing display panels
-          and worn cooling fans. Navigated Apple's proprietary component layouts, managed thermal
-          paste reapplication, and verified GPU thermal performance post-repair. Restored multiple
-          units to full working condition for personal and client use.
-        </p>
-        <div class="project-stack">
-          <span class="tag">MacBook Repair</span>
-          <span class="tag">LCD Replacement</span>
-          <span class="tag">Fan Replacement</span>
-          <span class="tag">Thermal Management</span>
-          <span class="tag">Apple Hardware</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">07</span>
-      <div class="project-body">
-        <div class="project-title">Computer Building &amp; Part Replacement</div>
-        <p class="project-desc">
-          Planned and assembled custom desktop PCs from scratch — selecting compatible components
-          (CPU, GPU, RAM, storage, PSU, cooling) and managing cable routing and airflow optimization.
-          Also performed targeted part replacements on existing systems: GPU swaps, RAM upgrades,
-          SSD migrations, and PSU replacements. Ran benchmarks and stress tests to validate stability.
-        </p>
-        <div class="project-stack">
-          <span class="tag">Custom PC Build</span>
-          <span class="tag">Component Compatibility</span>
-          <span class="tag">GPU / CPU Swap</span>
-          <span class="tag">SSD Migration</span>
-          <span class="tag">Benchmarking</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">08</span>
-      <div class="project-body">
-        <div class="project-title">Graphic Design — Small Business</div>
-        <p class="project-desc">
-          Brand identity and marketing material design for small businesses — logos, social media assets,
-          flyers, and visual collateral. Focused on clean, impactful visuals that communicate brand
-          personality at a glance.
-        </p>
-        <div class="project-stack">
-          <span class="tag">Canva</span>
-          <span class="tag">Photoshop</span>
-          <span class="tag">Illustrator</span>
-          <span class="tag">Brand Design</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">09</span>
-      <div class="project-body">
-        <div class="project-title">Video &amp; Film Production</div>
-        <p class="project-desc">
-          End-to-end video production for digital content — from scripting and footage editing to
-          motion graphics and final export. Spanning promotional content, personal projects,
-          and client deliverables.
-        </p>
-        <div class="project-stack">
-          <span class="tag">Premiere Pro</span>
-          <span class="tag">Canva Video</span>
-          <span class="tag">Motion Graphics</span>
-          <span class="tag">Audio</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-
-    <div class="project-item">
-      <span class="project-num">10</span>
-      <div class="project-body">
-        <div class="project-title">eBay Ecommerce — Collectors Listings</div>
-        <p class="project-desc">
-          Sourced, photographed, listed, and sold collectible electronics, vinyl records, and
-          miscellaneous items on eBay. Managed end-to-end listing workflow — item research,
-          competitive pricing, SEO-optimized descriptions, and buyer communication. Maintained
-          consistent seller ratings through accurate grading and reliable shipping.
-        </p>
-        <div class="project-stack">
-          <span class="tag">eBay</span>
-          <span class="tag">Ecommerce</span>
-          <span class="tag">Product Photography</span>
-          <span class="tag">Collectibles</span>
-          <span class="tag">Electronics</span>
-          <span class="tag">Vinyl / Misc</span>
-        </div>
-      </div>
-      <span class="project-arrow">→</span>
-    </div>
-  </div>
-
-  <!-- ZACH/C0DES CALLOUT -->
-  <div class="zjim zcodes" id="study-library">
-    <div>
-      <div class="zjim-eyebrow">Featured Site</div>
-      <h3 class="zjim-title">Zach/<em>C0des</em></h3>
-      <p class="zjim-desc">
-        My public notebook — a searchable library of study guides, references, and tutorials
-        written by hand while working through IT, networking, cybersecurity, and web development.
-        Everything renders straight from markdown: search it, open it, copy what you need.
-        Built and maintained as I learn, free for anyone on the same path.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Study Guides</span>
-        <span class="tag">IT &amp; Networking</span>
-        <span class="tag">Cybersecurity</span>
-        <span class="tag">Web Development</span>
-        <span class="tag">Markdown</span>
-      </div>
-    </div>
-    <div class="zjim-cta">
-      <a href="https://zachc0des.github.io/Zachc0des-Portfolio/#/" target="_blank" rel="noopener" class="btn btn-cobalt">Open Zach/C0des ↗</a>
-      <span class="zjim-url">zachc0des.github.io/Zachc0des-Portfolio</span>
-    </div>
-  </div>
-
-  <!-- Z CONCEPTS CALLOUT -->
-  <div class="zjim zconcepts" id="z-concepts">
-    <div>
-      <div class="zjim-eyebrow">Featured Site</div>
-      <h3 class="zjim-title">Z·<em>Concepts</em></h3>
-      <p class="zjim-desc">
-        A slower, steadier perspective on easing into financial markets — built on six years of
-        study, patience, and knowing when to step away. Covers a personal framework of price
-        action review, back test simulation, order book analysis, and micro/macro analytics.
-        Observe first, simulate second, and only then consider real participation.
-        Educational content only — not financial advice.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Price Action</span>
-        <span class="tag">Back Testing</span>
-        <span class="tag">Order Book</span>
-        <span class="tag">Micro / Macro</span>
-        <span class="tag">Risk Management</span>
-        <span class="tag">Educational Only</span>
-      </div>
-    </div>
-    <div class="zjim-cta">
-      <a href="https://zachc0des.github.io/zconcepts/" target="_blank" rel="noopener" class="btn btn-amber">Open Z Concepts ↗</a>
-      <span class="zjim-url">zachc0des.github.io/zconcepts</span>
-    </div>
-  </div>
-
-  <!-- SIX CARDS CALLOUT -->
-  <div class="zjim sixcards" id="six-cards">
-    <div>
-      <div class="zjim-eyebrow">Featured Site</div>
-      <h3 class="zjim-title">Six·<em>Cards</em></h3>
-      <p class="zjim-desc">
-        Custom business cards that open doors — six signature styles for companies building
-        their brand and people building their careers. Every card ships as double-sided,
-        print-ready 300 DPI files with printing steps included, plus fully custom designs
-        built from scratch on request.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Business Cards</span>
-        <span class="tag">Brand Design</span>
-        <span class="tag">Print-Ready Files</span>
-        <span class="tag">Six Styles</span>
-        <span class="tag">Custom Design</span>
-      </div>
-    </div>
-    <div class="zjim-cta">
-      <a href="https://zachc0des.github.io/sixcards/" target="_blank" rel="noopener" class="btn btn-green">Open Six Cards ↗</a>
-      <span class="zjim-url">zachc0des.github.io/sixcards</span>
-    </div>
-  </div>
-
-  <!-- Z VALT CALLOUT -->
-  <div class="zjim zvault" id="z-valt">
-    <div>
-      <div class="zjim-eyebrow">Featured Site</div>
-      <h3 class="zjim-title">Z·<em>VALT</em></h3>
-      <p class="zjim-desc">
-        The archive — a collection of visual artifacts filed by concept rather than by date.
-        Charts, dashboards, breakdowns, and reference visuals built while working through
-        markets, technology, and everything else worth mapping out. Open a concept, read
-        the artifact, flip the whole archive light or dark with one toggle.
-      </p>
-      <div class="skill-tags">
-        <span class="tag">Visual Artifacts</span>
-        <span class="tag">Filed by Concept</span>
-        <span class="tag">Dashboards</span>
-        <span class="tag">Research Visuals</span>
-        <span class="tag">Archive</span>
-      </div>
-    </div>
-    <div class="zjim-cta">
-      <a href="https://zachc0des.github.io/Zvault/" target="_blank" rel="noopener" class="btn btn-violet">Open Z VALT ↗</a>
-      <span class="zjim-url">zachc0des.github.io/Zvault</span>
-    </div>
-  </div>
-</section>
-
-<!-- AI STACK -->
-<section id="ai">
-  <div class="section-label">04 — AI Stack</div>
-
-  <div class="grid-frame cols-3">
-    <div class="cell ai-card">
-      <span class="ai-icon">◈</span>
-      <div class="ai-name">Claude</div>
-      <div class="ai-uses">
-        <div class="ai-use-item">Media creation &amp; content drafting</div>
-        <div class="ai-use-item">Code &amp; application building</div>
-        <div class="ai-use-item">Document review &amp; analysis</div>
-        <div class="ai-use-item">Debugging &amp; problem-solving</div>
-      </div>
-      <div class="ai-credential">
-        <div class="ai-credential-label">Certified — Anthropic</div>
-        <div class="skill-tags" style="margin-top:0;">
-          <span class="tag">Claude 101</span>
-          <span class="tag">AI Fluency: Framework &amp; Foundations</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="cell ai-card">
-      <span class="ai-icon">◇</span>
-      <div class="ai-name">Google Gemini</div>
-      <div class="ai-uses">
-        <div class="ai-use-item">Project organization &amp; planning</div>
-        <div class="ai-use-item">Data analysis &amp; interpretation</div>
-        <div class="ai-use-item">Code &amp; application building</div>
-        <div class="ai-use-item">Debugging workflows</div>
-      </div>
-    </div>
-
-    <div class="cell ai-card">
-      <span class="ai-icon">○</span>
-      <div class="ai-name">ChatGPT</div>
-      <div class="ai-uses">
-        <div class="ai-use-item">Research &amp; ideation</div>
-        <div class="ai-use-item">Writing assistance</div>
-        <div class="ai-use-item">Code generation &amp; review</div>
-        <div class="ai-use-item">Workflow automation</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CERTIFICATIONS -->
-<section id="certifications">
-  <div class="section-label">05 — Certifications</div>
-
-  <div class="cert-list">
-    <div class="cert-item">
-      <div class="cert-issuer">Anthropic</div>
-      <div>
-        <div class="cert-name">Claude 101 &nbsp;·&nbsp; AI Fluency: Framework &amp; Foundations</div>
-        <p class="cert-detail">
-          Working knowledge of prompting, context management, and applied AI workflows —
-          plus the four-part AI Fluency framework (Delegation, Description, Discernment, Diligence)
-          for using AI systems responsibly in professional settings.
-        </p>
-      </div>
-    </div>
-
-    <div class="cert-item">
-      <div class="cert-issuer">Google</div>
-      <div>
-        <div class="cert-name">Cybersecurity Professional Certificate</div>
-        <p class="cert-detail">
-          Foundations of Cybersecurity · Network Security · Linux &amp; SQL ·
-          Asset, Threat &amp; Vulnerability Management · SIEM &amp; IDS Tools ·
-          Python Automation · Cybersecurity Job Readiness.
-        </p>
-      </div>
-    </div>
-
-    <div class="cert-item">
-      <div class="cert-issuer">Google</div>
-      <div>
-        <div class="cert-name">Technical Support Fundamentals</div>
-        <p class="cert-detail">
-          Operating systems, troubleshooting methodology, customer care, and system administration.
-        </p>
-      </div>
-    </div>
-
-    <div class="cert-item">
-      <div class="cert-issuer">IBM SkillsBuild</div>
-      <div>
-        <div class="cert-name">Introduction to Data Concepts</div>
-        <p class="cert-detail">
-          Core data literacy — data types, structures, storage, and how organizations turn raw data
-          into decisions. Issued 2026.
-        </p>
-      </div>
-    </div>
-
-    <div class="cert-item">
-      <div class="cert-issuer">IBM SkillsBuild</div>
-      <div>
-        <div class="cert-name">Data Science in Our World</div>
-        <p class="cert-detail">
-          Applied data science fundamentals — the data lifecycle, real-world use cases,
-          and how analysis drives outcomes across industries.
-        </p>
-      </div>
-    </div>
-
-    <div class="cert-item">
-      <div class="cert-issuer">OPAC TestGenius</div>
-      <div>
-        <div class="cert-name">Data Entry, Financial Record Keeping &amp; Microsoft Office</div>
-        <p class="cert-detail">
-          Data entry and keyboarding · Financial record keeping (bank deposits, bank reconciliation,
-          petty cash) · Microsoft Office testing — Excel 2019 (Basic &amp; Intermediate) and PowerPoint 2019.
-        </p>
-      </div>
-    </div>
-
-    <div class="cert-item">
-      <div class="cert-issuer">OSHA</div>
-      <div>
-        <div class="cert-name">10-Hour Construction Safety</div>
-        <p class="cert-detail">
-          Hazard recognition, fall protection, electrical safety, and OSHA standards for
-          construction environments.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- HEALTH & FITNESS -->
-<section id="fitness">
-  <div class="section-label">06 — Health &amp; Fitness</div>
-
-  <div class="fitness-intro">
-    <h2 class="about-heading" style="font-size:34px;margin-bottom:0;">Discipline<br /><em>extends beyond the desk.</em></h2>
-    <p class="card-copy" style="font-size:12px;">
-      Same method, different gym. Track the inputs, watch the outputs, adjust, repeat.
-      Training is where I test whether a system actually holds up over months instead of sprints.
-    </p>
-  </div>
-
-  <div class="grid-frame cols-2">
-    <div class="cell fitness-card">
-      <div class="fitness-card-title">Training Philosophy</div>
-      <p class="fitness-text">
-        Fitness has always been a system — inputs, outputs, and iteration.<br /><br />
-        I approach training the same way I approach tech: with consistency,
-        data, and a drive to improve. Former Planet Fitness crew member,
-        now an independent lifter focused on strength and long-term health.
-      </p>
-    </div>
-
-    <div class="cell fitness-card">
-      <div class="fitness-card-title">Active Pursuits</div>
-      <p class="fitness-text">
-        Weightlifting &amp; resistance training<br />
-        Body composition &amp; performance tracking<br />
-        Nutrition awareness &amp; habit building<br />
-        Staying mobile — walks, activity, recovery<br />
-        Health as a long-term investment
-      </p>
-    </div>
-  </div>
-
-  <div class="grid-frame cols-3" style="margin-top:1px;">
-    <div class="cell fitness-stat">
-      <div class="fitness-stat-label">Focus</div>
-      <div class="fitness-stat-value">Strength &amp; Hypertrophy</div>
-    </div>
-    <div class="cell fitness-stat">
-      <div class="fitness-stat-label">Background</div>
-      <div class="fitness-stat-value">Planet Fitness Staff</div>
-    </div>
-    <div class="cell fitness-stat">
-      <div class="fitness-stat-label">Approach</div>
-      <div class="fitness-stat-value">Data-Driven Consistency</div>
-    </div>
-  </div>
-
-  <!-- ZJIM CALLOUT -->
-  <div class="zjim">
-    <div>
-      <div class="zjim-eyebrow">Companion Site</div>
-      <h3 class="zjim-title">Z.<em>JIM</em></h3>
-      <p class="zjim-desc">
-        Everything I lift, film, and steal from Pinterest lives here — gym pics, form breakdowns,
-        the apps I actually use, and the gear worth buying.
-      </p>
-    </div>
-    <div class="zjim-cta">
-      <a href="https://zachc0des.github.io/zjim/" target="_blank" rel="noopener" class="btn btn-iron">Open Z.JIM ↗</a>
-      <span class="zjim-url">zachc0des.github.io/zjim</span>
-    </div>
-  </div>
-</section>
-
-<!-- CONTACT -->
-<section id="contact">
-  <div class="section-label">07 — Contact</div>
-  <div class="contact-row">
-    <div>
-      <h2 class="contact-heading">Let's<br /><em>connect.</em></h2>
-    </div>
-    <div class="contact-links">
-      <a href="mailto:zfrederic00@outlook.com" class="contact-link">
-        <span>EMAIL</span> zfrederic00@outlook.com
-      </a>
-      <a href="tel:4077208907" class="contact-link">
-        <span>PHONE</span> 407-720-8907
-      </a>
-      <a href="https://github.com/Zachc0des" target="_blank" rel="noopener" class="contact-link">
-        <span>GITHUB</span> github.com/Zachc0des
-      </a>
-      <a href="https://zachc0des.github.io/Zachc0des-Portfolio/#/" target="_blank" rel="noopener" class="contact-link">
-        <span>ZACH/C0DES</span> zachc0des.github.io/Zachc0des-Portfolio
-      </a>
-      <a href="https://zachc0des.github.io/zconcepts/" target="_blank" rel="noopener" class="contact-link">
-        <span>Z CONCEPTS</span> zachc0des.github.io/zconcepts
-      </a>
-      <a href="https://zachc0des.github.io/sixcards/" target="_blank" rel="noopener" class="contact-link">
-        <span>SIX CARDS</span> zachc0des.github.io/sixcards
-      </a>
-      <a href="https://zachc0des.github.io/Zvault/" target="_blank" rel="noopener" class="contact-link">
-        <span>Z VALT</span> zachc0des.github.io/Zvault
-      </a>
-      <a href="https://zachc0des.github.io/zjim/" target="_blank" rel="noopener" class="contact-link">
-        <span>Z.JIM</span> zachc0des.github.io/zjim
-      </a>
-      <span class="contact-link">
-        <span>LOCATION</span> Palm Beach &amp; Orlando, FL
-      </span>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <span>© 2026 Zachary Frederic</span>
-  <span>IT · Design · Development · <a href="https://zachc0des.github.io/Zachc0des-Portfolio/#/" target="_blank" rel="noopener">Zach/C0des</a> · <a href="https://zachc0des.github.io/zconcepts/" target="_blank" rel="noopener">Z Concepts</a> · <a href="https://zachc0des.github.io/sixcards/" target="_blank" rel="noopener">Six Cards</a> · <a href="https://zachc0des.github.io/Zvault/" target="_blank" rel="noopener">Z VALT</a> · <a href="https://zachc0des.github.io/zjim/" target="_blank" rel="noopener">Z.JIM</a></span>
-</footer>
-
-<script>
-  /* ─── LIVE WAVE FIELD ─── */
-  (function () {
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const canvas = document.getElementById('waves');
-    if (!canvas || prefersReduced) return;
-
-    const ctx = canvas.getContext('2d');
-    let w = 0, h = 0, dpr = 1, t = 0, raf = null;
-    let pointer = 0.5;
-
-    function resize() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = canvas.clientWidth;
-      h = canvas.clientHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    const LINES = 7;
-
-    function draw() {
-      ctx.clearRect(0, 0, w, h);
-
-      for (let i = 0; i < LINES; i++) {
-        const phase = i * 0.55;
-        const amp = 26 + i * 14;
-        const baseY = h * 0.5 + (i - LINES / 2) * (h * 0.055);
-        const drift = (pointer - 0.5) * 40;
-
-        ctx.beginPath();
-        for (let x = 0; x <= w; x += 8) {
-          const y =
-            baseY +
-            Math.sin(x * 0.0032 + t + phase) * amp +
-            Math.sin(x * 0.0011 - t * 0.65 + phase) * (amp * 0.5) +
-            drift * Math.sin(x * 0.002 + phase);
-          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.strokeStyle = 'rgba(10,10,10,' + (0.055 - i * 0.005).toFixed(3) + ')';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-
-      t += 0.0035;
-      raf = requestAnimationFrame(draw);
-    }
-
-    window.addEventListener('resize', resize);
-    window.addEventListener('mousemove', (e) => {
-      pointer = e.clientX / window.innerWidth;
-    }, { passive: true });
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        cancelAnimationFrame(raf);
-      } else {
-        raf = requestAnimationFrame(draw);
-      }
-    });
-
-    resize();
-    draw();
-  })();
-
-  /* ─── SCROLL REVEAL ─── */
-  (function () {
-    const items = document.querySelectorAll(
-      '.skill-card, .project-item, .ai-card, .fitness-card, .fitness-stat, .fact-row, .cert-item, .zjim'
-    );
-
-    if (!('IntersectionObserver' in window)) return;
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry, i) => {
-        if (entry.isIntersecting) {
-          entry.target.style.animation = 'fadeUp 0.6s ' + (i * 0.05) + 's cubic-bezier(0.22,1,0.36,1) both';
-          entry.target.style.opacity = '1';
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.08 });
-
-    items.forEach((el) => {
-      el.style.opacity = '0';
-      observer.observe(el);
-    });
-  })();
-
-  /* ─── ACTIVE NAV LINK ─── */
-  (function () {
-    const sections = document.querySelectorAll('section, #home');
-    const navLinks = document.querySelectorAll('.nav-links a');
-    let ticking = false;
-
-    function update() {
-      let current = '';
-      sections.forEach((sec) => {
-        if (window.scrollY >= sec.offsetTop - 120) current = sec.id;
-      });
-      navLinks.forEach((a) => {
-        const isActive = a.getAttribute('href') === '#' + current;
-        if (a.classList.contains('health-link')) {
-          a.style.color = isActive ? '#6b1a1a' : '';
-        } else {
-          a.style.color = isActive ? 'var(--ink)' : '';
-        }
-      });
-      ticking = false;
-    }
-
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        window.requestAnimationFrame(update);
-        ticking = true;
-      }
-    }, { passive: true });
-  })();
+    q.addEventListener("keydown",e=>{ if(e.key==="Escape"){ searchQuery=""; render(); }});
+  }
+  // scale live previews down to thumbnail size
+  const BASE_W = 1280, BASE_H = 800;
+  document.querySelectorAll(".shot iframe[data-scale]").forEach(f=>{
+    const box = f.parentElement;
+    const fit = () => {
+      const s = box.clientWidth / BASE_W;
+      f.style.width = BASE_W+"px";
+      f.style.height = BASE_H+"px";
+      f.style.transform = "scale("+s+")";
+    };
+    fit();
+    if(window.ResizeObserver) new ResizeObserver(fit).observe(box);
+    else window.addEventListener("resize",fit);
+  });
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="/" && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)){
+    const q=document.getElementById("q");
+    if(q){ e.preventDefault(); q.focus(); q.select(); }
+    else { location.hash="#/"; }
+  }
+});
+window.addEventListener("hashchange",render);
+render();
 </script>
 </body>
 </html>
