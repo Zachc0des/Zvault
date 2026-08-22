@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Z VALT — visual artifact archive</title>
+<meta name="description" content="Z VALT — a collection of visual artifacts, filed by concept.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff;
+  --ink:#0b0b0b;
+  --shelf:#f4f4f4;
+  --rule:#d8d8d8;
+  --muted:#767676;
+  --plate-fg:#0b0b0b;
+  --plate-bg:#ffffff;
+  --display:"Cormorant Garamond",Georgia,serif;
+  --mono:"Share Tech Mono",ui-monospace,monospace;
+  --gut:clamp(20px,5vw,64px);
+}
+html[data-mode="inverted"]{
+  --paper:#0b0b0b;
+  --ink:#f6f6f6;
+  --shelf:#141414;
+  --rule:#2e2e2e;
+  --muted:#8b8b8b;
+  --plate-fg:#f6f6f6;
+  --plate-bg:#0b0b0b;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--display);font-weight:300;
+  font-size:clamp(16px,1.05vw,18px);line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.mono{font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;font-size:.7rem}
+
+/* ---------- chrome ---------- */
+.bar{
+  position:sticky;top:0;z-index:60;background:var(--paper);
+  border-bottom:1px solid var(--rule);
+  display:flex;align-items:center;gap:16px;
+  padding:10px var(--gut);
+}
+.bar .mark{font-family:var(--mono);font-size:.78rem;letter-spacing:.34em;text-transform:uppercase}
+.bar .crumb{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .spacer{flex:1}
+.bar button{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--rule);padding:5px 10px;transition:color .2s,border-color .2s}
+.bar button:hover{color:var(--ink);border-color:var(--ink)}
+
+/* ---------- hero ---------- */
+.hero{padding:clamp(56px,11vw,140px) var(--gut) clamp(36px,6vw,72px);border-bottom:1px solid var(--rule)}
+.hero h1{
+  margin:0;font-weight:300;line-height:.86;letter-spacing:-.02em;
+  font-size:clamp(74px,20vw,260px);
+}
+.hero h1 em{font-style:italic;letter-spacing:-.01em}
+.hero .lede{
+  margin:clamp(20px,3vw,32px) 0 0;max-width:46ch;
+  font-size:clamp(19px,1.7vw,26px);line-height:1.4;color:var(--ink);
+}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:clamp(24px,4vw,44px);color:var(--muted)}
+
+/* ---------- search ---------- */
+.finder{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--ink);
+  max-width:520px;margin-top:clamp(28px,4vw,44px);padding-bottom:8px}
+.finder input{
+  flex:1;border:0;background:none;font-family:var(--mono);font-size:.82rem;letter-spacing:.06em;
+  color:var(--ink);padding:0;min-width:0;
+}
+.finder input::placeholder{color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-size:.72rem}
+.finder input:focus{outline:none}
+.finder .key{color:var(--muted);border:1px solid var(--rule);padding:2px 6px;font-size:.6rem}
+
+/* ---------- plates ---------- */
+.section{padding:clamp(40px,6vw,80px) var(--gut)}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+  border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:clamp(24px,4vw,44px);color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.plate{background:var(--paper);padding:0;display:block;position:relative;transition:background .25s}
+.plate:hover{background:var(--shelf)}
+.plate .face{
+  position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--plate-bg);
+  border-bottom:1px solid var(--rule);
+}
+.plate .face::before,.plate .face::after{
+  content:"";position:absolute;inset:-40%;
+  transition:transform .9s cubic-bezier(.2,.7,.2,1),opacity .5s;
+}
+.plate:hover .face::after{transform:rotate(var(--tilt,6deg)) scale(1.06)}
+.plate .body{padding:16px 18px 20px}
+.plate .code{color:var(--muted);display:block}
+.plate .name{font-size:clamp(21px,2vw,27px);line-height:1.15;margin:6px 0 8px;font-weight:400}
+.plate .blurb{color:var(--muted);font-size:.95rem;line-height:1.4;margin:0}
+.plate .count{position:absolute;top:10px;right:12px;z-index:2;background:var(--paper);
+  border:1px solid var(--rule);padding:3px 7px;color:var(--muted)}
+
+/* moiré plate patterns — pure black on white */
+.pt{--a:0deg;--g:6px}
+.pt .face::before{background:var(--plate-bg)}
+.pt1 .face::after{background:repeating-linear-gradient(38deg,var(--plate-fg) 0 1px,transparent 1px 7px)}
+.pt2 .face::after{background:repeating-radial-gradient(circle at 30% 40%,var(--plate-fg) 0 1px,transparent 1px 9px)}
+.pt3 .face::after{background:
+  repeating-linear-gradient(0deg,var(--plate-fg) 0 1px,transparent 1px 11px),
+  repeating-linear-gradient(90deg,var(--plate-fg) 0 1px,transparent 1px 11px)}
+.pt4 .face::after{background:repeating-conic-gradient(from 12deg at 62% 38%,var(--plate-fg) 0 1.4deg,transparent 1.4deg 9deg)}
+.pt5 .face::after{background:
+  repeating-linear-gradient(-52deg,var(--plate-fg) 0 2px,transparent 2px 14px),
+  repeating-linear-gradient(52deg,var(--plate-fg) 0 1px,transparent 1px 14px)}
+.pt6 .face::after{background:repeating-linear-gradient(90deg,var(--plate-fg) 0 3px,transparent 3px 16px)}
+.pt7 .face::after{background:
+  repeating-radial-gradient(circle at 50% 50%,var(--plate-fg) 0 1px,transparent 1px 14px),
+  repeating-linear-gradient(0deg,var(--plate-fg) 0 1px,transparent 1px 28px)}
+.pt8 .face::after{background:repeating-linear-gradient(74deg,var(--plate-fg) 0 1px,transparent 1px 5px)}
+
+/* ---------- register (category view) ---------- */
+.page-head{padding:clamp(48px,8vw,110px) var(--gut) clamp(28px,4vw,52px);border-bottom:1px solid var(--rule)}
+.page-head h2{margin:10px 0 0;font-weight:300;font-size:clamp(40px,7vw,86px);line-height:1;letter-spacing:-.015em}
+.page-head p{margin:18px 0 0;max-width:52ch;color:var(--muted);font-size:1.05rem}
+.back{color:var(--muted);display:inline-block;margin-bottom:6px}
+.back:hover{color:var(--ink)}
+
+.rows{border-top:1px solid var(--rule)}
+.row{display:grid;grid-template-columns:96px 1.6fr 1fr 110px;gap:20px;align-items:baseline;
+  padding:18px 0;border-bottom:1px solid var(--rule);transition:padding-left .25s}
+.row:hover{padding-left:10px}
+.row .t{font-size:1.3rem;line-height:1.25}
+.row .s{color:var(--muted);font-size:.95rem}
+.row .acc,.row .d{color:var(--muted)}
+.row .d{text-align:right}
+@media(max-width:720px){
+  .row{grid-template-columns:1fr;gap:6px}
+  .row .d{text-align:left}
+}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.thumb{background:var(--paper);display:block}
+.thumb .shot{position:relative;aspect-ratio:16/10;overflow:hidden;border-bottom:1px solid var(--rule);background:var(--plate-bg)}
+.thumb .shot iframe,.thumb .shot img{position:absolute;top:0;left:0;border:0;transform-origin:top left;pointer-events:none}
+.thumb .shot img{width:100%;height:100%;object-fit:cover;transform:none}
+.thumb .cap{padding:14px 16px 18px}
+.thumb .cap .t{font-size:1.25rem;margin:6px 0 0;line-height:1.2}
+
+/* ---------- empty ---------- */
+.empty{border:1px solid var(--rule);padding:clamp(28px,5vw,56px);background:var(--shelf)}
+.empty h3{margin:0 0 10px;font-weight:400;font-size:clamp(24px,3vw,34px)}
+.empty p{margin:0 0 18px;max-width:56ch;color:var(--muted)}
+.empty pre{margin:0;overflow-x:auto;background:var(--paper);border:1px solid var(--rule);
+  padding:16px;font-family:var(--mono);font-size:.72rem;line-height:1.7;color:var(--ink)}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:1px;background:var(--rule);
+  border:1px solid var(--rule);margin-top:24px}
+.slot{background:var(--paper);aspect-ratio:1;display:grid;place-items:center;color:var(--rule);font-family:var(--mono);font-size:.7rem}
+
+/* ---------- viewer ---------- */
+.viewer{display:grid;grid-template-columns:1fr 300px;min-height:calc(100vh - 43px)}
+.viewer .stage{border-right:1px solid var(--rule);background:var(--shelf);display:grid;place-items:center;padding:clamp(16px,3vw,40px)}
+.viewer .stage iframe,.viewer .stage img{width:100%;height:100%;min-height:70vh;border:1px solid var(--rule);background:var(--plate-bg)}
+.viewer .stage img{object-fit:contain;min-height:0;height:auto}
+.viewer .side{padding:clamp(24px,3vw,36px) var(--gut) 60px 28px}
+.viewer .side h2{font-weight:300;font-size:clamp(28px,3vw,40px);line-height:1.05;margin:12px 0 0}
+.viewer dl{margin:28px 0 0;border-top:1px solid var(--rule)}
+.viewer dt{color:var(--muted);padding-top:12px}
+.viewer dd{margin:2px 0 12px;border-bottom:1px solid var(--rule);padding-bottom:12px}
+@media(max-width:900px){
+  .viewer{grid-template-columns:1fr}
+  .viewer .stage{border-right:0;border-bottom:1px solid var(--rule)}
+  .viewer .side{padding:28px var(--gut) 60px}
+}
+
+/* ---------- colophon ---------- */
+.colophon{border-top:1px solid var(--rule);padding:clamp(40px,6vw,72px) var(--gut);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:28px 40px;color:var(--muted)}
+.colophon h4{margin:0 0 8px;color:var(--ink);font-weight:400;font-size:1.15rem}
+.colophon p{margin:0;font-size:.95rem;line-height:1.5}
+.colophon code{font-family:var(--mono);font-size:.72rem;color:var(--ink)}
+
+.reveal{opacity:0;transform:translateY(10px);animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001s!important;transition-duration:.001s!important}
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <a class="mark" href="#/">Z VALT</a>
+  <span class="crumb" id="crumb"></span>
+  <span class="spacer"></span>
+  <button id="mode" type="button" aria-label="Switch between white and black">Invert</button>
+</header>
+
+<main id="app"></main>
+
+<script>
+/* ============================================================
+   Z VALT — data
+   Edit the two arrays below to change what the vault holds.
+   Full field reference lives in README.md.
+   ============================================================ */
+
+const CATEGORIES = [
+  { id:"silicon",    code:"ZV-01", name:"Silicon & Compute",     pattern:3, blurb:"Fabs, nodes, accelerators, and the supply chain beneath them." },
+  { id:"protocols",  code:"ZV-02", name:"Protocols & Networks",  pattern:4, blurb:"Chains, rails, standards, and the rules they encode." },
+  { id:"systems",    code:"ZV-03", name:"Systems & Architecture",pattern:5, blurb:"Blueprints, wiring, topologies, and how parts fit." },
+  { id:"ai",         code:"ZV-04", name:"AI Concepts",           pattern:6, blurb:"Models, training, agents, and the infrastructure carrying them." },
+  { id:"interface",  code:"ZV-05", name:"Interface & Type",      pattern:7, blurb:"Layout studies, type specimens, and screen craft." },
+  { id:"management", code:"ZV-06", name:"Business & IT Management", pattern:1, blurb:"Operations, governance, service delivery, and how work is run." },
+  { id:"psychology", code:"ZV-07", name:"Psychology & Health",     pattern:2, blurb:"Mind, behavior, physiology, and what keeps a person running." },
+  { id:"field",      code:"ZV-08", name:"Field Notes",           pattern:8, blurb:"Unfiled work. Everything before it earns a shelf." }
+];
+
+/* Artifacts are added here by hand — there is no upload path.
+   Shape:
+   {
+     id:"unique-slug",          // becomes the URL: #/a/unique-slug
+     category:"silicon",        // must match a CATEGORIES id
+     title:"Plate title",
+     date:"2026-08-22",         // YYYY-MM-DD
+     summary:"One line on what this shows.",
+     tags:["one","two"],
+     source:{ type:"file",   path:"artifacts/my-plate.html" }   // local html file
+     // source:{ type:"image",  path:"artifacts/my-chart.png" }  // png / jpg / svg file
+     // source:{ type:"inline", html:"<svg …></svg>" }           // markup written inline
+   }
+*/
+const ARTIFACTS = [];
+
+/* ============================================================
+   Below this line is the machine. You shouldn't need to touch it.
+   ============================================================ */
+
+const app  = document.getElementById("app");
+const crumbEl = document.getElementById("crumb");
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const cat = id => CATEGORIES.find(c=>c.id===id);
+const inCat = id => ARTIFACTS.filter(a=>a.category===id);
+const accession = a => {
+  const c = cat(a.category);
+  const n = String(inCat(a.category).indexOf(a)+1).padStart(3,"0");
+  return (c?c.code:"ZV-XX")+" · "+n;
+};
+const fmtDate = d => {
+  if(!d) return "undated";
+  const t = new Date(d+"T00:00:00");
+  return isNaN(t) ? esc(d) : t.toLocaleDateString("en-US",{year:"numeric",month:"short",day:"2-digit"});
+};
+
+/* --- mode --- */
+const root = document.documentElement;
+try{ if(localStorage.getItem("zvalt-mode")==="inverted") root.dataset.mode="inverted"; }catch(e){}
+document.getElementById("mode").addEventListener("click",()=>{
+  const next = root.dataset.mode==="inverted" ? "" : "inverted";
+  if(next) root.dataset.mode = next; else root.removeAttribute("data-mode");
+  try{ localStorage.setItem("zvalt-mode",next||"normal"); }catch(e){}
+});
+
+/* --- views --- */
+function viewIndex(query=""){
+  const q = query.trim().toLowerCase();
+  const list = q
+    ? CATEGORIES.filter(c=>(c.name+" "+c.code+" "+c.blurb).toLowerCase().includes(q)
+        || inCat(c.id).some(a=>(a.title+" "+(a.tags||[]).join(" ")).toLowerCase().includes(q)))
+    : CATEGORIES;
+  const total = ARTIFACTS.length;
+
+  return `
+  <section class="hero">
+    <h1 class="reveal">Z&nbsp;<em>Valt</em></h1>
+    <p class="lede reveal" style="animation-delay:.08s">Welcome in. A collection of visual artifacts, filed by concept — pick a shelf and have a look around.</p>
+    <div class="meta mono reveal" style="animation-delay:.14s">
+      <span>${CATEGORIES.length} shelves</span>
+      <span>${total} ${total===1?"artifact":"artifacts"}</span>
+      <span>Est. ${new Date().getFullYear()}</span>
+    </div>
+    <div class="finder reveal" style="animation-delay:.2s">
+      <span class="mono">Find</span>
+      <input id="q" type="search" placeholder="Shelf, title, or tag" value="${esc(query)}" autocomplete="off">
+      <span class="key mono">/</span>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head mono"><span>Shelves</span><span>${list.length} shown</span></div>
+    ${list.length ? `<div class="grid">${list.map(plate).join("")}</div>` : `
+      <div class="empty">
+        <h3>No shelf matches that</h3>
+        <p>Clear the field to see the full index, or add a shelf in the <code>CATEGORIES</code> array.</p>
+      </div>`}
+  </section>
+
+  ${colophon()}`;
+}
+
+function plate(c){
+  const n = inCat(c.id).length;
+  return `
+  <a class="plate pt pt${c.pattern}" href="#/c/${esc(c.id)}" style="--tilt:${(c.pattern%2?1:-1)*(3+c.pattern)}deg">
+    <span class="count mono">${n}</span>
+    <span class="face" aria-hidden="true"></span>
+    <span class="body">
+      <span class="code mono">${esc(c.code)}</span>
+      <span class="name">${esc(c.name)}</span>
+      <p class="blurb">${esc(c.blurb)}</p>
+    </span>
+  </a>`;
+}
+
+function viewCategory(id){
+  const c = cat(id);
+  if(!c) return viewMissing("That shelf isn't in the index.");
+  const items = inCat(id);
+  return `
+  <section class="page-head">
+    <a class="back mono" href="#/">← Index</a>
+    <div class="mono" style="color:var(--muted)">${esc(c.code)} · ${items.length} ${items.length===1?"artifact":"artifacts"}</div>
+    <h2>${esc(c.name)}</h2>
+    <p>${esc(c.blurb)}</p>
+  </section>
+  <section class="section">
+    ${items.length ? `
+      <div class="section-head mono"><span>Holdings</span><span>Accession · Title · Summary · Date</span></div>
+      <div class="thumbs">${items.map(a=>thumb(a)).join("")}</div>
+    ` : emptyShelf(c)}
+  </section>
+  ${colophon()}`;
+}
+
+function thumb(a){
+  const s = a.source||{};
+  let shot = "";
+  if(s.type==="image") shot = `<img src="${esc(s.path)}" alt="">`;
+  else if(s.type==="file") shot = `<iframe data-scale src="${esc(s.path)}" loading="lazy" tabindex="-1" title=""></iframe>`;
+  else if(s.type==="inline") shot = `<iframe data-scale srcdoc="${esc(s.html)}" loading="lazy" tabindex="-1" title=""></iframe>`;
+  return `
+  <a class="thumb" href="#/a/${esc(a.id)}">
+    <span class="shot">${shot}</span>
+    <span class="cap">
+      <span class="mono" style="color:var(--muted)">${esc(accession(a))} · ${fmtDate(a.date)}</span>
+      <span class="t">${esc(a.title)}</span>
+    </span>
+  </a>`;
+}
+
+function emptyShelf(c){
+  return `
+  <div class="empty">
+    <h3>This shelf is empty</h3>
+    <p>Artifacts are placed by hand. Open <code style="font-family:var(--mono);font-size:.8rem">index.html</code>, find the <code style="font-family:var(--mono);font-size:.8rem">ARTIFACTS</code> array, and add an entry with <code style="font-family:var(--mono);font-size:.8rem">category: "${esc(c.id)}"</code>.</p>
+    <pre>{
+  id: "${esc(c.id)}-001",
+  category: "${esc(c.id)}",
+  title: "Working title",
+  date: "${new Date().toISOString().slice(0,10)}",
+  summary: "One line on what this shows.",
+  tags: ["draft"],
+  source: { type: "file", path: "artifacts/${esc(c.id)}-001.html" }
+}</pre>
+    <div class="slots" aria-hidden="true">
+      ${Array.from({length:8},(_,i)=>`<span class="slot">${String(i+1).padStart(3,"0")}</span>`).join("")}
+    </div>
+  </div>`;
+}
+
+function viewArtifact(id){
+  const a = ARTIFACTS.find(x=>x.id===id);
+  if(!a) return viewMissing("That artifact isn't in the vault.");
+  const c = cat(a.category);
+  const s = a.source||{};
+  let stage = `<div class="mono" style="color:var(--muted)">No source attached</div>`;
+  if(s.type==="image") stage = `<img src="${esc(s.path)}" alt="${esc(a.title)}">`;
+  else if(s.type==="file") stage = `<iframe src="${esc(s.path)}" title="${esc(a.title)}"></iframe>`;
+  else if(s.type==="inline") stage = `<iframe srcdoc="${esc(s.html)}" title="${esc(a.title)}"></iframe>`;
+  return `
+  <section class="viewer">
+    <div class="stage">${stage}</div>
+    <aside class="side">
+      <a class="back mono" href="#/c/${esc(a.category)}">← ${esc(c?c.name:"Index")}</a>
+      <div class="mono" style="color:var(--muted);margin-top:10px">${esc(accession(a))}</div>
+      <h2>${esc(a.title)}</h2>
+      <dl>
+        <dt class="mono">Shelf</dt><dd>${esc(c?c.name:"Unfiled")}</dd>
+        <dt class="mono">Dated</dt><dd>${fmtDate(a.date)}</dd>
+        <dt class="mono">Summary</dt><dd>${esc(a.summary||"—")}</dd>
+        <dt class="mono">Tags</dt><dd>${(a.tags&&a.tags.length)?a.tags.map(t=>esc(t)).join(", "):"—"}</dd>
+        <dt class="mono">Source</dt><dd style="font-family:var(--mono);font-size:.72rem;word-break:break-all">${esc(s.path||s.type||"—")}</dd>
+      </dl>
+    </aside>
+  </section>`;
+}
+
+function viewMissing(msg){
+  return `
+  <section class="page-head">
+    <a class="back mono" href="#/">← Index</a>
+    <h2>Not found</h2>
+    <p>${esc(msg)} Check the id in the address, or return to the index.</p>
+  </section>
+  ${colophon()}`;
+}
+
+function colophon(){
+  return `
+  <footer class="colophon">
+    <div>
+      <h4>Z Valt</h4>
+      <p>Visual artifacts, kept in one place and filed by concept. Built as a single static page.</p>
+    </div>
+    <div>
+      <h4>Adding work</h4>
+      <p>Entries are written into the <code>ARTIFACTS</code> array in <code>index.html</code>. There is no upload form by design.</p>
+    </div>
+    <div>
+      <h4>Shortcuts</h4>
+      <p><code>/</code> jump to find · <code>Esc</code> clear find · <code>Invert</code> flips the page</p>
+    </div>
+    <div>
+      <h4>Set in</h4>
+      <p>Cormorant Garamond &amp; Share Tech Mono. Two values only: paper and ink.</p>
+    </div>
+  </footer>`;
+}
+
+/* --- router --- */
+let searchQuery = "";
+function render(){
+  const h = (location.hash||"#/").replace(/^#/,"");
+  const parts = h.split("/").filter(Boolean);
+  let html, crumb;
+  if(parts[0]==="c" && parts[1]){ const c=cat(parts[1]); html=viewCategory(parts[1]); crumb=c?`${c.code} / ${c.name}`:"Not found"; }
+  else if(parts[0]==="a" && parts[1]){ const a=ARTIFACTS.find(x=>x.id===parts[1]); html=viewArtifact(parts[1]); crumb=a?a.title:"Not found"; }
+  else { html=viewIndex(searchQuery); crumb="Index"; }
+  app.innerHTML = html;
+  crumbEl.textContent = crumb;
+  document.title = crumb==="Index" ? "Z VALT — visual artifact archive" : "Z VALT — "+crumb;
+  wire();
+  window.scrollTo(0,0);
+}
+
+function wire(){
+  const q = document.getElementById("q");
+  if(q){
+    q.addEventListener("input",e=>{
+      searchQuery = e.target.value;
+      const pos = e.target.selectionStart;
+      render();
+      const nq = document.getElementById("q");
+      if(nq){ nq.focus(); try{ nq.setSelectionRange(pos,pos); }catch(_){} }
+    });
+    q.addEventListener("keydown",e=>{ if(e.key==="Escape"){ searchQuery=""; render(); }});
+  }
+  // scale live previews down to thumbnail size
+  const BASE_W = 1280, BASE_H = 800;
+  document.querySelectorAll(".shot iframe[data-scale]").forEach(f=>{
+    const box = f.parentElement;
+    const fit = () => {
+      const s = box.clientWidth / BASE_W;
+      f.style.width = BASE_W+"px";
+      f.style.height = BASE_H+"px";
+      f.style.transform = "scale("+s+")";
+    };
+    fit();
+    if(window.ResizeObserver) new ResizeObserver(fit).observe(box);
+    else window.addEventListener("resize",fit);
+  });
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="/" && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)){
+    const q=document.getElementById("q");
+    if(q){ e.preventDefault(); q.focus(); q.select(); }
+    else { location.hash="#/"; }
+  }
+});
+window.addEventListener("hashchange",render);
+render();
+</script>
+</body>
+</html>
