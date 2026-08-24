@@ -1,1 +1,760 @@
+import { useState, useEffect, useMemo } from "react";
 
+/* ------------------------------------------------------------------
+   VGR-2 · INTERSTELLAR DOSSIER
+   Spec plate, power ledger, escape geometry, and a gap analysis
+   between what Voyager 2 actually is and what an optimized
+   interstellar probe would have to be.
+
+   Position figures are modeled from published ephemeris
+   (~143.6 AU from the Sun on 2026-08-24, receding 3.11 AU/yr).
+   Not live DSN telemetry.
+------------------------------------------------------------------- */
+
+const AU_KM = 149597870.7;
+const LIGHT_S_PER_AU = 499.004784;
+const ANCHOR = Date.UTC(2026, 7, 24);
+const SUN_AU_ANCHOR = 143.65;
+const RATE_AU_YR = 3.113;
+const SPEED_KM_S = 15.341;
+const YEAR_MS = 365.25 * 24 * 3600 * 1000;
+
+const sunAU = (t) => SUN_AU_ANCHOR + RATE_AU_YR * ((t - ANCHOR) / YEAR_MS);
+const earthAU = (t) => {
+  const doy = (t - Date.UTC(new Date(t).getUTCFullYear(), 0, 0)) / 86400000;
+  return sunAU(t) - 0.98 * Math.cos((2 * Math.PI * (doy - 236)) / 365.25);
+};
+
+const commas = (n, d = 0) =>
+  n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+const lightTime = (au) => {
+  const s = au * LIGHT_S_PER_AU;
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  return `${h}h ${String(m).padStart(2, "0")}m ${String(Math.floor(s % 60)).padStart(2, "0")}s`;
+};
+
+/* ---------------------------- data ---------------------------- */
+
+const SPEC_PLATE = [
+  {
+    group: "Identity",
+    rows: [
+      ["Designation", "Voyager 2 · COSPAR 1977-076A"],
+      ["Launch", "20 Aug 1977 · Titan IIIE-Centaur · LC-41, Cape Canaveral"],
+      ["Age in flight", "49 years (record-holder for operational lifetime)"],
+      ["Regime", "Interstellar medium — crossed heliopause 5 Nov 2018"],
+    ],
+  },
+  {
+    group: "Structure",
+    rows: [
+      ["Launch mass", "825 kg (≈722 kg spacecraft + hydrazine)"],
+      ["Science payload", "105 kg across 10 original instruments"],
+      ["Bus", "Ten-sided magnesium ring, 1.78 m across"],
+      ["Booms", "13 m magnetometer boom · 2.5 m science boom · 2.7 m RTG boom"],
+      ["Antenna", "3.7 m parabolic high-gain dish, X- and S-band"],
+    ],
+  },
+  {
+    group: "Power",
+    rows: [
+      ["Source", "3 × MHW-RTG, plutonium-238 thermoelectric"],
+      ["Output at launch", "≈470 W at 30 V DC"],
+      ["Decay rate", "≈4 W lost per year"],
+      ["Output today", "≈220 W (approx.) — heaters and instruments compete"],
+    ],
+  },
+  {
+    group: "Compute",
+    rows: [
+      ["Architecture", "3 double-redundant systems: CCS, FDS, AACS"],
+      ["Total memory", "≈69.63 KB — less than a single phone photo"],
+      ["Word size", "18-bit (CCS) · plated-wire and CMOS volatile memory"],
+      ["Reprogrammable", "Yes — flight software has been rewritten in flight repeatedly"],
+    ],
+  },
+  {
+    group: "Comms",
+    rows: [
+      ["Transmitter", "23 W X-band"],
+      ["Received power at Earth", "Under 10⁻¹⁶ W — a fraction of a billionth of a billionth of a watt"],
+      ["Downlink rate", "160 bit/s, 70-m Deep Space Network dishes required"],
+      ["One-way light time", "≈19.7 hours"],
+    ],
+  },
+  {
+    group: "Control",
+    rows: [
+      ["Thrusters", "16 × MR-103 hydrazine, 0.89 N each"],
+      ["Attitude", "Sun sensor + star tracker locked on Canopus"],
+      ["Thruster swap", "Switched to trajectory-correction thrusters, Jul 2019"],
+      ["Cargo", "Golden Record — 115 images, 55 languages, 90 min of music"],
+    ],
+  },
+];
+
+const ENCOUNTERS = [
+  { date: "9 Jul 1979", body: "Jupiter", note: "Refined the Io volcano discovery; mapped the ring." },
+  { date: "25 Aug 1981", body: "Saturn", note: "Scan platform seized after closest approach; recovered." },
+  { date: "24 Jan 1986", body: "Uranus", note: "Only spacecraft ever to visit. 11 new moons, tilted magnetic field." },
+  { date: "25 Aug 1989", body: "Neptune", note: "Great Dark Spot, 1,000 mph winds, Triton's nitrogen geysers." },
+  { date: "30 Aug 2007", body: "Termination shock", note: "Solar wind drops below the speed of sound." },
+  { date: "5 Nov 2018", body: "Heliopause", note: "Left the Sun's bubble. Plasma density jumped." },
+];
+
+const INSTRUMENTS = [
+  { n: 1, code: "IRIS", name: "Infrared spectrometer", off: "1998", live: false },
+  { n: 2, code: "ISS", name: "Imaging science (2 cameras)", off: "1998", live: false },
+  { n: 3, code: "PPS", name: "Photopolarimeter", off: "Failed early", live: false },
+  { n: 4, code: "UVS", name: "Ultraviolet spectrometer", off: "1998", live: false },
+  { n: 5, code: "PRA", name: "Planetary radio astronomy", off: "2007", live: false },
+  { n: 6, code: "RSS", name: "Radio science", off: "2007", live: false },
+  { n: 7, code: "PLS", name: "Plasma science", off: "Sep 2024", live: false },
+  { n: 8, code: "LECP", name: "Low-energy charged particle", off: "Mar 2025", live: false },
+  { n: 9, code: "CRS", name: "Cosmic ray subsystem", off: "Scheduled 2026", live: true, dying: true },
+  { n: 10, code: "MAG", name: "Magnetometer", off: "Active", live: true },
+  { n: 11, code: "PWS", name: "Plasma wave subsystem", off: "Active", live: true },
+];
+
+const GAPS = [
+  {
+    axis: "Cruise velocity",
+    now: "15.34 km/s",
+    nowSub: "3.11 AU/yr · 0.0051% of light speed",
+    need: "≈30,000 km/s",
+    needSub: "0.1c — Alpha Centauri inside one career",
+    factor: 1955,
+    fix:
+      "Voyager 2's speed is borrowed, not bought: four gravity assists off Jupiter, Saturn, Uranus, and Neptune. That trick is capped by the mass of the planets available. Getting to 0.1c means beamed energy (a ground laser array pushing a gram-scale sail), nuclear pulse propulsion, or fusion — none of which have flown.",
+  },
+  {
+    axis: "Deceleration",
+    now: "None",
+    nowSub: "Coasting forever; every encounter is a flyby",
+    need: "Braking to orbit",
+    needSub: "Magnetic or electric sail against the target's stellar wind",
+    factor: 900,
+    fix:
+      "A probe crossing a star system at 0.1c gets a few hours of data and is gone. An optimized mission has to shed the velocity it spent decades acquiring — magsail braking against the destination's stellar wind and magnetic field is the leading concept, and it is still paper.",
+  },
+  {
+    axis: "Electrical power",
+    now: "≈220 W",
+    nowSub: "Falling 4 W/yr from 470 W at launch",
+    need: "1–10 kW, stable",
+    needSub: "Fission reactor or long-half-life isotope",
+    factor: 25,
+    fix:
+      "Plutonium-238 has an 87.7-year half life, and thermocouples degrade faster than the fuel does. Voyager's engineers now trade instruments against heaters. Options: fission surface/space reactors in the Kilopower class, or americium-241 isotope sources with a 432-year half life, which trade power density for endurance.",
+  },
+  {
+    axis: "Data return",
+    now: "160 bit/s",
+    nowSub: "23 W transmitter, 70-m dish, 19.7 h one way",
+    need: "Mbit/s class",
+    needSub: "Optical downlink, large receive apertures",
+    factor: 6000,
+    fix:
+      "Signal strength falls with the square of distance, so the same radio that managed 115 kbit/s at Jupiter now trickles. Interstellar range demands laser communication, meter-class onboard telescopes, and receive arrays far larger than the DSN — or a chain of relay craft strung out along the route.",
+  },
+  {
+    axis: "Onboard autonomy",
+    now: "69.63 KB memory",
+    nowSub: "Ground-in-the-loop; commands take 39 h round trip",
+    need: "Full self-management",
+    needSub: "Fault diagnosis, science triage, target selection",
+    factor: 100000,
+    fix:
+      "At Alpha Centauri a round-trip command takes over eight years. Nobody is flying the spacecraft. It has to diagnose its own faults, decide what is worth observing during a flyby measured in hours, and choose what to spend its downlink budget on — without asking.",
+  },
+  {
+    axis: "Impact survival",
+    now: "Thin thermal blankets",
+    nowSub: "Adequate at 15 km/s in a sparse medium",
+    need: "Multi-layer bumper shield",
+    needSub: "Dust grains become kinetic weapons at 0.1c",
+    factor: 400,
+    fix:
+      "A one-milligram grain struck at 0.1c releases energy in the range of tens of kilograms of TNT. Interstellar space is thin but not empty. Optimized designs put an ablative sacrificial bumper ahead of the bus, fly edge-on to shrink the cross-section, and accept erosion as a budgeted consumable.",
+  },
+  {
+    axis: "Design lifetime",
+    now: "49 years, achieved",
+    nowSub: "The longest-operating spacecraft ever built",
+    need: "100–1,000 years",
+    needSub: "Materials, redundancy, zero maintenance",
+    factor: 20,
+    fix:
+      "This is the one axis where Voyager is closest to the requirement, and it got there by accident of good 1970s engineering: heavy redundancy, no moving parts that matter, and a team willing to rewrite flight software across four decades. The lesson transfers. The 12 kg of hydrazine and the decaying plutonium do not.",
+  },
+];
+
+const FUTURE = [
+  { t: "2026", e: "Cosmic ray subsystem switched off; two instruments remain." },
+  { t: "2027", e: "50th launch anniversary — if power holds." },
+  { t: "~2030s", e: "Power budget can no longer sustain any science instrument." },
+  { t: "2035", e: "Voyager 2 reaches one light-day from Earth." },
+  { t: "~40,000 yr", e: "Passes within 1.7 light-years of Ross 248 in Andromeda." },
+  { t: "~296,000 yr", e: "Passes Sirius at roughly 4.3 light-years." },
+];
+
+/* --------------------------- component --------------------------- */
+
+export default function VoyagerDossier() {
+  const [now, setNow] = useState(() => Date.now());
+  const [opened] = useState(() => Date.now());
+  const [openGap, setOpenGap] = useState(0);
+  const [mode, setMode] = useState("flown");
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const sun = sunAU(now);
+  const earth = earthAU(now);
+  const drift = ((now - opened) / 1000) * SPEED_KM_S;
+
+  const powerNow = useMemo(() => {
+    const yrs = (now - Date.UTC(1977, 7, 20)) / YEAR_MS;
+    return Math.max(0, 470 - 5.1 * yrs);
+  }, [now]);
+
+  return (
+    <div className="v2-root">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap');
+
+        .v2-root {
+          --void:#070B14;
+          --plate:#0E1524;
+          --plate-hi:#141D30;
+          --brass:#C6A15B;
+          --brass-hi:#EFCE8A;
+          --bone:#E6E1D3;
+          --slate:#7B8AA3;
+          --plasma:#59C6C2;
+          --amber:#DE8A42;
+          --rule:rgba(198,161,91,0.26);
+          background:
+            radial-gradient(ellipse at 20% -10%, rgba(89,198,194,0.07), transparent 55%),
+            radial-gradient(ellipse at 90% 10%, rgba(198,161,91,0.06), transparent 50%),
+            var(--void);
+          color: var(--bone);
+          font-family:'IBM Plex Sans',system-ui,sans-serif;
+          min-height:100%;
+          padding:0 0 5rem;
+          -webkit-font-smoothing:antialiased;
+        }
+        .v2-wrap{max-width:1080px;margin:0 auto;padding:0 1.25rem;}
+        .v2-mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;}
+        .v2-disp{font-family:'Saira Condensed','Arial Narrow',sans-serif;}
+
+        /* masthead */
+        .v2-mast{padding:3.5rem 0 2rem;border-bottom:1px solid var(--rule);}
+        .v2-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:.66rem;letter-spacing:.32em;
+          text-transform:uppercase;color:var(--brass);}
+        .v2-title{font-family:'Saira Condensed',sans-serif;font-weight:700;line-height:.86;
+          font-size:clamp(3.4rem,13vw,8.5rem);letter-spacing:-.015em;margin:.5rem 0 0;
+          color:var(--bone);text-transform:uppercase;}
+        .v2-title span{color:var(--brass-hi);}
+        .v2-sub{max-width:44ch;color:var(--slate);font-size:.95rem;line-height:1.65;margin-top:1.1rem;}
+
+        /* live strip */
+        .v2-live{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));
+          gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:2.25rem;}
+        .v2-cell{background:var(--plate);padding:1rem 1.05rem 1.1rem;}
+        .v2-cell dt{font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.18em;
+          text-transform:uppercase;color:var(--slate);}
+        .v2-cell dd{margin:.5rem 0 0;font-family:'IBM Plex Mono',monospace;font-weight:500;
+          font-size:1.24rem;color:var(--plasma);font-variant-numeric:tabular-nums;}
+        .v2-cell dd small{display:block;font-size:.63rem;color:var(--slate);margin-top:.3rem;
+          letter-spacing:.05em;font-weight:400;}
+        .v2-note{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--slate);
+          margin-top:.7rem;letter-spacing:.04em;}
+
+        /* sections */
+        .v2-sec{padding-top:4.25rem;}
+        .v2-head{display:flex;align-items:baseline;gap:1rem;border-bottom:1px solid var(--rule);
+          padding-bottom:.55rem;margin-bottom:1.75rem;}
+        .v2-head h2{font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:1.65rem;
+          text-transform:uppercase;letter-spacing:.06em;margin:0;color:var(--bone);}
+        .v2-head p{margin:0 0 0 auto;font-family:'IBM Plex Mono',monospace;font-size:.62rem;
+          letter-spacing:.16em;color:var(--brass);text-transform:uppercase;text-align:right;}
+
+        /* spec plate */
+        .v2-specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.6rem 2.5rem;}
+        .v2-grp h3{font-family:'IBM Plex Mono',monospace;font-size:.63rem;letter-spacing:.24em;
+          text-transform:uppercase;color:var(--brass);margin:0 0 .6rem;}
+        .v2-row{display:grid;grid-template-columns:9.5rem 1fr;gap:.75rem;padding:.42rem 0;
+          border-top:1px solid rgba(123,138,163,.14);font-size:.82rem;}
+        .v2-row b{font-weight:400;color:var(--slate);}
+        .v2-row span{color:var(--bone);}
+
+        /* escape plate */
+        .v2-plate-wrap{background:var(--plate);border:1px solid var(--rule);padding:1.25rem;}
+        .v2-legend{display:flex;flex-wrap:wrap;gap:1.4rem;margin-top:1rem;
+          font-family:'IBM Plex Mono',monospace;font-size:.63rem;color:var(--slate);letter-spacing:.08em;}
+        .v2-legend i{display:inline-block;width:16px;height:2px;margin-right:.45rem;vertical-align:middle;}
+
+        /* ledger */
+        .v2-ledger{border:1px solid var(--rule);}
+        .v2-li{display:grid;grid-template-columns:2.2rem 4.6rem 1fr auto;gap:.9rem;align-items:center;
+          padding:.6rem .95rem;border-bottom:1px solid rgba(123,138,163,.12);font-size:.83rem;}
+        .v2-li:last-child{border-bottom:0;}
+        .v2-li .idx{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--slate);}
+        .v2-li .code{font-family:'IBM Plex Mono',monospace;font-weight:600;letter-spacing:.06em;}
+        .v2-li .st{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.08em;
+          text-transform:uppercase;}
+        .off .code,.off .name{color:rgba(230,225,211,.32);}
+        .off .st{color:rgba(123,138,163,.55);}
+        .on .code{color:var(--plasma);} .on .name{color:var(--bone);} .on .st{color:var(--plasma);}
+        .dying .code{color:var(--amber);} .dying .st{color:var(--amber);}
+
+        .v2-bar{height:7px;background:rgba(123,138,163,.16);margin-top:.5rem;overflow:hidden;}
+        .v2-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--amber),var(--brass-hi));}
+
+        /* gaps */
+        .v2-toggle{display:inline-flex;border:1px solid var(--rule);margin-bottom:1.4rem;}
+        .v2-toggle button{background:none;border:0;color:var(--slate);cursor:pointer;
+          font-family:'IBM Plex Mono',monospace;font-size:.65rem;letter-spacing:.16em;
+          text-transform:uppercase;padding:.55rem 1rem;}
+        .v2-toggle button[data-on="true"]{background:var(--brass);color:var(--void);font-weight:600;}
+        .v2-gap{border-top:1px solid var(--rule);width:100%;text-align:left;background:none;
+          color:inherit;cursor:pointer;padding:.95rem .2rem;display:block;font:inherit;}
+        .v2-gap:last-of-type{border-bottom:1px solid var(--rule);}
+        .v2-gap:hover{background:rgba(198,161,91,.045);}
+        .v2-gap:focus-visible{outline:2px solid var(--plasma);outline-offset:-2px;}
+        .v2-gaptop{display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:baseline;}
+        .v2-axis{font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:1.12rem;
+          text-transform:uppercase;letter-spacing:.05em;}
+        .v2-mult{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--amber);}
+        .v2-vals{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.55rem;}
+        .v2-val{font-family:'IBM Plex Mono',monospace;font-size:.9rem;}
+        .v2-val small{display:block;font-size:.66rem;color:var(--slate);margin-top:.25rem;
+          font-family:'IBM Plex Sans',sans-serif;letter-spacing:0;line-height:1.45;}
+        .v2-fix{margin:.9rem 0 .2rem;font-size:.85rem;line-height:1.7;color:var(--bone);
+          max-width:70ch;border-left:2px solid var(--brass);padding-left:.95rem;}
+
+        /* timelines */
+        .v2-tl{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:1px;
+          background:var(--rule);border:1px solid var(--rule);}
+        .v2-tl > div{background:var(--plate);padding:.95rem 1rem 1.15rem;}
+        .v2-tl .when{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.14em;
+          color:var(--brass);text-transform:uppercase;}
+        .v2-tl .what{font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:1.1rem;
+          margin:.35rem 0 .3rem;text-transform:uppercase;letter-spacing:.03em;}
+        .v2-tl .why{font-size:.79rem;color:var(--slate);line-height:1.55;}
+
+        .v2-foot{margin-top:4rem;border-top:1px solid var(--rule);padding-top:1.1rem;
+          font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--slate);
+          line-height:1.9;letter-spacing:.04em;}
+
+        @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+        @media (max-width:560px){
+          .v2-row{grid-template-columns:1fr;gap:.1rem;}
+          .v2-li{grid-template-columns:2rem 1fr;row-gap:.2rem;}
+          .v2-li .st{grid-column:2;}
+          .v2-vals{grid-template-columns:1fr;}
+        }
+      `}</style>
+
+      <div className="v2-wrap">
+        {/* ---------------- masthead ---------------- */}
+        <header className="v2-mast">
+          <div className="v2-eyebrow">NASA / JPL · 1977-076A · Deep Space Network Object 32</div>
+          <h1 className="v2-title">
+            Voyager<span>&nbsp;2</span>
+          </h1>
+          <p className="v2-sub">
+            Launched sixteen days before its twin, on a once-in-176-years planetary alignment.
+            The only machine to have seen Uranus and Neptune. Forty-nine years on, it is one of
+            two working instruments humanity has in interstellar space, and no approved successor
+            is being built.
+          </p>
+
+          <dl className="v2-live">
+            <div className="v2-cell">
+              <dt>Distance from Sun</dt>
+              <dd>
+                {commas(sun, 4)} AU
+                <small>{commas(sun * AU_KM)} km</small>
+              </dd>
+            </div>
+            <div className="v2-cell">
+              <dt>Distance from Earth</dt>
+              <dd>
+                {commas(earth, 4)} AU
+                <small>{commas(earth * AU_KM)} km</small>
+              </dd>
+            </div>
+            <div className="v2-cell">
+              <dt>One-way light time</dt>
+              <dd>
+                {lightTime(earth)}
+                <small>{lightTime(earth * 2).replace(/s$/, "s round trip")}</small>
+              </dd>
+            </div>
+            <div className="v2-cell">
+              <dt>Speed rel. Sun</dt>
+              <dd>
+                {SPEED_KM_S} km/s
+                <small>3.11 AU per year · 0.0051% c</small>
+              </dd>
+            </div>
+            <div className="v2-cell">
+              <dt>Gained this session</dt>
+              <dd>
+                {commas(drift, 1)} km
+                <small>since you opened this page</small>
+              </dd>
+            </div>
+          </dl>
+          <p className="v2-note">
+            Position modeled from published ephemeris (143.65 AU on 2026-08-24, receding 3.113 AU/yr).
+            Indicative, not live telemetry.
+          </p>
+        </header>
+
+        {/* ---------------- escape plate ---------------- */}
+        <section className="v2-sec">
+          <div className="v2-head">
+            <h2>Escape geometry</h2>
+            <p>Departure asymptote set by Neptune, 1989</p>
+          </div>
+          <div className="v2-plate-wrap">
+            <EscapePlate sun={sun} />
+          </div>
+          <div className="v2-legend">
+            <span>
+              <i style={{ background: "#EFCE8A" }} />
+              Voyager 2 · 48° below the ecliptic, toward Telescopium and Pavo
+            </span>
+            <span>
+              <i style={{ background: "#59C6C2" }} />
+              Voyager 1 · 35° above, toward Ophiuchus
+            </span>
+            <span>
+              <i style={{ background: "rgba(123,138,163,.5)" }} />
+              Ecliptic plane · rings at 50 / 100 / 150 AU
+            </span>
+          </div>
+          <p className="v2-note" style={{ marginTop: "1rem", maxWidth: "72ch", lineHeight: 1.8 }}>
+            The Neptune encounter is what fixed this heading. An earlier candidate route would have
+            carried Voyager 2 within 0.8 light-years of Sirius — but taking it meant skipping a
+            close pass over Triton. Mission planners chose the science. The polar-crown trajectory
+            they flew instead bent the probe steeply south, out of the plane every other spacecraft
+            travels in.
+          </p>
+        </section>
+
+        {/* ---------------- spec plate ---------------- */}
+        <section className="v2-sec">
+          <div className="v2-head">
+            <h2>Spec plate</h2>
+            <p>As built · Pasadena, 1977</p>
+          </div>
+          <div className="v2-specs">
+            {SPEC_PLATE.map((g) => (
+              <div className="v2-grp" key={g.group}>
+                <h3>{g.group}</h3>
+                {g.rows.map(([k, v]) => (
+                  <div className="v2-row" key={k}>
+                    <b>{k}</b>
+                    <span>{v}</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ---------------- power ledger ---------------- */}
+        <section className="v2-sec">
+          <div className="v2-head">
+            <h2>Power ledger</h2>
+            <p>Every watt is spent once</p>
+          </div>
+
+          <div style={{ display: "grid", gap: "1.75rem", gridTemplateColumns: "minmax(0,1fr)" }}>
+            <div>
+              <div
+                className="v2-mono"
+                style={{ fontSize: ".72rem", color: "var(--slate)", letterSpacing: ".1em" }}
+              >
+                RTG OUTPUT · 470 W AT LAUNCH → ≈{Math.round(powerNow)} W NOW
+              </div>
+              <div className="v2-bar">
+                <i style={{ width: `${(powerNow / 470) * 100}%` }} />
+              </div>
+              <p style={{ fontSize: ".85rem", color: "var(--slate)", lineHeight: 1.7, marginTop: ".8rem", maxWidth: "70ch" }}>
+                Three thermoelectric generators convert the heat of decaying plutonium-238 into
+                electricity. The fuel has an 87.7-year half life; the thermocouples degrade faster
+                than the fuel does. The spacecraft loses roughly four watts a year, and there is no
+                way to add any back. Since 2024 the mission has been paying for science by
+                switching science off — instrument by instrument, each command treated as permanent.
+              </p>
+            </div>
+
+            <div className="v2-ledger">
+              {INSTRUMENTS.map((it) => (
+                <div
+                  key={it.code}
+                  className={`v2-li ${it.live ? (it.dying ? "on dying" : "on") : "off"}`}
+                >
+                  <span className="idx">{String(it.n).padStart(2, "0")}</span>
+                  <span className="code">{it.code}</span>
+                  <span className="name">{it.name}</span>
+                  <span className="st">{it.off}</span>
+                </div>
+              ))}
+            </div>
+            <p className="v2-note" style={{ marginTop: 0, lineHeight: 1.8, maxWidth: "70ch" }}>
+              Three of eleven experiment channels are still returning data. When the cosmic ray
+              subsystem goes dark, Voyager 2 will be down to the magnetometer and the plasma wave
+              subsystem — the same pair its twin is already reduced to. A July 2026 power
+              reconfiguration bought the mission roughly another year across a 39-hour
+              command-and-response delay.
+            </p>
+          </div>
+        </section>
+
+        {/* ---------------- encounters ---------------- */}
+        <section className="v2-sec">
+          <div className="v2-head">
+            <h2>Where it has been</h2>
+            <p>Four planets, two boundaries</p>
+          </div>
+          <div className="v2-tl">
+            {ENCOUNTERS.map((e) => (
+              <div key={e.body}>
+                <div className="when">{e.date}</div>
+                <div className="what">{e.body}</div>
+                <div className="why">{e.note}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ---------------- gap analysis ---------------- */}
+        <section className="v2-sec">
+          <div className="v2-head">
+            <h2>Gap analysis</h2>
+            <p>What optimized would actually require</p>
+          </div>
+
+          <div className="v2-toggle" role="group" aria-label="Comparison mode">
+            <button data-on={mode === "flown"} onClick={() => setMode("flown")}>
+              As flown, 1977
+            </button>
+            <button data-on={mode === "target"} onClick={() => setMode("target")}>
+              Interstellar-class target
+            </button>
+          </div>
+
+          <p style={{ fontSize: ".88rem", color: "var(--slate)", lineHeight: 1.75, maxWidth: "72ch", marginTop: 0, marginBottom: "1.5rem" }}>
+            Voyager 2 is an outer-planets probe that happens to have left the solar system. It was
+            never designed for this. Below, each axis compares what it actually carries against
+            what a purpose-built interstellar mission would need to reach another star within a
+            human career. Select a row for the adaptation required.
+          </p>
+
+          {GAPS.map((g, i) => (
+            <button
+              key={g.axis}
+              className="v2-gap"
+              onClick={() => setOpenGap(openGap === i ? -1 : i)}
+              aria-expanded={openGap === i}
+            >
+              <div className="v2-gaptop">
+                <span className="v2-axis">{g.axis}</span>
+                <span className="v2-mult">
+                  {g.factor >= 1000 ? `≈${commas(Math.round(g.factor / 1000))}k×` : `≈${g.factor}×`} short
+                </span>
+              </div>
+              <div className="v2-bar" aria-hidden="true">
+                <i
+                  style={{
+                    width: `${Math.min(100, (Math.log10(g.factor) / 5) * 100)}%`,
+                    opacity: mode === "target" ? 1 : 0.45,
+                  }}
+                />
+              </div>
+              <div className="v2-vals">
+                <div className="v2-val" style={{ color: mode === "flown" ? "var(--bone)" : "var(--slate)" }}>
+                  {g.now}
+                  <small>{g.nowSub}</small>
+                </div>
+                <div className="v2-val" style={{ color: mode === "target" ? "var(--plasma)" : "var(--slate)" }}>
+                  {g.need}
+                  <small>{g.needSub}</small>
+                </div>
+              </div>
+              {openGap === i && <p className="v2-fix">{g.fix}</p>}
+            </button>
+          ))}
+
+          <p className="v2-note" style={{ lineHeight: 1.9, maxWidth: "72ch", marginTop: "1.5rem" }}>
+            Bars are logarithmic. The multipliers are order-of-magnitude, not engineering figures —
+            the point is the shape of the shortfall, not its third decimal place. Nearest concrete
+            successor concepts: the JHU-APL Interstellar Probe study (1,000 AU in about 50 years via
+            a solar Oberth maneuver) and Breakthrough Starshot (gram-scale laser sails at 0.2c).
+            Neither is a funded mission.
+          </p>
+        </section>
+
+        {/* ---------------- ahead ---------------- */}
+        <section className="v2-sec">
+          <div className="v2-head">
+            <h2>What is ahead</h2>
+            <p>Two instruments, then silence</p>
+          </div>
+          <div className="v2-tl">
+            {FUTURE.map((f) => (
+              <div key={f.t}>
+                <div className="when">{f.t}</div>
+                <div className="why" style={{ marginTop: ".45rem" }}>
+                  {f.e}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: ".88rem", color: "var(--slate)", lineHeight: 1.75, maxWidth: "72ch", marginTop: "1.5rem" }}>
+            Voyager 2 is not aimed at anything. It will fall through the galaxy for as long as the
+            galaxy lasts, carrying a gold-plated copper record that stays playable for something on
+            the order of a billion years — far longer than the spacecraft will be able to say
+            anything about itself.
+          </p>
+        </section>
+
+        <footer className="v2-foot">
+          Sources: NASA/JPL Voyager mission pages and status blog · JPL instrument shutdown
+          announcements 2024–2026 · Bailer-Jones &amp; Farnocchia, future stellar flybys of the
+          Voyager and Pioneer spacecraft.
+          <br />
+          Counters are modeled from published ephemeris, not a live Deep Space Network feed.
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------ signature: the escape plate ------------------ */
+/* An engraved radial diagram in the spirit of the pulsar map etched
+   on the Golden Record this spacecraft is carrying.                */
+
+function EscapePlate({ sun }) {
+  const W = 760;
+  const H = 420;
+  const cx = W * 0.24;
+  const cy = H * 0.46;
+  const scale = 2.05; // px per AU
+
+  const deg = (d) => (d * Math.PI) / 180;
+  const ray = (angleDeg, au) => ({
+    x: cx + Math.cos(deg(angleDeg)) * au * scale,
+    y: cy - Math.sin(deg(angleDeg)) * au * scale,
+  });
+
+  const v2Angle = -21; // drawn foreshortening of the true 48° south departure
+  const v1Angle = 16;
+  const v2Now = ray(v2Angle, Math.min(sun, 160));
+  const v1Now = ray(v1Angle, 172);
+
+  // binary tick marks along the Voyager 2 ray — Golden Record vernacular
+  const ticks = [1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1];
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img"
+      aria-label="Radial diagram of Voyager 2's escape direction, 48 degrees below the ecliptic plane">
+      <defs>
+        <linearGradient id="v2ray" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#C6A15B" stopOpacity="0.25" />
+          <stop offset="100%" stopColor="#EFCE8A" stopOpacity="1" />
+        </linearGradient>
+        <linearGradient id="v1ray" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#59C6C2" stopOpacity="0.15" />
+          <stop offset="100%" stopColor="#59C6C2" stopOpacity="0.8" />
+        </linearGradient>
+      </defs>
+
+      {/* distance rings */}
+      {[50, 100, 150].map((au) => (
+        <g key={au}>
+          <ellipse
+            cx={cx} cy={cy} rx={au * scale} ry={au * scale * 0.26}
+            fill="none" stroke="rgba(123,138,163,0.28)" strokeWidth="1"
+            strokeDasharray={au === 150 ? "2 5" : "none"}
+          />
+          <text x={cx + au * scale - 4} y={cy - au * scale * 0.26 - 7}
+            fill="rgba(123,138,163,0.7)" fontSize="9.5" fontFamily="IBM Plex Mono, monospace"
+            letterSpacing="1.2" textAnchor="end">{au} AU</text>
+        </g>
+      ))}
+
+      {/* ecliptic plane */}
+      <line x1={cx - 60} y1={cy} x2={W - 18} y2={cy}
+        stroke="rgba(123,138,163,0.45)" strokeWidth="1" strokeDasharray="6 6" />
+      <text x={W - 20} y={cy - 8} fill="rgba(123,138,163,0.8)" fontSize="9.5"
+        fontFamily="IBM Plex Mono, monospace" letterSpacing="1.4" textAnchor="end">
+        ECLIPTIC PLANE
+      </text>
+
+      {/* heliopause marker */}
+      <ellipse cx={cx} cy={cy} rx={119 * scale} ry={119 * scale * 0.26}
+        fill="none" stroke="rgba(89,198,194,0.35)" strokeWidth="1.3" />
+      <text x={cx + 119 * scale * 0.62} y={cy + 119 * scale * 0.26 + 15}
+        fill="rgba(89,198,194,0.75)" fontSize="9.5" fontFamily="IBM Plex Mono, monospace"
+        letterSpacing="1.2">HELIOPAUSE · CROSSED 5 NOV 2018</text>
+
+      {/* Voyager 1 ray */}
+      <line x1={cx} y1={cy} x2={v1Now.x} y2={v1Now.y} stroke="url(#v1ray)" strokeWidth="1.6" />
+      <circle cx={v1Now.x} cy={v1Now.y} r="3.4" fill="#59C6C2" />
+      <text x={v1Now.x - 8} y={v1Now.y - 10} fill="#59C6C2" fontSize="10.5"
+        fontFamily="IBM Plex Mono, monospace" letterSpacing="1.2" textAnchor="end">VOYAGER 1 · 35° N</text>
+
+      {/* Voyager 2 ray — the subject */}
+      <line x1={cx} y1={cy} x2={v2Now.x} y2={v2Now.y} stroke="url(#v2ray)" strokeWidth="2.4" />
+
+      {/* binary ticks along the ray */}
+      {ticks.map((b, i) => {
+        const au = 12 + i * 9.6;
+        const p = ray(v2Angle, au);
+        const nx = Math.sin(deg(v2Angle));
+        const ny = Math.cos(deg(v2Angle));
+        const len = b ? 9 : 4.5;
+        return (
+          <line key={i}
+            x1={p.x - nx * len} y1={p.y - ny * len}
+            x2={p.x + nx * len} y2={p.y + ny * len}
+            stroke="#C6A15B" strokeWidth={b ? 1.5 : 1} opacity={0.55 + i * 0.03} />
+        );
+      })}
+
+      <circle cx={v2Now.x} cy={v2Now.y} r="5.2" fill="#EFCE8A" />
+      <circle cx={v2Now.x} cy={v2Now.y} r="11" fill="none" stroke="#EFCE8A" strokeOpacity="0.35" />
+      <text x={v2Now.x + 16} y={v2Now.y + 5} fill="#EFCE8A" fontSize="11.5"
+        fontFamily="Saira Condensed, sans-serif" fontWeight="600" letterSpacing="1.6">
+        VOYAGER 2
+      </text>
+      <text x={v2Now.x + 16} y={v2Now.y + 20} fill="rgba(198,161,91,0.85)" fontSize="9.5"
+        fontFamily="IBM Plex Mono, monospace" letterSpacing="1">
+        {sun.toFixed(2)} AU · 48° SOUTH
+      </text>
+
+      {/* Sun */}
+      <circle cx={cx} cy={cy} r="6" fill="#E6E1D3" />
+      <circle cx={cx} cy={cy} r="14" fill="none" stroke="rgba(230,225,211,0.28)" />
+      <text x={cx} y={cy + 34} fill="rgba(230,225,211,0.7)" fontSize="9.5"
+        fontFamily="IBM Plex Mono, monospace" letterSpacing="1.6" textAnchor="middle">SUN</text>
+
+      {/* departure angle annotation */}
+      <path d={`M ${cx + 62} ${cy} A 62 62 0 0 1 ${ray(v2Angle, 30.2).x} ${ray(v2Angle, 30.2).y}`}
+        fill="none" stroke="rgba(198,161,91,0.6)" strokeWidth="1" />
+      <text x={cx + 74} y={cy + 20} fill="rgba(198,161,91,0.9)" fontSize="10"
+        fontFamily="IBM Plex Mono, monospace" letterSpacing="1">48°</text>
+    </svg>
+  );
+}
