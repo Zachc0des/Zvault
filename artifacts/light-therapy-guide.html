@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Light, Timed — A Working Guide to Color Temperature, Focus, and Rest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0E0D0C;
+    --ink-2:#161412;
+    --paper:#EFEAE2;
+    --paper-dim:#A39C91;
+    --rule:rgba(239,234,226,.14);
+
+    /* Approximate sRGB rendering of each correlated color temperature */
+    --k1800:#FF4A24;
+    --k2200:#FF9A45;
+    --k2700:#FFC489;
+    --k3500:#FFDDBC;
+    --k4500:#FFF3E6;
+    --k5500:#F1F4FF;
+    --k6500:#CFE0FF;
+    --melanopic:#4DA3FF;
+
+    --shell: min(1120px, 100%);
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box}
+
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    *{animation:none !important;transition:none !important}
+  }
+
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    padding:0 20px 80px;
+  }
+
+  .shell{width:var(--shell);margin:0 auto}
+
+  /* ---------- type ---------- */
+  h1,h2,h3{font-family:'Instrument Serif', Georgia, serif;font-weight:400;letter-spacing:-.01em;line-height:1.08}
+  h1{font-size:clamp(2.6rem,7vw,4.6rem)}
+  h2{font-size:clamp(1.9rem,4.4vw,2.9rem)}
+  h3{font-size:1.35rem;line-height:1.2}
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--paper-dim);
+  }
+  .lede{font-size:clamp(1.05rem,2.2vw,1.25rem);color:#D6CFC5;max-width:62ch}
+  p{max-width:68ch;color:#D6CFC5}
+  .mono{font-family:'IBM Plex Mono', monospace}
+  em{font-style:italic}
+
+  /* ---------- header ---------- */
+  header{padding:clamp(56px,10vw,120px) 0 40px}
+  header h1{margin:18px 0 22px}
+  header h1 .k{
+    background:linear-gradient(90deg,var(--k1800),var(--k2700) 35%,var(--k5500) 70%,var(--k6500));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+
+  /* ---------- hero spectrum: the signature ---------- */
+  .spectrum{margin:52px 0 12px}
+  .spectrum-bar{
+    height:74px;border-radius:4px;
+    background:linear-gradient(90deg,
+      var(--k1800) 0%, var(--k2200) 14%, var(--k2700) 30%,
+      var(--k3500) 46%, var(--k4500) 62%, var(--k5500) 80%, var(--k6500) 100%);
+    box-shadow:0 0 70px rgba(255,180,110,.18), 0 0 120px rgba(90,150,255,.12);
+  }
+  .spectrum-ticks{
+    display:flex;margin-top:10px;border-top:1px solid var(--rule);padding-top:8px;
+    font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim);
+  }
+  .spectrum-ticks span{flex:1}
+  .spectrum-ticks span:last-child{text-align:right;flex:0 0 auto}
+  .spectrum-legend{
+    display:flex;justify-content:space-between;gap:20px;margin-top:6px;
+    font-size:.85rem;color:var(--paper-dim);
+  }
+  .spectrum-legend b{color:var(--paper);font-weight:500}
+
+  /* ---------- sections ---------- */
+  section{padding:clamp(56px,8vw,96px) 0 0}
+  .section-head{border-top:1px solid var(--rule);padding-top:22px;margin-bottom:34px}
+  .section-head h2{margin:14px 0 14px}
+
+  /* ---------- mechanism ---------- */
+  .mech{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:2px;background:var(--rule);border:1px solid var(--rule)}
+  .mech div{background:var(--ink);padding:24px 22px}
+  .mech .n{font-family:'IBM Plex Mono',monospace;font-size:.75rem;color:var(--melanopic);letter-spacing:.12em}
+  .mech h3{margin:12px 0 8px;font-size:1.2rem}
+  .mech p{font-size:.94rem;color:#B9B2A8}
+
+  /* ---------- modes ---------- */
+  .modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+  .mode{
+    background:var(--ink-2);
+    border:1px solid var(--rule);
+    border-radius:3px;
+    padding:0 0 22px;
+    overflow:hidden;
+  }
+  .mode .swatch{height:8px;display:block}
+  .mode-body{padding:22px 22px 0}
+  .mode .kv{
+    display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+    font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--paper-dim);
+    border-bottom:1px solid var(--rule);padding-bottom:10px;margin-bottom:16px;
+  }
+  .mode h3{margin-bottom:10px}
+  .mode p{font-size:.95rem;color:#B9B2A8;margin-bottom:14px}
+  .mode ul{list-style:none;font-size:.88rem;color:#D6CFC5}
+  .mode li{padding:5px 0 5px 16px;position:relative}
+  .mode li::before{content:"";position:absolute;left:0;top:14px;width:6px;height:1px;background:var(--paper-dim)}
+
+  /* ---------- scenarios ---------- */
+  .scenario{border-top:1px solid var(--rule);padding:34px 0}
+  .scenario-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 16px;margin-bottom:6px}
+  .scenario h3{font-size:1.6rem}
+  .scenario .who{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim);letter-spacing:.14em;text-transform:uppercase}
+  .scenario > p{margin-bottom:22px}
+
+  .strip{display:flex;width:100%;height:52px;border-radius:3px;overflow:hidden}
+  .strip div{
+    display:flex;align-items:center;justify-content:center;
+    font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:rgba(20,16,12,.72);
+    letter-spacing:.04em;text-align:center;padding:0 4px;overflow:hidden;white-space:nowrap;
+  }
+  .strip div.dark{color:rgba(255,255,255,.75)}
+  .strip-labels{display:flex;width:100%;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--paper-dim)}
+  .strip-labels div{padding-right:6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .why{
+    margin-top:20px;padding-left:18px;border-left:2px solid var(--melanopic);
+    font-size:.95rem;color:#B9B2A8;
+  }
+  .why b{color:var(--paper);font-weight:500}
+
+  /* ---------- rules ---------- */
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+  .rule-card{border-top:2px solid var(--paper);padding-top:16px}
+  .rule-card .num{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim);letter-spacing:.14em}
+  .rule-card h3{font-size:1.25rem;margin:8px 0 10px}
+  .rule-card p{font-size:.93rem;color:#B9B2A8}
+
+  /* ---------- reference table ---------- */
+  .table{width:100%;border-collapse:collapse;font-size:.9rem}
+  .table th,.table td{text-align:left;padding:14px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+  .table th{font-family:'IBM Plex Mono',monospace;font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--paper-dim);font-weight:400}
+  .table td.k{font-family:'IBM Plex Mono',monospace;color:var(--paper);white-space:nowrap}
+  .table td .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px;vertical-align:middle}
+  .table-wrap{overflow-x:auto}
+
+  /* ---------- rgb colors ---------- */
+  .hues{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:20px;margin-bottom:40px}
+  .hue{border:1px solid var(--rule);border-radius:3px;background:var(--ink-2);overflow:hidden}
+  .hue .cap{height:60px;position:relative}
+  .hue .cap::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(14,13,12,.85))}
+  .hue-body{padding:18px 20px 20px}
+  .hue h3{font-size:1.2rem;margin-bottom:4px}
+  .hue .nm{font-family:'IBM Plex Mono',monospace;font-size:.72rem;color:var(--paper-dim);letter-spacing:.1em;margin-bottom:12px}
+  .hue p{font-size:.92rem;color:#B9B2A8}
+  .evidence{
+    display:flex;align-items:center;gap:9px;margin-top:16px;padding-top:12px;border-top:1px solid var(--rule);
+    font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--paper-dim);
+  }
+  .meter{display:flex;gap:3px;flex:0 0 auto}
+  .meter i{width:16px;height:3px;background:rgba(239,234,226,.18);display:block}
+  .meter i.on{background:var(--melanopic)}
+
+  /* ---------- conditions ---------- */
+  .conditions{border-top:1px solid var(--rule)}
+  .cond{display:grid;grid-template-columns:minmax(160px,1fr) 2.4fr;gap:24px;padding:22px 0;border-bottom:1px solid var(--rule)}
+  .cond h3{font-size:1.15rem}
+  .cond .tag{font-family:'IBM Plex Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-dim);margin-top:8px}
+  .cond p{font-size:.93rem;color:#B9B2A8}
+  @media (max-width:620px){ .cond{grid-template-columns:1fr;gap:10px} }
+
+  /* ---------- note ---------- */
+  .note{
+    border:1px solid var(--rule);border-left:3px solid var(--k2200);
+    padding:26px;margin-top:44px;background:var(--ink-2);
+  }
+  .note h3{font-size:1.2rem;margin-bottom:12px}
+  .note p{font-size:.93rem;color:#B9B2A8}
+  .note p + p{margin-top:12px}
+
+  footer{border-top:1px solid var(--rule);margin-top:80px;padding-top:24px;font-size:.85rem;color:var(--paper-dim)}
+
+  a{color:var(--melanopic)}
+  a:focus-visible, [tabindex]:focus-visible{outline:2px solid var(--melanopic);outline-offset:3px}
+
+  @media (max-width:640px){
+    .strip{height:44px}
+    .strip div{font-size:.6rem}
+    .strip-labels{display:none}
+    .spectrum-legend{flex-direction:column;gap:4px}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<header>
+  <div class="eyebrow">A working guide to light and timing</div>
+  <h1>Your day has a <span class="k">color temperature</span>. Set it on purpose.</h1>
+  <p class="lede">Light is the strongest signal your body uses to decide whether it is time to work or time to stop. Color and brightness together tell that story — this guide covers what each setting does, and how six different real schedules use it.</p>
+
+  <div class="spectrum">
+    <div class="spectrum-bar" role="img" aria-label="Color temperature spectrum from 1800 Kelvin amber through 6500 Kelvin daylight blue-white"></div>
+    <div class="spectrum-ticks">
+      <span>1800K</span><span>2200K</span><span>2700K</span><span>3500K</span><span>4500K</span><span>5500K</span><span>6500K</span>
+    </div>
+    <div class="spectrum-legend">
+      <span><b>Warm / low K</b> — the body reads this as evening</span>
+      <span><b>Cool / high K</b> — the body reads this as midday</span>
+    </div>
+  </div>
+</header>
+
+<section id="how">
+  <div class="section-head">
+    <div class="eyebrow">01 — Mechanism</div>
+    <h2>Why a lightbulb can move your bedtime</h2>
+    <p>Four facts do most of the work. Everything else in this guide follows from them.</p>
+  </div>
+
+  <div class="mech">
+    <div>
+      <div class="n">01</div>
+      <h3>A third kind of eye cell</h3>
+      <p>Beyond the rods and cones you see with, the retina carries cells that report only one thing to the brain's master clock: how much light is hitting them. They don't build images. They set the time.</p>
+    </div>
+    <div>
+      <div class="n">02</div>
+      <h3>They peak near 480 nm</h3>
+      <p>Those cells are most sensitive to blue-cyan light, which is exactly the wavelength that dominates midday sky and cool-white bulbs. Amber and red light barely register with them — that's the whole basis of "warm at night."</p>
+    </div>
+    <div>
+      <div class="n">03</div>
+      <h3>Brightness outranks color</h3>
+      <p>A blazing 2700K lamp still says "daytime" louder than a dim 5000K one. Dimming is the first lever; shifting warm is the second. Doing only one of them is doing half the job.</p>
+    </div>
+    <div>
+      <div class="n">04</div>
+      <h3>Timing decides the direction</h3>
+      <p>The same bright light advances your clock in the morning and delays it at night. Light is not simply "good" or "bad" — it moves you, and when you get it determines which way.</p>
+    </div>
+  </div>
+</section>
+
+<section id="modes">
+  <div class="section-head">
+    <div class="eyebrow">02 — The settings</div>
+    <h2>Six settings, and what each one is for</h2>
+    <p>Anchor these by what they do, not by the clock. Then map them onto whatever hours you actually keep.</p>
+  </div>
+
+  <div class="modes">
+    <article class="mode">
+      <span class="swatch" style="background:var(--k6500)"></span>
+      <div class="mode-body">
+        <div class="kv"><span>6000–6500K · Daylight</span><span>100%</span></div>
+        <h3>Wake signal</h3>
+        <p>The hardest push your indoor lighting can make. Used inside the first hour after waking, it sharpens the boundary between night and day and pulls your whole clock earlier.</p>
+        <ul>
+          <li>First hour awake, especially in winter</li>
+          <li>Fighting a sleep schedule that keeps drifting later</li>
+          <li>Windowless rooms and dark mornings</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="mode">
+      <span class="swatch" style="background:var(--k5500)"></span>
+      <div class="mode-body">
+        <div class="kv"><span>5000–5500K · Cool white</span><span>90–100%</span></div>
+        <h3>Deep focus</h3>
+        <p>The setting for work that needs sustained attention — reading, code, study, anything analytical. It also flattens the mid-afternoon dip better than a second coffee does.</p>
+        <ul>
+          <li>Study blocks and technical work</li>
+          <li>The 2–4pm slump</li>
+          <li>Any task you keep re-reading the same line of</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="mode">
+      <span class="swatch" style="background:var(--k4500)"></span>
+      <div class="mode-body">
+        <div class="kv"><span>4000–4500K · Neutral</span><span>70–85%</span></div>
+        <h3>Steady state</h3>
+        <p>Boring on purpose. Neutral light is the right default for long stretches of ordinary work, meetings, chores and cooking — alert without the wired edge of full cool white.</p>
+        <ul>
+          <li>Calls, admin, email, errands</li>
+          <li>Shared rooms where one setting has to suit everyone</li>
+          <li>All-day background lighting</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="mode">
+      <span class="swatch" style="background:var(--k3500)"></span>
+      <div class="mode-body">
+        <div class="kv"><span>3000–3500K · Warm white</span><span>50–70%</span></div>
+        <h3>Transition</h3>
+        <p>The handoff between working and stopping. Still bright enough to be useful, warm enough that your body starts assembling melatonin instead of waiting for another push.</p>
+        <ul>
+          <li>The last couple of hours of output</li>
+          <li>Dinner, tidying, low-stakes tasks</li>
+          <li>Evening reading and conversation</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="mode">
+      <span class="swatch" style="background:var(--k2700)"></span>
+      <div class="mode-body">
+        <div class="kv"><span>2200–2700K · Soft amber</span><span>25–40%</span></div>
+        <h3>Wind-down</h3>
+        <p>The point where the room should feel noticeably dimmer than the hour before. Amber at low output keeps rooms navigable without restarting the alerting signal.</p>
+        <ul>
+          <li>The hour before bed</li>
+          <li>Showering, stretching, journaling</li>
+          <li>Screens still on? Turn the room down further</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="mode">
+      <span class="swatch" style="background:var(--k1800)"></span>
+      <div class="mode-body">
+        <div class="kv"><span>1800–2000K · Red</span><span>5–20%</span></div>
+        <h3>Night-safe</h3>
+        <p>Red sits furthest from what the clock cells respond to, so it lets you see without announcing morning. This is the setting for anything that happens between bedtime and sunrise.</p>
+        <ul>
+          <li>Bathroom trips and night feeds</li>
+          <li>Bedside lamps and hallway nightlights</li>
+          <li>The last 15 minutes before sleep</li>
+        </ul>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="rgb">
+  <div class="section-head">
+    <div class="eyebrow">03 — Color bulbs</div>
+    <h2>What an RGB bulb can and can't do</h2>
+    <p>A color-changing bulb does two very different jobs, and it's worth keeping them apart. One is physiological: saturated red at night and bright cool light in the morning genuinely change what your body clock reads. The other is atmospheric: a room bathed in green or violet changes how a space <em>feels</em>, which works through preference, association and habit rather than through the clock. Both are useful. Only one of them is a lever on your biology.</p>
+  </div>
+
+  <div class="hues">
+    <article class="hue">
+      <div class="cap" style="background:linear-gradient(180deg,#FF2D0B,#8E1400)"></div>
+      <div class="hue-body">
+        <h3>Red</h3>
+        <div class="nm">≈ 620–700 nm</div>
+        <p>The most useful color on the wheel after white. It sits almost entirely outside what the clock cells respond to, so you can see by it at 3am without telling your brain the day has started. Set one bulb to deep red at low output and leave it as your permanent night mode.</p>
+        <div class="evidence"><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i></span> Well supported</div>
+      </div>
+    </article>
+
+    <article class="hue">
+      <div class="cap" style="background:linear-gradient(180deg,#FFB03A,#B25E00)"></div>
+      <div class="hue-body">
+        <h3>Amber &amp; orange</h3>
+        <div class="nm">≈ 590–620 nm</div>
+        <p>A step brighter than red and easier to live in for a whole evening. Good for the last hour or two before bed when you still want to cook, read or talk. Same principle as red, slightly weaker effect, considerably more pleasant as a room light.</p>
+        <div class="evidence"><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i></span> Well supported</div>
+      </div>
+    </article>
+
+    <article class="hue">
+      <div class="cap" style="background:linear-gradient(180deg,#2E9BFF,#0B3F8E)"></div>
+      <div class="hue-body">
+        <h3>Blue &amp; cyan</h3>
+        <div class="nm">≈ 460–490 nm</div>
+        <p>The wavelength the clock cells are tuned to, which cuts both ways: strongest alerting effect during the day, worst offender at night. But a saturated blue bulb is dim, and dose matters — for a real morning push, bright <em>white</em> at 6500K delivers far more signal than a blue party light does.</p>
+        <div class="evidence"><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i></span> Well supported</div>
+      </div>
+    </article>
+
+    <article class="hue">
+      <div class="cap" style="background:linear-gradient(180deg,#3DD17A,#0C5C31)"></div>
+      <div class="hue-body">
+        <h3>Green</h3>
+        <div class="nm">≈ 520–530 nm</div>
+        <p>The one saturated color with a real clinical thread behind it: narrow-band green light has reduced pain in small migraine trials, where nearly every other color made it worse. Promising, not settled, and the studies used calibrated narrow-band sources rather than a smart bulb's green setting.</p>
+        <div class="evidence"><span class="meter"><i class="on"></i><i class="on"></i><i></i></span> Emerging</div>
+      </div>
+    </article>
+
+    <article class="hue">
+      <div class="cap" style="background:linear-gradient(180deg,#B96BFF,#5A2196)"></div>
+      <div class="hue-body">
+        <h3>Purple, pink, teal</h3>
+        <div class="nm">Ambience range</div>
+        <p>These change the mood of a room the way a paint color or a playlist does — real, but a matter of taste and association, not photoreceptors. Use them freely for atmosphere. Be skeptical of any chart claiming a specific hue treats a specific condition; that's decoration dressed as medicine.</p>
+        <div class="evidence"><span class="meter"><i class="on"></i><i></i><i></i></span> Preference-driven</div>
+      </div>
+    </article>
+
+    <article class="hue">
+      <div class="cap" style="background:linear-gradient(90deg,#FF2D0B,#FFB03A,#3DD17A,#2E9BFF,#B96BFF)"></div>
+      <div class="hue-body">
+        <h3>Cycling &amp; strobe modes</h3>
+        <div class="nm">Use with care</div>
+        <p>Rapid color cycling, pulsing and strobe effects can trigger seizures in people with photosensitive epilepsy and provoke migraine or nausea in others. Slow ambient fades are fine. Anything flashing faster than roughly once a second doesn't belong in a room where someone is trying to focus or rest.</p>
+        <div class="evidence"><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i></span> Known risk</div>
+      </div>
+    </article>
+  </div>
+
+  <div class="section-head" style="border-top:none;padding-top:0">
+    <h3 style="font-size:1.6rem;margin-bottom:12px">Where color bulbs actually help</h3>
+    <p>Supportive tools, all of them — they make an environment easier to live and rest in. None of them replaces treatment, and none is a substitute for a conversation with a clinician.</p>
+  </div>
+
+  <div class="conditions">
+    <div class="cond">
+      <div><h3>Seasonal low mood</h3><div class="tag">Use white, not color</div></div>
+      <p>The evidence here is for <em>intensity</em>: bright, broad-spectrum white light in the morning. A color bulb's blue setting is far too dim to substitute. Set the bulb to its brightest 6500K white, use it early, and treat a proper 10,000-lux box as the real tool if symptoms return every winter.</p>
+    </div>
+    <div class="cond">
+      <div><h3>Shift work &amp; jet lag</h3><div class="tag">Bright cool, then red</div></div>
+      <p>This is where programmable bulbs earn their price. Schedule bright cool white across the first half of the shift, an automatic warm-down before it ends, and a red-only profile for the hours you need to see but not wake up. Automating it means it happens on the nights you're too tired to think about it.</p>
+    </div>
+    <div class="cond">
+      <div><h3>Migraine &amp; light sensitivity</h3><div class="tag">Dim first, green second</div></div>
+      <p>During an attack, less light beats better light — dim everything and cut glare. If you want to try green, use a low, steady, saturated setting on a single lamp, and stop if it makes things worse. Flicker from cheap dimmed bulbs is a common and overlooked trigger.</p>
+    </div>
+    <div class="cond">
+      <div><h3>Sensory sensitivity</h3><div class="tag">Steady beats bright</div></div>
+      <p>For people who find fluorescent overheads exhausting — including many autistic and ADHD adults — the win comes from replacing harsh, flickering ceiling light with a few steady, dimmable lamps at eye level. Letting someone choose their own color for a room is a low-cost way to hand back some control over a space.</p>
+    </div>
+    <div class="cond">
+      <div><h3>Dementia &amp; late-day agitation</h3><div class="tag">Strong day/night contrast</div></div>
+      <p>Care-setting research has focused on making days unambiguously bright and evenings unambiguously dim, which can help with restlessness and disrupted sleep. Consistency is the active ingredient: the same bright morning and the same warm, low evening every day, with red nightlights on the route to the bathroom.</p>
+    </div>
+    <div class="cond">
+      <div><h3>Anxiety &amp; winding down</h3><div class="tag">Ritual over hue</div></div>
+      <p>No color reduces anxiety on its own. What helps is the cue: one repeated, unmistakable change — lights drop to amber at the same time each night — that marks the end of the day. The bulb's job is to make the boundary visible, and the routine around it does the rest.</p>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:36px">
+    <h3>Buying notes, briefly</h3>
+    <p><b>Tunable white matters more than color.</b> A bulb that sweeps 2000K–6500K white at high brightness will do more for your sleep and focus than one with sixteen million colors and a weak white mode. If a bulb only offers one fixed white, it can't do most of this guide.</p>
+    <p><b>Saturated color is dim.</b> Running an RGB bulb on pure red or blue uses a fraction of its output. That's exactly what you want at night and useless in the morning.</p>
+    <p><b>Watch for flicker and low CRI.</b> Cheap bulbs often pulse visibly at low dim levels and render skin and food badly. If a bulb looks unpleasant to read under at 20%, it's not the color that's wrong.</p>
+    <p><b>Automate it.</b> Schedules beat willpower. Set the transitions once and let them run — the point is that the lights change without you deciding to change them at 11pm.</p>
+  </div>
+</section>
+
+<section id="scenarios">
+  <div class="section-head">
+    <div class="eyebrow">04 — In practice</div>
+    <h2>Six real schedules</h2>
+    <p>Each strip below runs left to right across the person's waking day, colored by the light they should be under. The constraint is different every time — the logic underneath isn't.</p>
+  </div>
+
+  <article class="scenario">
+    <div class="scenario-head">
+      <h3>The nurse on nights</h3>
+      <span class="who">7pm–7am · three shifts a week</span>
+    </div>
+    <p>The hardest case in circadian lighting: she needs to be alert while her body expects darkness, then sleep while the world is bright.</p>
+    <div class="strip" aria-hidden="true">
+      <div class="dark" style="background:var(--k5500);flex:5;color:rgba(20,16,12,.72)">Bright cool — first half of shift</div>
+      <div style="background:var(--k3500);flex:4">Warmer — last hours</div>
+      <div style="background:var(--k2700);flex:2">Amber commute (sunglasses)</div>
+      <div class="dark" style="background:#1a1a1a;flex:5">Blackout sleep</div>
+    </div>
+    <div class="strip-labels" aria-hidden="true">
+      <div style="flex:5">19:00</div><div style="flex:4">00:00</div><div style="flex:2">05:00</div><div style="flex:5">08:00</div>
+    </div>
+    <div class="why"><b>The move:</b> bright cool light front-loaded into the shift, then a deliberate warm-down in the final hours so she isn't peaking at clock-out. Dark sunglasses on the drive home are doing real work — they stop the sunrise from resetting her clock the wrong way. Blackout curtains and a red nightlight at home make daytime sleep possible.</div>
+  </article>
+
+  <article class="scenario">
+    <div class="scenario-head">
+      <h3>The student with an 8am exam</h3>
+      <span class="who">Habitually asleep at 3am · exam in five days</span>
+    </div>
+    <p>You can't jump a sleep schedule three hours in one night, but you can walk it back roughly 30–60 minutes a day using light at both ends.</p>
+    <div class="strip" aria-hidden="true">
+      <div style="background:var(--k6500);flex:3">Daylight, on waking</div>
+      <div style="background:var(--k5500);flex:6">Cool white — study blocks</div>
+      <div style="background:var(--k3500);flex:3">Warm — review only</div>
+      <div style="background:var(--k2700);flex:2">Amber wind-down</div>
+    </div>
+    <div class="strip-labels" aria-hidden="true">
+      <div style="flex:3">Wake</div><div style="flex:6">Midday</div><div style="flex:3">Evening</div><div style="flex:2">Pre-sleep</div>
+    </div>
+    <div class="why"><b>The move:</b> each morning, wake 30 minutes earlier than the last and hit daylight-temperature light immediately — ideally by stepping outside, which is brighter than any bulb. Each evening, start the amber shift 30 minutes earlier too. Late-night cramming under cool white is exactly what keeps the schedule stuck where it is.</div>
+  </article>
+
+  <article class="scenario">
+    <div class="scenario-head">
+      <h3>The remote worker in a windowless room</h3>
+      <span class="who">Home office, interior wall, winter</span>
+    </div>
+    <p>Ordinary indoor light is roughly 300–500 lux. An overcast sky is 10,000. Sitting inside all day means the body never gets an unambiguous "it's daytime" signal at all.</p>
+    <div class="strip" aria-hidden="true">
+      <div style="background:var(--k6500);flex:2">Light box, 20–30 min</div>
+      <div style="background:var(--k5500);flex:5">Cool white — focus</div>
+      <div style="background:var(--k4500);flex:4">Neutral — calls, admin</div>
+      <div style="background:var(--k3500);flex:3">Warm — logging off</div>
+      <div style="background:var(--k2700);flex:2">Amber evening</div>
+    </div>
+    <div class="strip-labels" aria-hidden="true">
+      <div style="flex:2">07:00</div><div style="flex:5">09:00</div><div style="flex:4">13:00</div><div style="flex:3">17:00</div><div style="flex:2">21:00</div>
+    </div>
+    <div class="why"><b>The move:</b> a 10,000-lux light box for 20–30 minutes shortly after waking, positioned off to the side at eye level rather than stared into. A real lunchtime walk outside beats any fixture in the house. And a hard warm-shift at logoff builds the boundary the commute used to provide.</div>
+  </article>
+
+  <article class="scenario">
+    <div class="scenario-head">
+      <h3>The new parent</h3>
+      <span class="who">Sleep in fragments · feeds at 2am and 5am</span>
+    </div>
+    <p>Total sleep is out of their control. The quality of what remains is not — and it hinges almost entirely on what light gets switched on at 2am.</p>
+    <div class="strip" aria-hidden="true">
+      <div style="background:var(--k4500);flex:5">Neutral daytime</div>
+      <div style="background:var(--k3500);flex:3">Warm evening</div>
+      <div style="background:var(--k2700);flex:2">Amber, bedtime</div>
+      <div style="background:var(--k1800);flex:2">Red — night feeds</div>
+      <div style="background:var(--k6500);flex:2">Daylight on the true wake</div>
+    </div>
+    <div class="strip-labels" aria-hidden="true">
+      <div style="flex:5">Day</div><div style="flex:3">Evening</div><div style="flex:2">Bedtime</div><div style="flex:2">Overnight</div><div style="flex:2">Morning</div>
+    </div>
+    <div class="why"><b>The move:</b> the overhead light stays off overnight — a dim red lamp is enough to feed, change and settle by, and it lets both parent and baby drop back off faster. Save the bright cool light for the first real wake of the morning, so the day still gets a clear starting line.</div>
+  </article>
+
+  <article class="scenario">
+    <div class="scenario-head">
+      <h3>The traveler flying east</h3>
+      <span class="who">Six time zones · meetings the morning after landing</span>
+    </div>
+    <p>Direction of travel changes the prescription completely. Flying east means going to bed earlier than your body wants, so the clock has to move forward.</p>
+    <div class="strip" aria-hidden="true">
+      <div style="background:var(--k6500);flex:4">Aggressive morning light, local time</div>
+      <div style="background:var(--k4500);flex:5">Neutral through the day</div>
+      <div style="background:var(--k2700);flex:3">Early amber, dim</div>
+      <div style="background:var(--k1800);flex:2">Dark by local bedtime</div>
+    </div>
+    <div class="strip-labels" aria-hidden="true">
+      <div style="flex:4">Local morning</div><div style="flex:5">Local day</div><div style="flex:3">Local evening</div><div style="flex:2">Local night</div>
+    </div>
+    <div class="why"><b>The move:</b> east — chase morning light and hide from evening light. West — the reverse: keep the evening bright and take the morning easy. Getting this backwards is why some trips never stop feeling like jet lag. Shifting an hour a day for two or three days before flying softens the landing considerably.</div>
+  </article>
+
+  <article class="scenario">
+    <div class="scenario-head">
+      <h3>The late-shift streamer</h3>
+      <span class="who">Live 9pm–1am · can't move the schedule</span>
+    </div>
+    <p>Sometimes the peak hours are the late ones and that isn't negotiable. The goal shifts from "sleep early" to "sleep consistently" — a stable late schedule beats a chaotic one.</p>
+    <div class="strip" aria-hidden="true">
+      <div style="background:var(--k6500);flex:2">Daylight at wake (11am)</div>
+      <div style="background:var(--k4500);flex:4">Neutral — prep, editing</div>
+      <div style="background:var(--k5500);flex:4">Cool white — live</div>
+      <div style="background:var(--k2700);flex:3">Hard amber drop at wrap</div>
+      <div style="background:var(--k1800);flex:2">Red, last 20 min</div>
+    </div>
+    <div class="strip-labels" aria-hidden="true">
+      <div style="flex:2">11:00</div><div style="flex:4">13:00</div><div style="flex:4">21:00</div><div style="flex:3">01:00</div><div style="flex:2">02:30</div>
+    </div>
+    <div class="why"><b>The move:</b> the danger isn't the late hours, it's ending a bright, high-arousal broadcast and expecting sleep 20 minutes later. Cut the room to amber the moment the stream ends, keep key lights off the face and out of the eyeline once you're off air, and hold the same wake time even on days off.</div>
+  </article>
+</section>
+
+<section id="rules">
+  <div class="section-head">
+    <div class="eyebrow">05 — Rules of thumb</div>
+    <h2>What carries across every schedule</h2>
+  </div>
+
+  <div class="rules">
+    <div class="rule-card">
+      <div class="num">ANCHOR</div>
+      <h3>Fix the wake time first</h3>
+      <p>Light is a nudge; a consistent wake time is the post the nudge pushes against. Vary your wake time by three hours on weekends and no lighting setup will save the week.</p>
+    </div>
+    <div class="rule-card">
+      <div class="num">DOSE</div>
+      <h3>Outdoors beats any bulb</h3>
+      <p>Ten minutes outside in the morning delivers more circadian signal than an hour under the best fixture you own. Use bulbs for the hours you can't be outside — not instead of.</p>
+    </div>
+    <div class="rule-card">
+      <div class="num">CONTRAST</div>
+      <h3>Make night look like night</h3>
+      <p>What the clock reads is the difference between your brightest hours and your dimmest ones. A bright day makes an evening dim-down far more effective than the dim-down alone.</p>
+    </div>
+    <div class="rule-card">
+      <div class="num">RAMP</div>
+      <h3>Step down, don't cut</h3>
+      <p>Three moves work better than one: dimmer and warmer two hours out, again one hour out, then red at the end. Slamming the lights off after a bright evening rarely works.</p>
+    </div>
+    <div class="rule-card">
+      <div class="num">HEIGHT</div>
+      <h3>Lower the light, not just the color</h3>
+      <p>Evening light hitting the eyes from below — lamps, sconces, floor level — registers less than the same light overhead. Ceiling fixtures are a morning tool.</p>
+    </div>
+    <div class="rule-card">
+      <div class="num">EYES</div>
+      <h3>Break the near-focus, too</h3>
+      <p>Color temperature doesn't fix eye strain. Every 20 minutes, look 20 feet away for 20 seconds — the muscles doing the focusing need the change more than the retina does.</p>
+    </div>
+  </div>
+</section>
+
+<section id="reference">
+  <div class="section-head">
+    <div class="eyebrow">06 — Reference</div>
+    <h2>One-screen cheat sheet</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr><th>Setting</th><th>Kelvin</th><th>Output</th><th>Use it for</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="dot" style="background:var(--k6500)"></span>Wake signal</td><td class="k">6000–6500K</td><td class="k">100%</td><td>First hour awake, dark winters, resetting a drifting schedule</td></tr>
+        <tr><td><span class="dot" style="background:var(--k5500)"></span>Deep focus</td><td class="k">5000–5500K</td><td class="k">90–100%</td><td>Study, analysis, technical work, the afternoon dip</td></tr>
+        <tr><td><span class="dot" style="background:var(--k4500)"></span>Steady state</td><td class="k">4000–4500K</td><td class="k">70–85%</td><td>Meetings, admin, chores, general daytime default</td></tr>
+        <tr><td><span class="dot" style="background:var(--k3500)"></span>Transition</td><td class="k">3000–3500K</td><td class="k">50–70%</td><td>Final work hours, dinner, evening reading</td></tr>
+        <tr><td><span class="dot" style="background:var(--k2700)"></span>Wind-down</td><td class="k">2200–2700K</td><td class="k">25–40%</td><td>The hour before bed, low-stakes evening routines</td></tr>
+        <tr><td><span class="dot" style="background:var(--k1800)"></span>Night-safe</td><td class="k">1800–2000K</td><td class="k">5–20%</td><td>Night feeds, bathroom trips, bedside lamps</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <h3>Two things worth separating</h3>
+    <p><b>Circadian lighting</b> is what most of this guide describes: using ordinary bulbs and their color and brightness to reinforce a schedule you're already trying to keep.</p>
+    <p><b>Clinical light therapy</b> is a specific treatment — typically a 10,000-lux box used for 20–30 minutes shortly after waking, most often for seasonal depression or a diagnosed circadian rhythm disorder. It's a different dose delivered for a different reason.</p>
+    <p>Bright-light protocols aren't right for everyone. Talk to a clinician first if you have bipolar disorder, an eye condition such as macular degeneration or retinopathy, or take medication that increases light sensitivity — and if sleep problems persist despite a steady schedule, that's worth investigating on its own rather than lighting around.</p>
+  </div>
+</section>
+
+<footer>
+  <p>Set your lights by what the hour is <em>for</em>, not by what time it is. Then keep the wake time steady and let the light do the rest.</p>
+</footer>
+
+</div>
+</body>
+</html>
