@@ -128,6 +128,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .pt10 .face::after{background:
   repeating-linear-gradient(0deg,var(--plate-fg) 0 1px,transparent 1px 9px),
   repeating-linear-gradient(3deg,var(--plate-fg) 0 1px,transparent 1px 10px)}
+.pt11 .face::after{background:
+  repeating-linear-gradient(90deg,var(--plate-fg) 0 1px,transparent 1px 24px),
+  repeating-linear-gradient(0deg,var(--plate-fg) 0 1px,transparent 1px 24px),
+  repeating-linear-gradient(45deg,var(--plate-fg) 0 1px,transparent 1px 6px)}
 
 /* ---------- register (category view) ---------- */
 .page-head{padding:clamp(48px,8vw,110px) var(--gut) clamp(28px,4vw,52px);border-bottom:1px solid var(--rule)}
@@ -221,22 +225,28 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
    Z VAULT — data
    Edit the two arrays below to change what the vault holds.
    Full field reference lives in README.md.
+
+   Shelf order below is the order shown on the index, and the
+   ZV codes run in that same order. Move an entry, renumber its
+   code, and the accession numbers follow.
    ============================================================ */
 
 const CATEGORIES = [
-  { id:"silicon",    code:"ZV-01", name:"Silicon & Compute",     pattern:3, blurb:"Fabs, nodes, accelerators, and the supply chain beneath them." },
-  { id:"protocols",  code:"ZV-02", name:"Protocols & Networks",  pattern:4, blurb:"Chains, rails, standards, and the rules they encode." },
-  { id:"systems",    code:"ZV-03", name:"Systems & Architecture",pattern:5, blurb:"Blueprints, wiring, topologies, and how parts fit." },
-  { id:"ai",         code:"ZV-04", name:"AI Concepts",           pattern:6, blurb:"Models, training, agents, and the infrastructure carrying them." },
-  { id:"interface",  code:"ZV-05", name:"Interface & Type",      pattern:7, blurb:"Layout studies, type specimens, and screen craft." },
-  { id:"management", code:"ZV-06", name:"Business & IT Management", pattern:1, blurb:"Operations, governance, service delivery, and how work is run." },
-  { id:"psychology", code:"ZV-07", name:"Psychology & Health",     pattern:2, blurb:"Mind, behavior, physiology, and what keeps a person running." },
-  { id:"space",      code:"ZV-08", name:"Space & Travel",        pattern:9, blurb:"Orbits, launch vehicles, routes, and the maps that make distance legible." },
-  { id:"philosophy", code:"ZV-09", name:"Philosophy & History",  pattern:10, blurb:"Arguments, ethics, eras, and the long record of how we got here." },
-  { id:"field",      code:"ZV-10", name:"Field Notes",           pattern:8, blurb:"Unfiled work. Everything before it earns a shelf." }
+  { id:"it",         code:"ZV-01", name:"Information Technology Concepts", pattern:11, blurb:"Hardware, networks, service desks, and the fundamentals the rest of the stack sits on." },
+  { id:"silicon",    code:"ZV-02", name:"Silicon & Compute",     pattern:3, blurb:"Fabs, nodes, accelerators, and the supply chain beneath them." },
+  { id:"protocols",  code:"ZV-03", name:"Protocols & Networks",  pattern:4, blurb:"Chains, rails, standards, and the rules they encode." },
+  { id:"systems",    code:"ZV-04", name:"Systems & Architecture",pattern:5, blurb:"Blueprints, wiring, topologies, and how parts fit." },
+  { id:"ai",         code:"ZV-05", name:"AI Concepts",           pattern:6, blurb:"Models, training, agents, and the infrastructure carrying them." },
+  { id:"interface",  code:"ZV-06", name:"Interface & Type",      pattern:7, blurb:"Layout studies, type specimens, and screen craft." },
+  { id:"management", code:"ZV-07", name:"Business & IT Management", pattern:1, blurb:"Operations, governance, service delivery, and how work is run." },
+  { id:"psychology", code:"ZV-08", name:"Psychology & Health",     pattern:2, blurb:"Mind, behavior, physiology, and what keeps a person running." },
+  { id:"space",      code:"ZV-09", name:"Space & Travel",        pattern:9, blurb:"Orbits, launch vehicles, routes, and the maps that make distance legible." },
+  { id:"philosophy", code:"ZV-10", name:"Philosophy & History",  pattern:10, blurb:"Arguments, ethics, eras, and the long record of how we got here." },
+  { id:"field",      code:"ZV-11", name:"Field Notes",           pattern:8, blurb:"Unfiled work. Everything before it earns a shelf." }
 ];
 
 /* Artifacts are added here by hand — there is no upload path.
+   Kept in shelf order, newest first within a shelf.
    Shape:
    {
      id:"unique-slug",          // becomes the URL: #/a/unique-slug
@@ -260,7 +270,7 @@ const ARTIFACTS = [
     tags: ["psychology", "health"],
     source: { type: "file", path: "artifacts/light-therapy-guide.html" }
   },
-   {
+  {
     id: "space-001",
     category: "space",
     title: "orbital-compute",
@@ -269,9 +279,8 @@ const ARTIFACTS = [
     tags: ["space", "science"],
     source: { type: "file", path: "artifacts/orbital-compute.html" }
   }
-  
-];  
-  
+];
+
 /* ============================================================
    Below this line is the machine. You shouldn't need to touch it.
    ============================================================ */
