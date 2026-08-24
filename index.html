@@ -150,6 +150,15 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .thumb .cap{padding:14px 16px 18px}
 .thumb .cap .t{font-size:1.25rem;margin:6px 0 0;line-height:1.2}
 
+/* card children are spans — aspect-ratio and margins need block boxes */
+.plate .face,.plate .body,.plate .code,.plate .name,
+.thumb .shot,.thumb .cap,.thumb .cap .mono,.thumb .cap .t{display:block}
+
+/* ghost cells — fill the leftover auto-fill tracks with open accession numbers */
+.ghost{background:var(--paper);display:grid;place-items:center;min-height:180px;
+  color:var(--rule);font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;
+  -webkit-user-select:none;user-select:none}
+
 /* ---------- empty ---------- */
 .empty{border:1px solid var(--rule);padding:clamp(28px,5vw,56px);background:var(--shelf)}
 .empty h3{margin:0 0 10px;font-weight:400;font-size:clamp(24px,3vw,34px)}
@@ -456,6 +465,30 @@ function render(){
   window.scrollTo(0,0);
 }
 
+/* pad an auto-fill grid so leftover tracks read as open slots, not rule-colored gaps */
+function fillGrid(el,sel){
+  if(!el) return;
+  let lastCols = 0;
+  const pad = () => {
+    const cols = getComputedStyle(el).gridTemplateColumns.split(" ").filter(Boolean).length;
+    const items = el.querySelectorAll(sel).length;
+    if(!cols || !items || cols === lastCols) return;
+    lastCols = cols;
+    el.querySelectorAll(".ghost").forEach(g=>g.remove());
+    const need = (cols - (items % cols)) % cols;
+    for(let i=0;i<need;i++){
+      const g = document.createElement("span");
+      g.className = "ghost";
+      g.setAttribute("aria-hidden","true");
+      g.textContent = String(items+i+1).padStart(3,"0");
+      el.appendChild(g);
+    }
+  };
+  pad();
+  if(window.ResizeObserver) new ResizeObserver(pad).observe(el);
+  else window.addEventListener("resize",pad);
+}
+
 function wire(){
   const q = document.getElementById("q");
   if(q){
@@ -482,6 +515,8 @@ function wire(){
     if(window.ResizeObserver) new ResizeObserver(fit).observe(box);
     else window.addEventListener("resize",fit);
   });
+  fillGrid(document.querySelector(".thumbs"), ".thumb");
+  fillGrid(document.querySelector(".grid"), ".plate");
 }
 
 document.addEventListener("keydown",e=>{
