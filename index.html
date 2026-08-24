@@ -122,9 +122,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   repeating-radial-gradient(circle at 50% 50%,var(--plate-fg) 0 1px,transparent 1px 14px),
   repeating-linear-gradient(0deg,var(--plate-fg) 0 1px,transparent 1px 28px)}
 .pt8 .face::after{background:repeating-linear-gradient(74deg,var(--plate-fg) 0 1px,transparent 1px 5px)}
-.pt9 .face::after{background:
-  repeating-linear-gradient(26deg,var(--plate-fg) 0 1px,transparent 1px 8px),
-  repeating-linear-gradient(-26deg,var(--plate-fg) 0 1px,transparent 1px 22px)}
 
 /* ---------- register (category view) ---------- */
 .page-head{padding:clamp(48px,8vw,110px) var(--gut) clamp(28px,4vw,52px);border-bottom:1px solid var(--rule)}
@@ -219,8 +216,7 @@ const CATEGORIES = [
   { id:"interface",  code:"ZV-05", name:"Interface & Type",      pattern:7, blurb:"Layout studies, type specimens, and screen craft." },
   { id:"management", code:"ZV-06", name:"Business & IT Management", pattern:1, blurb:"Operations, governance, service delivery, and how work is run." },
   { id:"psychology", code:"ZV-07", name:"Psychology & Health",     pattern:2, blurb:"Mind, behavior, physiology, and what keeps a person running." },
-  { id:"software",   code:"ZV-08", name:"Software Development",  pattern:9, blurb:"Code, tooling, architecture decisions, and the craft of shipping." },
-  { id:"field",      code:"ZV-09", name:"Field Notes",           pattern:8, blurb:"Unfiled work. Everything before it earns a shelf." }
+  { id:"field",      code:"ZV-08", name:"Field Notes",           pattern:8, blurb:"Unfiled work. Everything before it earns a shelf." }
 ];
 
 /* Artifacts are added here by hand — there is no upload path.
@@ -237,8 +233,7 @@ const CATEGORIES = [
      // source:{ type:"inline", html:"<svg …></svg>" }           // markup written inline
    }
 */
-const artifacts = []
-  
+const ARTIFACTS = [
   {
     id: "psychology-001",
     category: "psychology",
