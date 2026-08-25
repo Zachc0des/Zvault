@@ -1,1 +1,433 @@
+import { useState } from "react";
 
+const sections = [
+  {
+    id: "overview",
+    label: "Overview",
+    color: "purple",
+    title: "What is COBOL?",
+    description:
+      "COBOL (Common Business-Oriented Language) is a compiled, high-level programming language designed in 1959. It was created to handle large-scale business, financial, and administrative data processing — and it still powers much of the world's banking and government infrastructure today.",
+    pills: ["Compiled", "Strongly Typed", "Procedural", "Verbose by Design"],
+    facts: [
+      { label: "Created", value: "1959" },
+      { label: "Paradigm", value: "Procedural" },
+      { label: "Runs On", value: "~95% of ATM transactions" },
+      { label: "Lines in prod.", value: "~800 billion" },
+    ],
+  },
+  {
+    id: "compilation",
+    label: "Compilation",
+    color: "teal",
+    title: "How COBOL compiles",
+    description:
+      "COBOL source code is human-readable text. A compiler translates it into machine code that runs natively on the hardware — bypassing any interpreter or virtual machine. This is why COBOL programs are exceptionally fast and stable.",
+    steps: [
+      { icon: "📄", label: "Source (.cbl)", sub: "Human-readable COBOL" },
+      { icon: "🔍", label: "Lexer & Parser", sub: "Tokenise & check syntax" },
+      { icon: "🧠", label: "Semantic Analysis", sub: "Type & division checks" },
+      { icon: "⚙️", label: "Code Generator", sub: "Emit machine / object code" },
+      { icon: "🔗", label: "Linker", sub: "Resolve external calls" },
+      { icon: "🚀", label: "Executable", sub: "Native binary, no runtime" },
+    ],
+  },
+  {
+    id: "divisions",
+    label: "4 Divisions",
+    color: "coral",
+    title: "The 4 mandatory divisions",
+    description:
+      "Every COBOL program is divided into exactly four sections, in a fixed order. This rigid structure makes programs highly self-documenting and auditable — a deliberate design for business environments.",
+    divisions: [
+      {
+        name: "IDENTIFICATION DIVISION",
+        role: "Metadata",
+        desc: "Program name, author, date written. Pure documentation — no executable code.",
+        code: "PROGRAM-ID. PAYROLL-CALC.",
+      },
+      {
+        name: "ENVIRONMENT DIVISION",
+        role: "I/O wiring",
+        desc: "Maps logical file names to physical files on disk or tape.",
+        code: "SELECT EMPLOYEES ASSIGN TO 'EMP.DAT'.",
+      },
+      {
+        name: "DATA DIVISION",
+        role: "Memory layout",
+        desc: "Declares every variable, record structure, and working-storage field. No globals — all data is explicit.",
+        code: "01 EMPLOYEE-REC.\n   05 EMP-ID   PIC 9(6).\n   05 EMP-NAME PIC X(30).",
+      },
+      {
+        name: "PROCEDURE DIVISION",
+        role: "Business logic",
+        desc: "The only section that executes. Contains paragraphs and sections — COBOL's equivalent of functions.",
+        code: "COMPUTE NET-PAY =\n   GROSS-PAY - DEDUCTIONS.",
+      },
+    ],
+  },
+  {
+    id: "principles",
+    label: "Core Principles",
+    color: "amber",
+    title: "Core design principles",
+    description:
+      "COBOL's design philosophy is deliberately different from modern languages. It was built for business analysts — not computer scientists.",
+    principles: [
+      {
+        icon: "📖",
+        title: "English-like readability",
+        body: "COBOL reads like prose. ADD HOURS-WORKED TO TOTAL-HOURS is legal COBOL. This was intentional — managers should be able to audit the code.",
+      },
+      {
+        icon: "🏗️",
+        title: "Explicit data declaration",
+        body: "Every variable, its type, and its byte length must be declared. PICTURE clauses define exact memory layouts — critical for fixed-width banking records.",
+      },
+      {
+        icon: "🔢",
+        title: "Decimal arithmetic",
+        body: "COBOL uses COMP-3 (packed decimal) by default, not floating point. This avoids rounding errors on monetary values — $0.001 is exact, not an approximation.",
+      },
+      {
+        icon: "📂",
+        title: "File-oriented processing",
+        body: "COBOL treats files as first-class citizens. Sequential, indexed, and relative file access are built into the language — no library needed.",
+      },
+      {
+        icon: "🔒",
+        title: "Backward compatibility",
+        body: "Code written in 1970 still compiles today. The language evolves conservatively — the banking industry cannot afford breaking changes.",
+      },
+      {
+        icon: "⚡",
+        title: "Compiled, not interpreted",
+        body: "COBOL compiles to native machine code. No JVM, no interpreter overhead. Mainframe COBOL benchmarks often match or beat equivalent C programs for batch throughput.",
+      },
+    ],
+  },
+];
+
+const colorMap = {
+  purple: {
+    bg: "#EEEDFE",
+    border: "#534AB7",
+    text: "#3C3489",
+    pill: "#AFA9EC",
+    pillText: "#26215C",
+    darkBg: "#26215C",
+    darkText: "#CECBF6",
+  },
+  teal: {
+    bg: "#E1F5EE",
+    border: "#0F6E56",
+    text: "#085041",
+    pill: "#5DCAA5",
+    pillText: "#04342C",
+    darkBg: "#04342C",
+    darkText: "#9FE1CB",
+  },
+  coral: {
+    bg: "#FAECE7",
+    border: "#993C1D",
+    text: "#712B13",
+    pill: "#F0997B",
+    pillText: "#4A1B0C",
+    darkBg: "#4A1B0C",
+    darkText: "#F5C4B3",
+  },
+  amber: {
+    bg: "#FAEEDA",
+    border: "#854F0B",
+    text: "#633806",
+    pill: "#EF9F27",
+    pillText: "#412402",
+    darkBg: "#412402",
+    darkText: "#FAC775",
+  },
+};
+
+function Pill({ children, color }) {
+  const c = colorMap[color];
+  return (
+    <span
+      style={{
+        background: c.pill,
+        color: c.pillText,
+        borderRadius: 20,
+        padding: "3px 12px",
+        fontSize: 12,
+        fontWeight: 500,
+        marginRight: 6,
+        marginBottom: 6,
+        display: "inline-block",
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
+function CodeBlock({ code }) {
+  return (
+    <pre
+      style={{
+        background: "var(--color-background-tertiary, #f5f5f3)",
+        border: "0.5px solid var(--color-border-tertiary)",
+        borderRadius: 8,
+        padding: "10px 14px",
+        fontSize: 12,
+        fontFamily: "monospace",
+        color: "var(--color-text-primary)",
+        margin: "10px 0 0",
+        overflowX: "auto",
+        whiteSpace: "pre-wrap",
+        lineHeight: 1.6,
+      }}
+    >
+      {code}
+    </pre>
+  );
+}
+
+function OverviewPanel({ section }) {
+  const c = colorMap[section.color];
+  return (
+    <div>
+      <p style={{ color: "var(--color-text-secondary)", fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
+        {section.description}
+      </p>
+      <div style={{ marginBottom: 20 }}>
+        {section.pills.map((p) => (
+          <Pill key={p} color={section.color}>{p}</Pill>
+        ))}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
+        {section.facts.map((f) => (
+          <div
+            key={f.label}
+            style={{
+              background: c.bg,
+              border: `0.5px solid ${c.border}`,
+              borderRadius: 10,
+              padding: "12px 16px",
+            }}
+          >
+            <div style={{ fontSize: 11, color: c.text, fontWeight: 500, marginBottom: 4 }}>{f.label}</div>
+            <div style={{ fontSize: 15, fontWeight: 500, color: c.text }}>{f.value}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CompilationPanel({ section }) {
+  const c = colorMap[section.color];
+  return (
+    <div>
+      <p style={{ color: "var(--color-text-secondary)", fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
+        {section.description}
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {section.steps.map((step, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div
+              style={{
+                background: c.bg,
+                border: `0.5px solid ${c.border}`,
+                borderRadius: 10,
+                padding: "10px 14px",
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                flex: 1,
+              }}
+            >
+              <span style={{ fontSize: 18 }}>{step.icon}</span>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: c.text }}>{step.label}</div>
+                <div style={{ fontSize: 11, color: c.text, opacity: 0.8 }}>{step.sub}</div>
+              </div>
+            </div>
+            {i < section.steps.length - 1 && (
+              <div style={{ color: c.border, fontSize: 16, fontWeight: 500 }}>↓</div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function DivisionsPanel({ section }) {
+  const [open, setOpen] = useState(null);
+  const c = colorMap[section.color];
+  return (
+    <div>
+      <p style={{ color: "var(--color-text-secondary)", fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
+        {section.description}
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {section.divisions.map((div, i) => (
+          <div
+            key={i}
+            style={{
+              border: `0.5px solid ${open === i ? c.border : "var(--color-border-tertiary)"}`,
+              borderRadius: 10,
+              overflow: "hidden",
+              cursor: "pointer",
+              background: open === i ? c.bg : "var(--color-background-primary)",
+            }}
+            onClick={() => setOpen(open === i ? null : i)}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "12px 16px",
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 12, fontFamily: "monospace", fontWeight: 500, color: c.text }}>
+                  {div.name}
+                </div>
+                <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}>
+                  {div.role}
+                </div>
+              </div>
+              <span style={{ color: c.text, fontSize: 14 }}>{open === i ? "▲" : "▼"}</span>
+            </div>
+            {open === i && (
+              <div style={{ padding: "0 16px 14px" }}>
+                <p style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.6, margin: "0 0 8px" }}>
+                  {div.desc}
+                </p>
+                <CodeBlock code={div.code} />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PrinciplesPanel({ section }) {
+  return (
+    <div>
+      <p style={{ color: "var(--color-text-secondary)", fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
+        {section.description}
+      </p>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        {section.principles.map((p, i) => (
+          <div
+            key={i}
+            style={{
+              background: "var(--color-background-secondary)",
+              border: "0.5px solid var(--color-border-tertiary)",
+              borderRadius: 10,
+              padding: "14px 14px",
+            }}
+          >
+            <div style={{ fontSize: 20, marginBottom: 6 }}>{p.icon}</div>
+            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 4 }}>
+              {p.title}
+            </div>
+            <div style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.6 }}>{p.body}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function COBOLExplainer() {
+  const [active, setActive] = useState(0);
+  const section = sections[active];
+  const c = colorMap[section.color];
+
+  return (
+    <div style={{ fontFamily: "var(--font-sans, sans-serif)", maxWidth: 680, margin: "0 auto", padding: "0 0 1rem" }}>
+      {/* Header */}
+      <div
+        style={{
+          background: c.bg,
+          border: `0.5px solid ${c.border}`,
+          borderRadius: 14,
+          padding: "20px 24px",
+          marginBottom: 16,
+        }}
+      >
+        <div style={{ fontSize: 11, color: c.text, fontWeight: 500, letterSpacing: 1, marginBottom: 4 }}>
+          COMPILED LANGUAGE • SINCE 1959
+        </div>
+        <div style={{ fontSize: 22, fontWeight: 500, color: c.text, marginBottom: 6 }}>
+          COBOL
+        </div>
+        <div style={{ fontSize: 13, color: c.text, opacity: 0.85 }}>
+          Common Business-Oriented Language — structure, foundation & core principles
+        </div>
+      </div>
+
+      {/* Tab Nav */}
+      <div
+        style={{
+          display: "flex",
+          gap: 6,
+          marginBottom: 14,
+          flexWrap: "wrap",
+        }}
+      >
+        {sections.map((s, i) => {
+          const sc = colorMap[s.color];
+          const isActive = i === active;
+          return (
+            <button
+              key={s.id}
+              onClick={() => setActive(i)}
+              style={{
+                padding: "7px 16px",
+                borderRadius: 20,
+                border: `0.5px solid ${isActive ? sc.border : "var(--color-border-secondary)"}`,
+                background: isActive ? sc.bg : "transparent",
+                color: isActive ? sc.text : "var(--color-text-secondary)",
+                fontSize: 13,
+                fontWeight: isActive ? 500 : 400,
+                cursor: "pointer",
+                transition: "all 0.15s",
+              }}
+            >
+              {s.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Panel */}
+      <div
+        style={{
+          background: "var(--color-background-primary)",
+          border: "0.5px solid var(--color-border-tertiary)",
+          borderRadius: 12,
+          padding: "20px 20px",
+        }}
+      >
+        <div style={{ fontSize: 16, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 14 }}>
+          {section.title}
+        </div>
+
+        {active === 0 && <OverviewPanel section={section} />}
+        {active === 1 && <CompilationPanel section={section} />}
+        {active === 2 && <DivisionsPanel section={section} />}
+        {active === 3 && <PrinciplesPanel section={section} />}
+      </div>
+
+      {/* Footer */}
+      <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", textAlign: "center", marginTop: 14 }}>
+        Click each tab to explore • Click divisions to expand code examples
+      </div>
+    </div>
+  );
+}
