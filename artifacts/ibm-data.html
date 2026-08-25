@@ -1,433 +1,938 @@
-import { useState } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBM Data Concepts — Foundations, Method, Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0A1628;
+  --ink-2:#16233A;
+  --buff:#E9E2D0;
+  --paper:#FAF9F6;
+  --card:#FFFFFF;
+  --rule:#D9D5CB;
+  --rule-soft:#EBE8E0;
+  --text:#131A24;
+  --text-2:#4C5866;
+  --text-3:#78838F;
 
-const sections = [
-  {
-    id: "overview",
-    label: "Overview",
-    color: "purple",
-    title: "What is COBOL?",
-    description:
-      "COBOL (Common Business-Oriented Language) is a compiled, high-level programming language designed in 1959. It was created to handle large-scale business, financial, and administrative data processing — and it still powers much of the world's banking and government infrastructure today.",
-    pills: ["Compiled", "Strongly Typed", "Procedural", "Verbose by Design"],
-    facts: [
-      { label: "Created", value: "1959" },
-      { label: "Paradigm", value: "Procedural" },
-      { label: "Runs On", value: "~95% of ATM transactions" },
-      { label: "Lines in prod.", value: "~800 billion" },
-    ],
-  },
-  {
-    id: "compilation",
-    label: "Compilation",
-    color: "teal",
-    title: "How COBOL compiles",
-    description:
-      "COBOL source code is human-readable text. A compiler translates it into machine code that runs natively on the hardware — bypassing any interpreter or virtual machine. This is why COBOL programs are exceptionally fast and stable.",
-    steps: [
-      { icon: "📄", label: "Source (.cbl)", sub: "Human-readable COBOL" },
-      { icon: "🔍", label: "Lexer & Parser", sub: "Tokenise & check syntax" },
-      { icon: "🧠", label: "Semantic Analysis", sub: "Type & division checks" },
-      { icon: "⚙️", label: "Code Generator", sub: "Emit machine / object code" },
-      { icon: "🔗", label: "Linker", sub: "Resolve external calls" },
-      { icon: "🚀", label: "Executable", sub: "Native binary, no runtime" },
-    ],
-  },
-  {
-    id: "divisions",
-    label: "4 Divisions",
-    color: "coral",
-    title: "The 4 mandatory divisions",
-    description:
-      "Every COBOL program is divided into exactly four sections, in a fixed order. This rigid structure makes programs highly self-documenting and auditable — a deliberate design for business environments.",
-    divisions: [
-      {
-        name: "IDENTIFICATION DIVISION",
-        role: "Metadata",
-        desc: "Program name, author, date written. Pure documentation — no executable code.",
-        code: "PROGRAM-ID. PAYROLL-CALC.",
-      },
-      {
-        name: "ENVIRONMENT DIVISION",
-        role: "I/O wiring",
-        desc: "Maps logical file names to physical files on disk or tape.",
-        code: "SELECT EMPLOYEES ASSIGN TO 'EMP.DAT'.",
-      },
-      {
-        name: "DATA DIVISION",
-        role: "Memory layout",
-        desc: "Declares every variable, record structure, and working-storage field. No globals — all data is explicit.",
-        code: "01 EMPLOYEE-REC.\n   05 EMP-ID   PIC 9(6).\n   05 EMP-NAME PIC X(30).",
-      },
-      {
-        name: "PROCEDURE DIVISION",
-        role: "Business logic",
-        desc: "The only section that executes. Contains paragraphs and sections — COBOL's equivalent of functions.",
-        code: "COMPUTE NET-PAY =\n   GROSS-PAY - DEDUCTIONS.",
-      },
-    ],
-  },
-  {
-    id: "principles",
-    label: "Core Principles",
-    color: "amber",
-    title: "Core design principles",
-    description:
-      "COBOL's design philosophy is deliberately different from modern languages. It was built for business analysts — not computer scientists.",
-    principles: [
-      {
-        icon: "📖",
-        title: "English-like readability",
-        body: "COBOL reads like prose. ADD HOURS-WORKED TO TOTAL-HOURS is legal COBOL. This was intentional — managers should be able to audit the code.",
-      },
-      {
-        icon: "🏗️",
-        title: "Explicit data declaration",
-        body: "Every variable, its type, and its byte length must be declared. PICTURE clauses define exact memory layouts — critical for fixed-width banking records.",
-      },
-      {
-        icon: "🔢",
-        title: "Decimal arithmetic",
-        body: "COBOL uses COMP-3 (packed decimal) by default, not floating point. This avoids rounding errors on monetary values — $0.001 is exact, not an approximation.",
-      },
-      {
-        icon: "📂",
-        title: "File-oriented processing",
-        body: "COBOL treats files as first-class citizens. Sequential, indexed, and relative file access are built into the language — no library needed.",
-      },
-      {
-        icon: "🔒",
-        title: "Backward compatibility",
-        body: "Code written in 1970 still compiles today. The language evolves conservatively — the banking industry cannot afford breaking changes.",
-      },
-      {
-        icon: "⚡",
-        title: "Compiled, not interpreted",
-        body: "COBOL compiles to native machine code. No JVM, no interpreter overhead. Mainframe COBOL benchmarks often match or beat equivalent C programs for batch throughput.",
-      },
-    ],
-  },
+  --blue:#0F62FE;
+  --teal:#007D79;
+  --magenta:#D02670;
+  --purple:#8A3FFA;
+  --green:#198038;
+  --cyan:#1192E8;
+  --gold:#B28600;
+  --red:#DA1E28;
+
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --disp:'IBM Plex Sans Condensed','IBM Plex Sans',system-ui,sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--text);
+  font-weight:400;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* ============ HERO ============ */
+.hero{
+  background:var(--ink);
+  color:var(--buff);
+  padding:0 0 72px;
+  position:relative;
+  overflow:hidden;
+}
+.hero::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,transparent 0 39px,rgba(233,226,208,.045) 39px 40px);
+}
+.ruler{
+  border-bottom:1px solid rgba(233,226,208,.18);
+  padding:10px 0 8px;
+  position:relative;z-index:2;
+}
+.ruler-inner{
+  display:flex;gap:0;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.08em;color:rgba(233,226,208,.5);
+  overflow:hidden;white-space:nowrap;
+}
+.tick{flex:0 0 auto;padding-right:22px;opacity:0;animation:tickIn .5s ease-out forwards}
+.hero-body{padding:56px 0 0;position:relative;z-index:2}
+.eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--blue);
+  display:flex;align-items:center;gap:10px;margin-bottom:22px;
+}
+.eyebrow::before{content:'';width:28px;height:2px;background:var(--blue)}
+h1{
+  font-family:var(--disp);font-weight:700;
+  font-size:clamp(2.9rem,8.5vw,6.4rem);
+  line-height:.93;letter-spacing:-.025em;
+  text-transform:uppercase;margin-bottom:26px;
+}
+h1 em{font-style:normal;color:rgba(233,226,208,.34)}
+.thesis{
+  max-width:660px;font-size:clamp(1.02rem,1.9vw,1.22rem);
+  line-height:1.66;color:rgba(233,226,208,.86);font-weight:300;
+}
+.thesis strong{font-weight:500;color:var(--buff)}
+.stat-row{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:1px;background:rgba(233,226,208,.15);
+  margin-top:48px;border:1px solid rgba(233,226,208,.15);
+}
+.stat{background:var(--ink);padding:18px 20px}
+.stat-k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(233,226,208,.45);margin-bottom:7px}
+.stat-v{font-family:var(--disp);font-size:1.42rem;font-weight:600;line-height:1.15;color:var(--buff)}
+
+/* ============ NAV ============ */
+nav{
+  position:sticky;top:0;z-index:40;
+  background:rgba(250,249,246,.93);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--rule);
+}
+.nav-inner{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding:0 24px;max-width:1120px;margin:0 auto}
+.nav-inner::-webkit-scrollbar{display:none}
+nav a{
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--text-3);text-decoration:none;
+  padding:15px 13px;white-space:nowrap;border-bottom:2px solid transparent;
+  transition:color .15s,border-color .15s;
+}
+nav a:hover{color:var(--text)}
+nav a.on{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* ============ SECTIONS ============ */
+section{padding:78px 0;border-bottom:1px solid var(--rule-soft)}
+.sec-head{max-width:720px;margin-bottom:38px}
+.sec-num{
+  font-family:var(--mono);font-size:11px;letter-spacing:.2em;
+  color:var(--text-3);margin-bottom:12px;display:block;
+}
+h2{
+  font-family:var(--disp);font-weight:700;text-transform:uppercase;
+  font-size:clamp(1.75rem,4vw,2.7rem);line-height:1.02;
+  letter-spacing:-.018em;margin-bottom:16px;
+}
+.lede{font-size:1.04rem;line-height:1.7;color:var(--text-2);font-weight:300}
+h3{font-family:var(--disp);font-weight:600;font-size:1.16rem;letter-spacing:-.005em;margin-bottom:8px}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ============ SIGNATURE: RECORD DECODER ============ */
+.decoder{border:1px solid var(--rule);background:var(--card)}
+.dec-bar{
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;
+  padding:12px 18px;background:var(--ink);color:var(--buff);
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+}
+.dec-bar span:last-child{color:rgba(233,226,208,.5)}
+.byte-scale{
+  display:flex;padding:14px 18px 0;font-family:var(--mono);
+  font-size:9px;color:var(--text-3);letter-spacing:.02em;
+}
+.byte-scale div{border-left:1px solid var(--rule);padding-left:4px;overflow:hidden;white-space:nowrap}
+.strip{display:flex;padding:0 18px;gap:2px;margin-top:5px}
+.fld{
+  border:1px solid var(--rule);border-top:3px solid var(--c);
+  background:var(--card);cursor:pointer;padding:11px 8px;
+  font-family:var(--mono);font-size:10px;text-align:center;
+  overflow:hidden;transition:background .15s,transform .15s;
+  min-width:0;
+}
+.fld:hover{background:#F3F6FF}
+.fld.on{background:var(--c);color:#fff;border-color:var(--c)}
+.fld b{display:block;font-weight:600;font-size:10.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fld i{font-style:normal;opacity:.65;font-size:9px}
+.dec-out{padding:20px 18px 22px;border-top:1px solid var(--rule-soft);margin-top:16px;background:#FCFCFA}
+.dec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:1px;background:var(--rule-soft);border:1px solid var(--rule-soft)}
+.dec-cell{background:var(--card);padding:13px 15px}
+.dec-cell .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--text-3);margin-bottom:5px}
+.dec-cell .v{font-family:var(--mono);font-size:12.5px;color:var(--text);word-break:break-word;line-height:1.5}
+.dec-note{margin-top:14px;font-size:13.5px;color:var(--text-2);line-height:1.65;border-left:3px solid var(--c,var(--blue));padding-left:13px}
+.hint{font-family:var(--mono);font-size:10.5px;color:var(--text-3);text-align:center;padding:10px 0 0;letter-spacing:.05em}
+
+/* ============ GENERIC CARD GRID ============ */
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(288px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(224px,1fr))}
+.card{
+  background:var(--card);border:1px solid var(--rule);
+  padding:20px;position:relative;
+}
+.card.acc{border-left:3px solid var(--c)}
+.tag{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--c,var(--text-3));margin-bottom:9px;display:block;font-weight:500;
+}
+.card p{font-size:13.6px;color:var(--text-2);line-height:1.66}
+.card p+p{margin-top:9px}
+.chips{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+.chip{
+  font-family:var(--mono);font-size:10px;letter-spacing:.04em;
+  border:1px solid var(--rule);padding:3px 9px;color:var(--text-2);background:#FCFCFA;
+}
+
+/* ============ LADDER ============ */
+.rung{
+  display:grid;grid-template-columns:64px 1fr;gap:0;
+  border:1px solid var(--rule);border-left:4px solid var(--c);
+  background:var(--card);margin-bottom:-1px;
+}
+.rung-n{
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--disp);font-weight:700;font-size:1.5rem;
+  color:#fff;background:var(--c);
+}
+.rung-b{padding:17px 20px}
+.rung-b h3{margin-bottom:5px}
+.rung-b .role{font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--c);margin-bottom:8px}
+.rung-b p{font-size:13.6px;color:var(--text-2);line-height:1.66}
+
+/* ============ METHOD STAGES ============ */
+.stages{border-top:1px solid var(--rule)}
+.stage{border-bottom:1px solid var(--rule);background:var(--card)}
+.stage-h{
+  display:grid;grid-template-columns:52px 1fr auto;align-items:center;
+  gap:14px;padding:14px 18px;cursor:pointer;transition:background .15s;
+}
+.stage-h:hover{background:#F6F8FE}
+.stage.open .stage-h{background:#F6F8FE}
+.stage-n{font-family:var(--mono);font-size:12px;color:#fff;background:var(--c);width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-weight:500}
+.stage-t{font-family:var(--disp);font-weight:600;font-size:1.03rem}
+.stage-q{font-family:var(--mono);font-size:11px;color:var(--text-3);display:block;margin-top:2px;font-weight:400;letter-spacing:.01em}
+.stage-x{font-family:var(--mono);font-size:14px;color:var(--text-3)}
+.stage-c{display:none;padding:2px 18px 20px 84px}
+.stage.open .stage-c{display:block}
+.stage-c p{font-size:13.8px;color:var(--text-2);line-height:1.7;margin-bottom:12px}
+.stage-c .out{
+  font-family:var(--mono);font-size:11.5px;color:var(--text-2);
+  background:#F6F5F1;border:1px solid var(--rule-soft);padding:10px 13px;line-height:1.6;
+}
+.stage-c .out b{color:var(--text);font-weight:600;letter-spacing:.1em;font-size:10px;text-transform:uppercase;display:block;margin-bottom:4px}
+.loopnote{
+  margin-top:22px;border:1px solid var(--rule);border-left:3px solid var(--magenta);
+  background:var(--card);padding:18px 20px;font-size:13.8px;color:var(--text-2);line-height:1.7;
+}
+.loopnote b{color:var(--text);font-weight:600}
+
+/* ============ TABLES ============ */
+.tbl-scroll{overflow-x:auto;border:1px solid var(--rule);background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:600px}
+th,td{padding:12px 15px;text-align:left;border-bottom:1px solid var(--rule-soft);font-size:13.2px;vertical-align:top}
+th{
+  font-family:var(--mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--text-3);font-weight:500;background:#F6F5F1;border-bottom:1px solid var(--rule);
+  position:sticky;top:0;
+}
+td:first-child{font-weight:500;color:var(--text)}
+td{color:var(--text-2)}
+tr:last-child td{border-bottom:none}
+.mono-cell{font-family:var(--mono);font-size:11.5px}
+
+/* ============ QUALITY DIMENSIONS ============ */
+.dim{
+  border:1px solid var(--rule);background:var(--card);padding:16px 18px;
+  display:grid;grid-template-columns:1fr;gap:6px;
+}
+.dim .top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.dim .name{font-family:var(--disp);font-weight:600;font-size:1.02rem}
+.dim .test{font-family:var(--mono);font-size:10px;color:var(--c);letter-spacing:.06em}
+.dim p{font-size:13.2px;color:var(--text-2);line-height:1.6}
+.dim .fail{font-family:var(--mono);font-size:11px;color:var(--text-3);border-top:1px dashed var(--rule);padding-top:8px;margin-top:3px}
+
+/* ============ GLOSSARY ============ */
+.gloss{columns:2;column-gap:34px}
+.gloss dl{break-inside:avoid;margin-bottom:15px}
+.gloss dt{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--text);letter-spacing:.02em;margin-bottom:3px}
+.gloss dd{font-size:13px;color:var(--text-2);line-height:1.6}
+
+/* ============ FOOTER ============ */
+footer{background:var(--ink);color:rgba(233,226,208,.8);padding:60px 0 70px}
+footer h3{font-family:var(--disp);text-transform:uppercase;font-size:1.5rem;color:var(--buff);margin-bottom:16px;letter-spacing:-.01em}
+footer p{max-width:680px;font-size:14.5px;line-height:1.75;font-weight:300}
+footer .fnote{margin-top:26px;font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;color:rgba(233,226,208,.42);text-transform:uppercase}
+
+@keyframes tickIn{to{opacity:1}}
+@media (max-width:720px){
+  .stage-c{padding-left:18px}
+  .stage-h{grid-template-columns:40px 1fr auto;gap:10px}
+  .gloss{columns:1}
+  .strip{flex-wrap:nowrap}
+  .fld{padding:9px 3px}
+  .fld i{display:none}
+  .byte-scale{display:none}
+  section{padding:56px 0}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+a:focus-visible,button:focus-visible,.fld:focus-visible,.stage-h:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="ruler"><div class="wrap"><div class="ruler-inner" id="ruler"></div></div></div>
+  <div class="wrap hero-body">
+    <div class="eyebrow">Foundations · Method · Platform</div>
+    <h1>IBM Data<br>Concepts<em>.</em></h1>
+    <p class="thesis">
+      Data only becomes valuable when it is <strong>collected deliberately, organized so it can be trusted,
+      analyzed with a repeatable method, and put back to work</strong> inside a decision. Everything on this page
+      is one of those four moves — from a 54-byte record on a mainframe to a governed model in production.
+    </p>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-k">Framework</div><div class="stat-v">The AI Ladder</div></div>
+      <div class="stat"><div class="stat-k">Method</div><div class="stat-v">10 Stages</div></div>
+      <div class="stat"><div class="stat-k">Quality tests</div><div class="stat-v">6 Dimensions</div></div>
+      <div class="stat"><div class="stat-k">Big data</div><div class="stat-v">4 V's</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= NAV ================= -->
+<nav>
+  <div class="nav-inner">
+    <a href="#shapes">01 Shapes of data</a>
+    <a href="#record">02 One record, three forms</a>
+    <a href="#stores">03 Where data lives</a>
+    <a href="#ladder">04 The AI Ladder</a>
+    <a href="#method">05 The method</a>
+    <a href="#mapping">06 Method vs. science</a>
+    <a href="#quality">07 Quality</a>
+    <a href="#governance">08 Governance</a>
+    <a href="#roles">09 Who does what</a>
+    <a href="#glossary">10 Glossary</a>
+  </div>
+</nav>
+
+<!-- ================= 01 SHAPES ================= -->
+<section id="shapes">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">01 / SHAPES OF DATA</span>
+      <h2>Structure is what decides everything downstream</h2>
+      <p class="lede">
+        Before you can store, query, or model anything, you have to know how much shape the data arrived with.
+        Structure determines which store it belongs in, which tools can read it, and how much work stands between
+        raw input and an answer. IBM frames enterprise data along this spectrum, and the four V's describe the
+        pressure it puts on any system that has to hold it.
+      </p>
+    </div>
+
+    <div class="grid g3 reveal">
+      <div class="card acc" style="--c:var(--blue)">
+        <span class="tag">Structured</span>
+        <h3>Fits a schema already</h3>
+        <p>Fixed fields with declared types and lengths — relational tables, mainframe VSAM files, COBOL copybook
+        records, CSV extracts. Every value has a known position and meaning before you read it.</p>
+        <p>Cheap to query, expensive to change. Altering a schema means migrating everything already written to it.</p>
+        <div class="chips"><span class="chip">Db2</span><span class="chip">VSAM</span><span class="chip">SQL</span><span class="chip">~20% of enterprise data</span></div>
+      </div>
+      <div class="card acc" style="--c:var(--teal)">
+        <span class="tag">Semi-structured</span>
+        <h3>Carries its own labels</h3>
+        <p>JSON, XML, Avro, Parquet, log lines. There is no separate schema to look up — the tags travel with the
+        values, so two records in the same file can legitimately differ in shape.</p>
+        <p>This is the native format of APIs and event streams, which is why it dominates anything real-time.</p>
+        <div class="chips"><span class="chip">JSON</span><span class="chip">Parquet</span><span class="chip">Schema-on-read</span></div>
+      </div>
+      <div class="card acc" style="--c:var(--magenta)">
+        <span class="tag">Unstructured</span>
+        <h3>Meaning has to be extracted</h3>
+        <p>Contracts, emails, call recordings, images, scanned claims, support tickets. The information is real but
+        nothing about the storage format exposes it.</p>
+        <p>The dominant share of what an enterprise holds, and the reason NLP, OCR, and now foundation models moved
+        from research to infrastructure.</p>
+        <div class="chips"><span class="chip">Text</span><span class="chip">Audio</span><span class="chip">Embeddings</span></div>
+      </div>
+    </div>
+
+    <div class="grid g2 reveal" style="margin-top:14px">
+      <div class="card acc" style="--c:var(--gold)">
+        <span class="tag">The four V's</span>
+        <h3>What makes data "big"</h3>
+        <p><b>Volume</b> — how much there is. <b>Velocity</b> — how fast it arrives and how fast it goes stale.
+        <b>Variety</b> — how many shapes and sources it comes in. <b>Veracity</b> — how much of it you can actually
+        trust.</p>
+        <p>Veracity is the one that gets skipped and the one that sinks projects: a pipeline that moves untrustworthy
+        data faster just produces wrong answers sooner. Many teams add a fifth V, <b>value</b>, as the test of whether
+        the other four were worth paying for.</p>
+      </div>
+      <div class="card acc" style="--c:var(--purple)">
+        <span class="tag">Metadata</span>
+        <h3>Data about the data</h3>
+        <p><b>Technical</b> — types, lengths, keys, null rules, partitions. <b>Business</b> — what the field means in
+        plain language and who owns it. <b>Operational</b> — when it last loaded, how many rows, which job wrote it.</p>
+        <p>Metadata is what makes a data estate searchable instead of merely large. Without it, an analyst cannot tell
+        whether <span class="mono-cell">CUST_STAT</span> means account status, statistical segment, or state code.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 02 RECORD DECODER (SIGNATURE) ================= -->
+<section id="record">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">02 / ONE RECORD, THREE FORMS</span>
+      <h2>The same 54 bytes, read three ways</h2>
+      <p class="lede">
+        A COBOL copybook, a relational column, and a JSON key are not three different things — they are three
+        descriptions of the same bytes on a disk. This is the single most useful mental model in enterprise data,
+        because it explains why a modernization project is mostly translation work. Select a field to decode it.
+      </p>
+    </div>
+
+    <div class="decoder reveal">
+      <div class="dec-bar"><span>EMPLOYEE-REC · Fixed-length · 54 bytes</span><span id="decHdr">Field 1 of 6</span></div>
+      <div class="byte-scale" id="scale"></div>
+      <div class="strip" id="strip"></div>
+      <div class="hint">Select a field to see how it is declared, stored, and translated</div>
+      <div class="dec-out" id="out"></div>
+    </div>
+
+    <div class="grid g3 reveal" style="margin-top:14px">
+      <div class="card acc" style="--c:var(--cyan)">
+        <span class="tag">Why fixed width</span>
+        <p>If every record is exactly 54 bytes, record number 4,000,000 starts at byte 216,000,000. No index lookup,
+        no parsing — arithmetic. That is why batch systems processing millions of records overnight still use it.</p>
+      </div>
+      <div class="card acc" style="--c:var(--cyan)">
+        <span class="tag">Why packed decimal</span>
+        <p>COMP-3 stores two digits per byte with the sign in the final nibble, and arithmetic stays exact.
+        Binary floating point cannot represent 0.10 exactly; for money, that rounding error is a defect, not a nuance.</p>
+      </div>
+      <div class="card acc" style="--c:var(--cyan)">
+        <span class="tag">Why encoding matters</span>
+        <p>Mainframes store text in EBCDIC, distributed systems in ASCII or UTF-8. The letter A is 0xC1 in one and
+        0x41 in the other. Skip the conversion in a pipeline and you get silent corruption, not an error.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 03 WHERE DATA LIVES ================= -->
+<section id="stores">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">03 / WHERE DATA LIVES</span>
+      <h2>Every store is a bet about how the data will be read</h2>
+      <p class="lede">
+        There is no general-purpose data store. Each one trades write speed against read speed, or schema rigor
+        against flexibility, and the right choice depends entirely on whether the workload is running the business
+        or analyzing it.
+      </p>
+    </div>
+
+    <div class="tbl-scroll reveal">
+      <table>
+        <thead><tr><th>Store</th><th>Holds</th><th>Schema applied</th><th>Built for</th><th>IBM example</th></tr></thead>
+        <tbody>
+          <tr><td>Operational database (OLTP)</td><td>Current transactional state</td><td class="mono-cell">On write</td><td>Many small reads and writes, sub-second, highly concurrent</td><td>Db2, IMS, VSAM</td></tr>
+          <tr><td>Data warehouse (OLAP)</td><td>Cleaned, historical, modeled</td><td class="mono-cell">On write</td><td>Large aggregate queries across years of history</td><td>Db2 Warehouse, Netezza</td></tr>
+          <tr><td>Data mart</td><td>One subject area of the warehouse</td><td class="mono-cell">On write</td><td>A single department querying without contention</td><td>Warehouse subset</td></tr>
+          <tr><td>Data lake</td><td>Raw files in native format</td><td class="mono-cell">On read</td><td>Cheap retention of anything you might need later</td><td>Object storage + Spark</td></tr>
+          <tr><td>Data lakehouse</td><td>Lake storage, warehouse behavior</td><td class="mono-cell">On read, enforced</td><td>One copy serving both BI and model training</td><td>watsonx.data</td></tr>
+          <tr><td>Data fabric</td><td>Nothing — it connects stores</td><td class="mono-cell">Virtualized</td><td>Querying across systems without physically moving data</td><td>Cloud Pak for Data</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid g2 reveal" style="margin-top:16px">
+      <div class="card acc" style="--c:var(--blue)">
+        <span class="tag">Modeling</span>
+        <h3>Normalized vs. dimensional</h3>
+        <p>Operational systems normalize — each fact stored once, so an update touches one row and cannot contradict
+        itself. Warehouses denormalize into star schemas — a central fact table surrounded by dimension tables — so a
+        report joins two tables instead of eleven.</p>
+        <p>Both are correct. They optimize for opposite workloads, which is why the same company runs both.</p>
+      </div>
+      <div class="card acc" style="--c:var(--teal)">
+        <span class="tag">Movement</span>
+        <h3>ETL vs. ELT</h3>
+        <p><b>ETL</b> transforms before loading: the warehouse only ever receives conforming data, but every new
+        question may require reworking the pipeline. <b>ELT</b> loads raw and transforms in place, which suits cheap
+        elastic storage and exploratory work.</p>
+        <p>ELT did not replace ETL. Regulated reporting still wants transformation governed and auditable before the
+        data lands.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 04 AI LADDER ================= -->
+<section id="ladder">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">04 / THE AI LADDER</span>
+      <h2>Four rungs, and you cannot skip one</h2>
+      <p class="lede">
+        IBM's organizing framework for getting from raw data to AI in production. The point of the metaphor is
+        strictly ordered: organizations that jump to the top rung end up with impressive models trained on data
+        nobody can vouch for. The ladder is climbed, not leapt.
+      </p>
+    </div>
+
+    <div class="reveal">
+      <div class="rung" style="--c:var(--blue)">
+        <div class="rung-n">1</div>
+        <div class="rung-b">
+          <div class="role">Make data simple and accessible</div>
+          <h3>Collect</h3>
+          <p>Bring data in from wherever it already lives — mainframe files, operational databases, SaaS APIs, sensors,
+          documents — without first demanding that every source be rebuilt. Virtualization matters here: the cheapest
+          way to collect data is often to query it where it sits rather than copy it.</p>
+        </div>
+      </div>
+      <div class="rung" style="--c:var(--teal)">
+        <div class="rung-n">2</div>
+        <div class="rung-b">
+          <div class="role">Create a business-ready foundation</div>
+          <h3>Organize</h3>
+          <p>Catalog it, define what each field means, trace its lineage, enforce quality rules, mask what is sensitive.
+          This is the rung that gets underfunded because it produces no demo — and the rung whose absence makes every
+          later result contestable.</p>
+        </div>
+      </div>
+      <div class="rung" style="--c:var(--purple)">
+        <div class="rung-n">3</div>
+        <div class="rung-b">
+          <div class="role">Build and scale with trust</div>
+          <h3>Analyze</h3>
+          <p>Descriptive reporting, statistical analysis, machine learning, model training and validation. Trust is the
+          operative word: a model whose behavior cannot be explained to a regulator or a customer is not deployable in
+          a bank, regardless of accuracy.</p>
+        </div>
+      </div>
+      <div class="rung" style="--c:var(--magenta)">
+        <div class="rung-n">4</div>
+        <div class="rung-b">
+          <div class="role">Operationalize across the business</div>
+          <h3>Infuse</h3>
+          <p>Put the result inside the workflow where the decision actually happens — the claims screen, the credit
+          check, the maintenance schedule. An insight that requires someone to open a dashboard and interpret it has
+          not been infused; it has been filed.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="loopnote reveal">
+      <b>Modernize is the rail alongside the ladder.</b> IBM adds it as the condition that makes the climb possible:
+      hybrid cloud architecture, containerized workloads, and API access to legacy systems. You do not need to replace
+      the mainframe to use its data — but you do need to be able to reach it.
+    </div>
+  </div>
+</section>
+
+<!-- ================= 05 METHOD ================= -->
+<section id="method">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">05 / THE METHOD</span>
+      <h2>The Foundational Methodology for Data Science</h2>
+      <p class="lede">
+        IBM's ten-stage method, formalized by John Rollins, is a descendant of CRISP-DM with two deliberate
+        differences: it starts from a business question rather than a dataset, and it does not end. Each stage asks
+        one question and produces one artifact. Select a stage to open it.
+      </p>
+    </div>
+
+    <div class="stages reveal" id="stages"></div>
+
+    <div class="loopnote reveal">
+      <b>The two loops are the whole point.</b> Data understanding sends you back to collection when what you gathered
+      cannot answer the question. Evaluation sends you back to modeling when performance falls short. And feedback
+      returns you to business understanding, because a deployed model changes the behavior it was trained to predict —
+      which is why models drift and monitoring is a permanent job, not a launch task.
+    </div>
+  </div>
+</section>
+
+<!-- ================= 06 MAPPING ================= -->
+<section id="mapping">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">06 / METHOD VS. SCIENCE</span>
+      <h2>The same discipline, a different deliverable</h2>
+      <p class="lede">
+        The data science method is the scientific method with a stakeholder attached. Both insist on a falsifiable
+        claim, controlled evidence, and honest evaluation. They part company at the end: a paper concludes, a model
+        gets deployed and then has to keep being right.
+      </p>
+    </div>
+
+    <div class="tbl-scroll reveal">
+      <table>
+        <thead><tr><th>Scientific method</th><th>Data science method</th><th>What changes</th></tr></thead>
+        <tbody>
+          <tr><td>Observation</td><td>Business understanding</td><td>The phenomenon is chosen by a stakeholder with a cost attached, not by curiosity alone</td></tr>
+          <tr><td>Question</td><td>Analytic approach</td><td>You also decide the answer's <em>shape</em> — a yes/no, a number, a ranking, a cluster</td></tr>
+          <tr><td>Background research</td><td>Data requirements</td><td>Prior work tells you which evidence exists; here it tells you which evidence you are allowed to use</td></tr>
+          <tr><td>Hypothesis</td><td>Modeling</td><td>The model <em>is</em> the hypothesis — a formal, testable claim about the relationship</td></tr>
+          <tr><td>Experiment</td><td>Data collection, understanding, preparation</td><td>Rarely a controlled trial; usually observational data that must be cleaned into fitness</td></tr>
+          <tr><td>Analysis</td><td>Evaluation</td><td>Held-out test data replaces the control group as the guard against fooling yourself</td></tr>
+          <tr><td>Conclusion</td><td>Deployment + feedback</td><td>No terminal state. The finding enters production and is re-tested continuously</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="loopnote reveal" style="border-left-color:var(--red)">
+      <b>The failure mode both share.</b> In science it is p-hacking; in data science it is leakage and overfitting.
+      Both are the same sin — testing on the evidence you used to build the claim. Holding out data you have not
+      looked at is the discipline that keeps a model honest, exactly as pre-registration does for a study.
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 QUALITY ================= -->
+<section id="quality">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">07 / QUALITY</span>
+      <h2>Six dimensions, each a test you can actually run</h2>
+      <p class="lede">
+        "Good data" is not a judgment call. Quality decomposes into six measurable properties, and each one has a
+        query that either passes or fails. Profiling a dataset means running all six before anyone models anything.
+      </p>
+    </div>
+
+    <div class="grid g3 reveal">
+      <div class="dim" style="--c:var(--blue)">
+        <div class="top"><span class="name">Accuracy</span><span class="test">vs. reality</span></div>
+        <p>Does the value match the real-world thing it describes?</p>
+        <div class="fail">Fails as: a valid ZIP code for the wrong address</div>
+      </div>
+      <div class="dim" style="--c:var(--teal)">
+        <div class="top"><span class="name">Completeness</span><span class="test">null rate</span></div>
+        <p>Are the required values present at the required grain?</p>
+        <div class="fail">Fails as: 12% of rows missing an income field</div>
+      </div>
+      <div class="dim" style="--c:var(--purple)">
+        <div class="top"><span class="name">Consistency</span><span class="test">cross-system</span></div>
+        <p>Does the same entity agree across every system that holds it?</p>
+        <div class="fail">Fails as: two addresses for one customer</div>
+      </div>
+      <div class="dim" style="--c:var(--magenta)">
+        <div class="top"><span class="name">Timeliness</span><span class="test">latency</span></div>
+        <p>Is it current enough for the decision it will inform?</p>
+        <div class="fail">Fails as: yesterday's balance on a fraud check</div>
+      </div>
+      <div class="dim" style="--c:var(--gold)">
+        <div class="top"><span class="name">Validity</span><span class="test">vs. rules</span></div>
+        <p>Does it conform to its declared format, type, and range?</p>
+        <div class="fail">Fails as: a hire date of 1899-12-31</div>
+      </div>
+      <div class="dim" style="--c:var(--green)">
+        <div class="top"><span class="name">Uniqueness</span><span class="test">dup rate</span></div>
+        <p>Is each real entity represented exactly once?</p>
+        <div class="fail">Fails as: the same customer under three IDs</div>
+      </div>
+    </div>
+
+    <div class="loopnote reveal" style="border-left-color:var(--gold)">
+      <b>Preparation is most of the job.</b> Practitioner surveys have put data collection and preparation at roughly
+      seventy to eighty percent of project effort for years. That number is not a sign of inefficiency — resolving
+      duplicates, reconciling encodings, and deciding what a null means <em>is</em> the analysis, done early.
+    </div>
+  </div>
+</section>
+
+<!-- ================= 08 GOVERNANCE ================= -->
+<section id="governance">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">08 / GOVERNANCE</span>
+      <h2>Who may use which data, for what, and can you prove it</h2>
+      <p class="lede">
+        Governance is often mistaken for a compliance tax. It is closer to version control: a set of guarantees that
+        make data safe to reuse by people who did not create it. Without it, every analysis starts by re-establishing
+        trust from scratch.
+      </p>
+    </div>
+
+    <div class="grid g2 reveal">
+      <div class="card acc" style="--c:var(--purple)">
+        <span class="tag">Catalog</span>
+        <h3>Findability</h3>
+        <p>A searchable inventory of assets with business definitions, owners, and quality scores attached. The
+        question it answers is "does this already exist, and can I trust it?" — the two questions that otherwise get
+        answered by building a duplicate.</p>
+      </div>
+      <div class="card acc" style="--c:var(--blue)">
+        <span class="tag">Lineage</span>
+        <h3>Traceability</h3>
+        <p>The end-to-end path from source system through every transformation to the number on the report. Required
+        for audits, and the only practical way to answer "which downstream reports break if I change this column?"</p>
+      </div>
+      <div class="card acc" style="--c:var(--teal)">
+        <span class="tag">Master data</span>
+        <h3>One version of an entity</h3>
+        <p>MDM resolves the same customer, product, or vendor across systems into a single golden record with a stable
+        identifier. This is what makes "how many customers do we have" a question with one answer.</p>
+      </div>
+      <div class="card acc" style="--c:var(--red)">
+        <span class="tag">Privacy</span>
+        <h3>Protection and obligation</h3>
+        <p>Classifying PII and PHI, then enforcing masking, encryption, retention limits, and access rules against it —
+        under GDPR, CCPA, HIPAA, and sector regulators. Consent and the right to erasure are data engineering problems
+        long before they are legal ones.</p>
+      </div>
+      <div class="card acc" style="--c:var(--magenta)">
+        <span class="tag">Stewardship</span>
+        <h3>Named accountability</h3>
+        <p>Every critical data element has an owner who decides its definition and an accountable steward who maintains
+        it. Governance without names is a policy document nobody enforces.</p>
+      </div>
+      <div class="card acc" style="--c:var(--gold)">
+        <span class="tag">AI governance</span>
+        <h3>Models are assets too</h3>
+        <p>The same disciplines now extend to models: documented training data, bias and drift monitoring,
+        explainability for contested decisions, and an approval trail. This is the substance behind watsonx.governance
+        and the EU AI Act alike.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 09 ROLES ================= -->
+<section id="roles">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">09 / WHO DOES WHAT</span>
+      <h2>Four roles, one pipeline</h2>
+      <p class="lede">
+        These titles blur in small teams and harden in large ones, but the division of labor is stable: someone moves
+        the data, someone guards it, someone explains what happened, someone predicts what will.
+      </p>
+    </div>
+
+    <div class="tbl-scroll reveal">
+      <table>
+        <thead><tr><th>Role</th><th>Owns</th><th>Answers</th><th>Typical tools</th></tr></thead>
+        <tbody>
+          <tr><td>Data engineer</td><td>Pipelines, storage, schemas, reliability</td><td>Is the data here, on time, in the right shape?</td><td class="mono-cell">SQL · Python · Spark · DataStage</td></tr>
+          <tr><td>Data steward / governance</td><td>Definitions, quality rules, access policy</td><td>Is this the right data, and may you use it?</td><td class="mono-cell">Knowledge Catalog · MDM</td></tr>
+          <tr><td>Data / BI analyst</td><td>Reporting, metrics, descriptive analysis</td><td>What happened, and why?</td><td class="mono-cell">SQL · Cognos · Excel</td></tr>
+          <tr><td>Data scientist</td><td>Models, experiments, statistical inference</td><td>What is likely to happen next?</td><td class="mono-cell">Python · R · watsonx.ai</td></tr>
+          <tr><td>ML engineer</td><td>Deployment, serving, monitoring, retraining</td><td>Is the model still correct in production?</td><td class="mono-cell">MLOps · containers · APIs</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 10 GLOSSARY ================= -->
+<section id="glossary">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="sec-num">10 / GLOSSARY</span>
+      <h2>Terms worth being precise about</h2>
+      <p class="lede">These are the ones that get used loosely and cause real confusion when they do.</p>
+    </div>
+    <div class="gloss reveal">
+      <dl><dt>Schema-on-write</dt><dd>Structure enforced at load time. Nothing invalid enters the store; changing the structure is expensive.</dd></dl>
+      <dl><dt>Schema-on-read</dt><dd>Structure applied when queried. Loading is cheap and flexible; the interpretation burden moves to whoever reads it.</dd></dl>
+      <dl><dt>Grain</dt><dd>What one row represents — one order, one order line, one order per day. Mixing grains in a table is the most common modeling error.</dd></dl>
+      <dl><dt>Cardinality</dt><dd>How many distinct values a column holds. Drives index choice, join cost, and whether a field is a useful dimension.</dd></dl>
+      <dl><dt>Idempotence</dt><dd>Running a pipeline twice produces the same result as running it once. The property that makes a failed job safe to re-run.</dd></dl>
+      <dl><dt>Slowly changing dimension</dt><dd>How a warehouse records that an attribute changed — overwrite the old value, or keep both with effective dates.</dd></dl>
+      <dl><dt>Data lineage</dt><dd>The traced path from origin through every transformation to final use.</dd></dl>
+      <dl><dt>Golden record</dt><dd>The single reconciled version of an entity that MDM produces from conflicting sources.</dd></dl>
+      <dl><dt>Feature</dt><dd>An input variable to a model, usually engineered from raw fields rather than used as-is.</dd></dl>
+      <dl><dt>Leakage</dt><dd>Information in the training data that would not exist at prediction time. Produces excellent test scores and useless models.</dd></dl>
+      <dl><dt>Drift</dt><dd>The world changing until a deployed model's assumptions no longer hold. Detected by monitoring, fixed by retraining.</dd></dl>
+      <dl><dt>Copybook</dt><dd>A shared COBOL file defining a record layout. The mainframe's schema definition, reused across every program that reads the file.</dd></dl>
+      <dl><dt>EBCDIC</dt><dd>IBM's mainframe character encoding. Incompatible byte-for-byte with ASCII, so every mainframe extract needs conversion.</dd></dl>
+      <dl><dt>Packed decimal (COMP-3)</dt><dd>Two digits per byte, sign in the last nibble. Exact base-10 arithmetic for money.</dd></dl>
+      <dl><dt>OLTP / OLAP</dt><dd>Transaction processing — many tiny concurrent writes — versus analytical processing — few enormous reads.</dd></dl>
+      <dl><dt>Data fabric</dt><dd>An architecture that connects and virtualizes distributed data rather than consolidating it into one store.</dd></dl>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <h3>The through-line</h3>
+    <p>
+      Every concept here serves one purpose: making a claim about the world that someone else can check. A copybook
+      declares what the bytes mean so a second program reads them the same way. Lineage records where a number came
+      from so an auditor can retrace it. A held-out test set keeps a model from grading its own work. Governance names
+      who is accountable. Data engineering, at its core, is the practice of building systems whose outputs remain
+      verifiable after the people who built them have moved on.
+    </p>
+    <div class="fnote">Study reference · Collect → Organize → Analyze → Infuse</div>
+  </div>
+</footer>
+
+<script>
+/* ---------- hero ruler ---------- */
+(function(){
+  var r=document.getElementById('ruler'),h='';
+  for(var i=0;i<=200;i+=8){h+='<span class="tick" style="animation-delay:'+(i*4)+'ms">'+String(i).padStart(3,'0')+'</span>';}
+  r.innerHTML=h;
+})();
+
+/* ---------- record decoder ---------- */
+var FIELDS=[
+  {n:'EMP-ID',pic:'PIC 9(6)',b:[1,6],len:6,c:'var(--blue)',store:'Zoned decimal, 6 bytes',raw:'F0F0F4F4F1F7',val:'004417',
+   sql:'emp_id  CHAR(6)  PRIMARY KEY',json:'"empId": "004417"',
+   note:'The primary key. Stored as characters, not a number — leading zeros are significant, so casting this to an integer in a pipeline silently destroys 004417 into 4417 and breaks every join that depends on it.'},
+  {n:'EMP-NAME',pic:'PIC X(30)',b:[7,36],len:30,c:'var(--teal)',store:'EBCDIC text, space-padded to 30',raw:'"MARTINEZ, R L" + 17 spaces',val:'MARTINEZ, R L',
+   sql:'emp_name  VARCHAR(30)',json:'"empName": "MARTINEZ, R L"',
+   note:'One field holding two facts — surname and initials in a single string. Splitting it into given and family names is a classic preparation task, and the reason "just load the file" is never just loading the file.'},
+  {n:'DEPT-CODE',pic:'PIC X(4)',b:[37,40],len:4,c:'var(--purple)',store:'EBCDIC text, 4 bytes',raw:'D5D6D7F2',val:'NOP2',
+   sql:'dept_code  CHAR(4)  REFERENCES dept(code)',json:'"deptCode": "NOP2"',
+   note:'A foreign key with no constraint enforcing it. The mainframe file has no referential integrity — the guarantee lives in application code, so orphaned codes are common and must be checked during profiling.'},
+  {n:'HIRE-DATE',pic:'PIC 9(8)',b:[41,48],len:8,c:'var(--magenta)',store:'Zoned decimal YYYYMMDD',raw:'F2F0F1F9F0F3F1F1',val:'20190311',
+   sql:'hire_date  DATE',json:'"hireDate": "2019-03-11"',
+   note:'A date stored as a number, which means the file format cannot reject 20190231. Validity has to be tested on read. Older records may still use a 6-digit YYMMDD form — the shape that caused Y2K.'},
+  {n:'SALARY',pic:'PIC S9(7)V99 COMP-3',b:[49,53],len:5,c:'var(--gold)',store:'Packed decimal, 5 bytes, 9 digits + sign',raw:'00 06 85 00 0C',val:'68500.00',
+   sql:'salary  DECIMAL(9,2)',json:'"salary": 68500.00',
+   note:'V is an implied decimal point — it occupies no byte, so the position is knowledge the copybook holds and the raw file does not. The trailing C nibble is the positive sign. Read these 5 bytes as text and you get garbage.'},
+  {n:'STATUS',pic:'PIC X(1)',b:[54,54],len:1,c:'var(--green)',store:'Single EBCDIC character',raw:'C1',val:'A',
+   sql:"status  CHAR(1)  CHECK (status IN ('A','L','T'))",json:'"status": "ACTIVE"',
+   note:'A coded flag: A active, L leave, T terminated. The meaning exists only in documentation, so translating it into a readable value is exactly the business-metadata work a catalog is meant to capture.'}
 ];
 
-const colorMap = {
-  purple: {
-    bg: "#EEEDFE",
-    border: "#534AB7",
-    text: "#3C3489",
-    pill: "#AFA9EC",
-    pillText: "#26215C",
-    darkBg: "#26215C",
-    darkText: "#CECBF6",
-  },
-  teal: {
-    bg: "#E1F5EE",
-    border: "#0F6E56",
-    text: "#085041",
-    pill: "#5DCAA5",
-    pillText: "#04342C",
-    darkBg: "#04342C",
-    darkText: "#9FE1CB",
-  },
-  coral: {
-    bg: "#FAECE7",
-    border: "#993C1D",
-    text: "#712B13",
-    pill: "#F0997B",
-    pillText: "#4A1B0C",
-    darkBg: "#4A1B0C",
-    darkText: "#F5C4B3",
-  },
-  amber: {
-    bg: "#FAEEDA",
-    border: "#854F0B",
-    text: "#633806",
-    pill: "#EF9F27",
-    pillText: "#412402",
-    darkBg: "#412402",
-    darkText: "#FAC775",
-  },
-};
+(function(){
+  var strip=document.getElementById('strip'),scale=document.getElementById('scale'),
+      out=document.getElementById('out'),hdr=document.getElementById('decHdr'),total=54;
 
-function Pill({ children, color }) {
-  const c = colorMap[color];
-  return (
-    <span
-      style={{
-        background: c.pill,
-        color: c.pillText,
-        borderRadius: 20,
-        padding: "3px 12px",
-        fontSize: 12,
-        fontWeight: 500,
-        marginRight: 6,
-        marginBottom: 6,
-        display: "inline-block",
-      }}
-    >
-      {children}
-    </span>
-  );
-}
+  FIELDS.forEach(function(f,i){
+    var w=(f.len/total*100);
+    var d=document.createElement('div');
+    d.className='fld';d.style.cssText='--c:'+f.c+';flex:'+f.len+' 1 0';
+    d.setAttribute('tabindex','0');d.setAttribute('role','button');
+    d.innerHTML='<b>'+f.n+'</b><i>'+f.len+'b</i>';
+    d.onclick=function(){show(i)};
+    d.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();show(i)}};
+    strip.appendChild(d);
 
-function CodeBlock({ code }) {
-  return (
-    <pre
-      style={{
-        background: "var(--color-background-tertiary, #f5f5f3)",
-        border: "0.5px solid var(--color-border-tertiary)",
-        borderRadius: 8,
-        padding: "10px 14px",
-        fontSize: 12,
-        fontFamily: "monospace",
-        color: "var(--color-text-primary)",
-        margin: "10px 0 0",
-        overflowX: "auto",
-        whiteSpace: "pre-wrap",
-        lineHeight: 1.6,
-      }}
-    >
-      {code}
-    </pre>
-  );
-}
+    var s=document.createElement('div');
+    s.style.cssText='flex:'+f.len+' 1 0';
+    s.textContent=f.b[0];
+    scale.appendChild(s);
+  });
 
-function OverviewPanel({ section }) {
-  const c = colorMap[section.color];
-  return (
-    <div>
-      <p style={{ color: "var(--color-text-secondary)", fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
-        {section.description}
-      </p>
-      <div style={{ marginBottom: 20 }}>
-        {section.pills.map((p) => (
-          <Pill key={p} color={section.color}>{p}</Pill>
-        ))}
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
-        {section.facts.map((f) => (
-          <div
-            key={f.label}
-            style={{
-              background: c.bg,
-              border: `0.5px solid ${c.border}`,
-              borderRadius: 10,
-              padding: "12px 16px",
-            }}
-          >
-            <div style={{ fontSize: 11, color: c.text, fontWeight: 500, marginBottom: 4 }}>{f.label}</div>
-            <div style={{ fontSize: 15, fontWeight: 500, color: c.text }}>{f.value}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+  function show(i){
+    var f=FIELDS[i];
+    [].forEach.call(strip.children,function(el,j){el.classList.toggle('on',j===i)});
+    hdr.textContent='Bytes '+f.b[0]+'–'+f.b[1]+' · '+f.len+' of 54';
+    out.style.setProperty('--c',f.c);
+    out.innerHTML=
+      '<div class="dec-grid">'+
+      cell('COBOL declaration',f.pic)+
+      cell('Storage',f.store)+
+      cell('Raw bytes',f.raw)+
+      cell('Decoded value',f.val)+
+      cell('As a SQL column',f.sql)+
+      cell('As JSON',f.json)+
+      '</div><div class="dec-note" style="border-color:'+f.c+'">'+f.note+'</div>';
+  }
+  function cell(k,v){return '<div class="dec-cell"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>'}
+  show(0);
+})();
 
-function CompilationPanel({ section }) {
-  const c = colorMap[section.color];
-  return (
-    <div>
-      <p style={{ color: "var(--color-text-secondary)", fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
-        {section.description}
-      </p>
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        {section.steps.map((step, i) => (
-          <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div
-              style={{
-                background: c.bg,
-                border: `0.5px solid ${c.border}`,
-                borderRadius: 10,
-                padding: "10px 14px",
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                flex: 1,
-              }}
-            >
-              <span style={{ fontSize: 18 }}>{step.icon}</span>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 500, color: c.text }}>{step.label}</div>
-                <div style={{ fontSize: 11, color: c.text, opacity: 0.8 }}>{step.sub}</div>
-              </div>
-            </div>
-            {i < section.steps.length - 1 && (
-              <div style={{ color: c.border, fontSize: 16, fontWeight: 500 }}>↓</div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+/* ---------- method stages ---------- */
+var STAGES=[
+ ['Business understanding','What problem are we solving?','var(--blue)',
+  'Everything begins with a clearly stated goal agreed with whoever owns the outcome. Vague goals produce vague models. "Reduce readmissions" is a direction; "predict which discharged patients will return within 30 days, so a nurse can call them" is a problem with a decision attached.',
+  'A problem statement naming the decision, the user, and the cost of being wrong'],
+ ['Analytic approach','What kind of answer does it need?','var(--teal)',
+  'The business question determines the technique, not the reverse. A yes/no outcome points to classification; a quantity points to regression; grouping without labels points to clustering; "what should we do next" points to optimization or a recommender. Choosing the approach first prevents fitting the problem to a favorite algorithm.',
+  'A chosen problem type and candidate techniques'],
+ ['Data requirements','What evidence would answer it?','var(--purple)',
+  'Specify the content, formats, and sources needed — before checking what happens to be available. Writing the ideal requirement first makes the eventual gaps visible and documentable rather than invisible and assumed away.',
+  'A specification of required fields, grain, history depth, and sources'],
+ ['Data collection','Can we actually get it?','var(--magenta)',
+  'Acquire what exists, note what does not, and decide whether the gaps are fatal or acceptable. Access rights are part of collection: data that legally cannot be used for this purpose is unavailable regardless of whether you can technically read it.',
+  'An assembled raw dataset plus a documented gap list'],
+ ['Data understanding','Is it what we think it is?','var(--gold)',
+  'Descriptive statistics and visualization to establish what the data actually contains — distributions, missingness, outliers, encodings, whether the field named REVENUE is gross or net. This stage routinely sends the project back to collection, and that loop is a feature.',
+  'A profile of the data and a list of quality findings'],
+ ['Data preparation','Can a model consume it?','var(--green)',
+  'Cleaning, deduplication, joins, handling of missing values, and feature engineering. The most consequential decisions get made here quietly: how you treat a null determines what the model believes about it, and there is no default that is right in every case.',
+  'A model-ready dataset with transformations documented and repeatable'],
+ ['Modeling','What relationship does the data support?','var(--blue)',
+  'Train candidate models on training data, tune them on validation data. Descriptive models characterize what is there; predictive models estimate what comes next. Multiple candidates are normal — the point is comparison, not devotion to one.',
+  'Trained candidate models and their parameters'],
+ ['Evaluation','Is it good enough, and good at what?','var(--teal)',
+  'Measure against held-out data the model has never seen, using metrics that match the business cost. Accuracy is misleading on imbalanced problems — a fraud model that predicts "not fraud" for everything scores 99% and is worthless. Precision, recall, and the cost of each error type matter more.',
+  'Validated performance metrics and a deploy / iterate decision'],
+ ['Deployment','Does it reach the decision?','var(--purple)',
+  'Put the model where the work happens — embedded in an application, exposed as an API, scheduled as a batch job. Deployment includes the unglamorous parts: user training, fallback behavior when the model is unavailable, and a documented way to override it.',
+  'A model in production with monitoring and a rollback path'],
+ ['Feedback','Is it still right?','var(--magenta)',
+  'Collect real-world results, compare them to predictions, watch for drift, and refine. This stage closes the loop back to business understanding — which is why the method is drawn as a circle. A model is a claim about a world that keeps changing.',
+  'Monitored performance over time and a refinement backlog']
+];
 
-function DivisionsPanel({ section }) {
-  const [open, setOpen] = useState(null);
-  const c = colorMap[section.color];
-  return (
-    <div>
-      <p style={{ color: "var(--color-text-secondary)", fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
-        {section.description}
-      </p>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {section.divisions.map((div, i) => (
-          <div
-            key={i}
-            style={{
-              border: `0.5px solid ${open === i ? c.border : "var(--color-border-tertiary)"}`,
-              borderRadius: 10,
-              overflow: "hidden",
-              cursor: "pointer",
-              background: open === i ? c.bg : "var(--color-background-primary)",
-            }}
-            onClick={() => setOpen(open === i ? null : i)}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "12px 16px",
-              }}
-            >
-              <div>
-                <div style={{ fontSize: 12, fontFamily: "monospace", fontWeight: 500, color: c.text }}>
-                  {div.name}
-                </div>
-                <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}>
-                  {div.role}
-                </div>
-              </div>
-              <span style={{ color: c.text, fontSize: 14 }}>{open === i ? "▲" : "▼"}</span>
-            </div>
-            {open === i && (
-              <div style={{ padding: "0 16px 14px" }}>
-                <p style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.6, margin: "0 0 8px" }}>
-                  {div.desc}
-                </p>
-                <CodeBlock code={div.code} />
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+(function(){
+  var host=document.getElementById('stages');
+  STAGES.forEach(function(s,i){
+    var d=document.createElement('div');
+    d.className='stage';d.style.setProperty('--c',s[2]);
+    d.innerHTML=
+      '<div class="stage-h" tabindex="0" role="button">'+
+        '<div class="stage-n">'+String(i+1).padStart(2,'0')+'</div>'+
+        '<div><span class="stage-t">'+s[0]+'</span><span class="stage-q">'+s[1]+'</span></div>'+
+        '<div class="stage-x">+</div>'+
+      '</div>'+
+      '<div class="stage-c"><p>'+s[3]+'</p><div class="out"><b>Produces</b>'+s[4]+'</div></div>';
+    var head=d.querySelector('.stage-h');
+    function tog(){
+      var open=d.classList.toggle('open');
+      d.querySelector('.stage-x').textContent=open?'−':'+';
+    }
+    head.onclick=tog;
+    head.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();tog()}};
+    host.appendChild(d);
+  });
+  host.firstChild.classList.add('open');
+  host.firstChild.querySelector('.stage-x').textContent='−';
+})();
 
-function PrinciplesPanel({ section }) {
-  return (
-    <div>
-      <p style={{ color: "var(--color-text-secondary)", fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
-        {section.description}
-      </p>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        {section.principles.map((p, i) => (
-          <div
-            key={i}
-            style={{
-              background: "var(--color-background-secondary)",
-              border: "0.5px solid var(--color-border-tertiary)",
-              borderRadius: 10,
-              padding: "14px 14px",
-            }}
-          >
-            <div style={{ fontSize: 20, marginBottom: 6 }}>{p.icon}</div>
-            <div style={{ fontSize: 13, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 4 }}>
-              {p.title}
-            </div>
-            <div style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.6 }}>{p.body}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+/* ---------- scroll reveal + nav ---------- */
+(function(){
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}});
+  },{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
 
-export default function COBOLExplainer() {
-  const [active, setActive] = useState(0);
-  const section = sections[active];
-  const c = colorMap[section.color];
-
-  return (
-    <div style={{ fontFamily: "var(--font-sans, sans-serif)", maxWidth: 680, margin: "0 auto", padding: "0 0 1rem" }}>
-      {/* Header */}
-      <div
-        style={{
-          background: c.bg,
-          border: `0.5px solid ${c.border}`,
-          borderRadius: 14,
-          padding: "20px 24px",
-          marginBottom: 16,
-        }}
-      >
-        <div style={{ fontSize: 11, color: c.text, fontWeight: 500, letterSpacing: 1, marginBottom: 4 }}>
-          COMPILED LANGUAGE • SINCE 1959
-        </div>
-        <div style={{ fontSize: 22, fontWeight: 500, color: c.text, marginBottom: 6 }}>
-          COBOL
-        </div>
-        <div style={{ fontSize: 13, color: c.text, opacity: 0.85 }}>
-          Common Business-Oriented Language — structure, foundation & core principles
-        </div>
-      </div>
-
-      {/* Tab Nav */}
-      <div
-        style={{
-          display: "flex",
-          gap: 6,
-          marginBottom: 14,
-          flexWrap: "wrap",
-        }}
-      >
-        {sections.map((s, i) => {
-          const sc = colorMap[s.color];
-          const isActive = i === active;
-          return (
-            <button
-              key={s.id}
-              onClick={() => setActive(i)}
-              style={{
-                padding: "7px 16px",
-                borderRadius: 20,
-                border: `0.5px solid ${isActive ? sc.border : "var(--color-border-secondary)"}`,
-                background: isActive ? sc.bg : "transparent",
-                color: isActive ? sc.text : "var(--color-text-secondary)",
-                fontSize: 13,
-                fontWeight: isActive ? 500 : 400,
-                cursor: "pointer",
-                transition: "all 0.15s",
-              }}
-            >
-              {s.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Panel */}
-      <div
-        style={{
-          background: "var(--color-background-primary)",
-          border: "0.5px solid var(--color-border-tertiary)",
-          borderRadius: 12,
-          padding: "20px 20px",
-        }}
-      >
-        <div style={{ fontSize: 16, fontWeight: 500, color: "var(--color-text-primary)", marginBottom: 14 }}>
-          {section.title}
-        </div>
-
-        {active === 0 && <OverviewPanel section={section} />}
-        {active === 1 && <CompilationPanel section={section} />}
-        {active === 2 && <DivisionsPanel section={section} />}
-        {active === 3 && <PrinciplesPanel section={section} />}
-      </div>
-
-      {/* Footer */}
-      <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", textAlign: "center", marginTop: 14 }}>
-        Click each tab to explore • Click divisions to expand code examples
-      </div>
-    </div>
-  );
-}
+  var links=[].slice.call(document.querySelectorAll('nav a'));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'))});
+  var so=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){
+        links.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id)});
+        var a=document.querySelector('nav a[href="#'+e.target.id+'"]');
+        if(a&&a.parentElement.scrollWidth>a.parentElement.clientWidth){
+          a.parentElement.scrollTo({left:a.offsetLeft-70,behavior:'smooth'});
+        }
+      }
+    });
+  },{rootMargin:'-15% 0px -70% 0px'});
+  secs.forEach(function(s){if(s)so.observe(s)});
+})();
+</script>
+</body>
+</html>
