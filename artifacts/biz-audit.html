@@ -1,1 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weak Point Audit — Protocol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#070B11;
+  --panel:#0D1420;
+  --panel-2:#111A28;
+  --line:#1D2A3C;
+  --text:#D6DEEA;
+  --dim:#7B8AA0;
+  --brass:#C79A2E;
+  --alarm:#C24A38;
+  --ok:#4E9A6A;
+  --watch:#C79A2E;
+  --display:"Cormorant Garamond",Georgia,serif;
+  --mono:"Share Tech Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--ink);color:var(--text);
+  font-family:var(--display);font-size:19px;line-height:1.68;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:860px;margin:0 auto;padding:0 22px}
+a{color:var(--brass);text-decoration:none;border-bottom:1px solid rgba(199,154,46,.35)}
+h1,h2,h3{font-weight:600;line-height:1.12;margin:0}
+.mono{font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;font-size:.72rem;color:var(--dim)}
 
+/* ---------- masthead ---------- */
+header.mast{
+  border-bottom:1px solid var(--line);
+  padding:64px 0 34px;
+  background:
+    radial-gradient(120% 80% at 12% 0%, rgba(199,154,46,.10), transparent 60%),
+    var(--ink);
+}
+.mast .eyebrow{display:flex;gap:14px;align-items:center;margin-bottom:26px;flex-wrap:wrap}
+.mast .eyebrow span{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+.mast .eyebrow span.tag{color:var(--brass);border:1px solid rgba(199,154,46,.4);padding:3px 8px}
+.mast h1{font-size:clamp(2.7rem,9vw,4.6rem);letter-spacing:-.02em}
+.mast h1 em{font-style:italic;color:var(--brass);font-weight:400}
+.mast p.lede{color:var(--dim);max-width:56ch;margin:20px 0 0;font-size:1.08rem}
+
+/* ---------- nav ---------- */
+nav.rail{position:sticky;top:0;z-index:40;background:rgba(7,11,17,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.rail ol{display:flex;gap:0;margin:0;padding:0;list-style:none;overflow-x:auto;scrollbar-width:none}
+nav.rail ol::-webkit-scrollbar{display:none}
+nav.rail a{
+  display:block;padding:13px 16px;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--dim);border-bottom:none;white-space:nowrap;border-right:1px solid var(--line)
+}
+nav.rail a:hover,nav.rail a:focus-visible{color:var(--brass);background:var(--panel)}
+
+/* ---------- sections ---------- */
+section{padding:62px 0;border-bottom:1px solid var(--line)}
+.sechead{display:flex;gap:16px;align-items:baseline;margin-bottom:10px}
+.sechead .num{font-family:var(--mono);font-size:.78rem;color:var(--brass);letter-spacing:.1em}
+.sechead h2{font-size:clamp(1.9rem,5.5vw,2.6rem);letter-spacing:-.01em}
+.subhead{color:var(--dim);max-width:60ch;margin:0 0 34px}
+h3.blockhead{
+  font-family:var(--mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--brass);margin:38px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--line)
+}
+p{margin:0 0 16px}
+.note{color:var(--dim);font-size:.95rem}
+
+/* ---------- doc pull list ---------- */
+.pull{border:1px solid var(--line);background:var(--panel);margin-bottom:10px}
+.pull summary{
+  cursor:pointer;padding:13px 16px;display:flex;gap:12px;align-items:center;list-style:none;
+  font-family:var(--mono);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text)
+}
+.pull summary::-webkit-details-marker{display:none}
+.pull summary::before{content:"+";color:var(--brass);font-size:1rem;line-height:1}
+.pull[open] summary::before{content:"–"}
+.pull summary .count{margin-left:auto;color:var(--dim);font-size:.68rem}
+.pull .body{padding:4px 16px 18px;border-top:1px solid var(--line)}
+.doc{display:flex;gap:12px;padding:11px 0;border-bottom:1px dashed rgba(29,42,60,.9)}
+.doc:last-child{border-bottom:none}
+.doc input{margin-top:7px;accent-color:var(--brass);width:15px;height:15px;flex:none}
+.doc .d-name{display:block;font-size:1rem}
+.doc .d-tell{display:block;color:var(--dim);font-size:.9rem;line-height:1.5}
+.doc .d-tell b{color:var(--text);font-weight:600}
+
+/* ---------- vitals strip (signature) ---------- */
+.vitals{position:sticky;top:44px;z-index:30;background:var(--panel);border:1px solid var(--line);padding:12px 14px;margin-bottom:26px}
+.vitals .vlabel{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;gap:10px}
+.vitals .vlabel .mono{font-size:.65rem}
+.strip{display:flex;gap:3px;height:24px}
+.strip .cell{flex:1;background:var(--panel-2);border-bottom:2px solid var(--line);transition:background .25s,border-color .25s}
+.strip .cell.ok{background:rgba(78,154,106,.18);border-bottom-color:var(--ok)}
+.strip .cell.watch{background:rgba(199,154,46,.18);border-bottom-color:var(--watch)}
+.strip .cell.alarm{background:rgba(194,74,56,.22);border-bottom-color:var(--alarm)}
+#vsummary{font-family:var(--mono);font-size:.68rem;color:var(--dim);letter-spacing:.05em}
+
+/* ---------- ratio rows ---------- */
+.ratio{border:1px solid var(--line);background:var(--panel);margin-bottom:10px}
+.ratio .r-top{padding:14px 16px 12px}
+.ratio .r-name{font-size:1.18rem;font-weight:600;display:block}
+.ratio .r-form{font-family:var(--mono);font-size:.7rem;color:var(--brass);letter-spacing:.05em;text-transform:none;display:block;margin-top:3px}
+.ratio .r-hide{color:var(--dim);font-size:.94rem;line-height:1.5;margin-top:9px;display:block}
+.ratio .r-in{display:flex;flex-wrap:wrap;gap:10px;padding:0 16px 14px}
+.field{flex:1 1 130px;min-width:120px}
+.field label{display:block;font-family:var(--mono);font-size:.63rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+input[type=number],input[type=text],select,textarea{
+  width:100%;background:var(--ink);border:1px solid var(--line);color:var(--text);
+  font-family:var(--mono);font-size:.86rem;padding:9px 10px;border-radius:0
+}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--brass);outline-offset:1px}
+.ratio .r-out{display:flex;gap:12px;align-items:center;padding:11px 16px;border-top:1px solid var(--line);background:var(--panel-2);flex-wrap:wrap}
+.r-val{font-family:var(--mono);font-size:1.05rem;color:var(--text)}
+.chip{font-family:var(--mono);font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--line);color:var(--dim)}
+.chip.ok{color:var(--ok);border-color:rgba(78,154,106,.5)}
+.chip.watch{color:var(--watch);border-color:rgba(199,154,46,.5)}
+.chip.alarm{color:var(--alarm);border-color:rgba(194,74,56,.55)}
+.r-read{font-size:.93rem;color:var(--dim);flex:1 1 100%;line-height:1.45}
+
+/* ---------- tells ---------- */
+.tell{display:grid;grid-template-columns:26px 1fr;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+.tell:last-child{border-bottom:none}
+.tell .tn{font-family:var(--mono);font-size:.7rem;color:var(--brass);padding-top:5px}
+.tell h4{margin:0 0 5px;font-size:1.14rem;font-weight:600}
+.tell p{margin:0;color:var(--dim);font-size:.97rem;line-height:1.55}
+.tell p b{color:var(--text);font-weight:600}
+
+/* ---------- generic list ---------- */
+ul.clean{list-style:none;padding:0;margin:0 0 18px}
+ul.clean li{padding:9px 0 9px 18px;border-bottom:1px solid var(--line);position:relative;font-size:1rem}
+ul.clean li:before{content:"—";position:absolute;left:0;color:var(--brass)}
+ul.clean li b{font-weight:600}
+ul.clean li span{color:var(--dim)}
+
+/* ---------- ladder ---------- */
+.ladder{border-left:2px solid var(--line);padding-left:0;margin:0 0 24px}
+.rung{padding:10px 0 10px 18px;border-left:3px solid transparent;margin-left:-2px;position:relative}
+.rung .lv{font-family:var(--mono);font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);display:block}
+.rung .lt{font-size:1.02rem}
+.rung.r1{border-left-color:var(--ok)}
+.rung.r2{border-left-color:#7f9a55}
+.rung.r3{border-left-color:var(--watch)}
+.rung.r4{border-left-color:#b5713a}
+.rung.r5{border-left-color:var(--alarm)}
+
+/* ---------- finding builder ---------- */
+.builder{border:1px solid var(--line);background:var(--panel);padding:18px 16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fullw{grid-column:1/-1}
+textarea{min-height:64px;line-height:1.5;resize:vertical}
+.btn{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;
+  background:transparent;border:1px solid var(--brass);color:var(--brass);
+  padding:11px 18px;cursor:pointer;transition:background .18s,color .18s
+}
+.btn:hover{background:var(--brass);color:var(--ink)}
+.btn.ghost{border-color:var(--line);color:var(--dim)}
+.btn.ghost:hover{background:var(--panel-2);color:var(--text)}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.register{margin-top:22px}
+.fcard{border:1px solid var(--line);border-left:3px solid var(--line);background:var(--panel-2);padding:13px 15px;margin-bottom:9px}
+.fcard.sev-ruin{border-left-color:var(--alarm)}
+.fcard.sev-leak{border-left-color:var(--watch)}
+.fcard.sev-constraint{border-left-color:#4a7fb5}
+.fcard.sev-note{border-left-color:var(--line)}
+.fcard .fh{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.fcard .ft{font-size:1.08rem;font-weight:600}
+.fcard .fmeta{font-family:var(--mono);font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-top:6px}
+.fcard .fbody{color:var(--dim);font-size:.95rem;margin-top:7px;line-height:1.5}
+.fcard .rm{background:none;border:none;color:var(--dim);font-family:var(--mono);font-size:.62rem;cursor:pointer;letter-spacing:.1em}
+.fcard .rm:hover{color:var(--alarm)}
+.empty{color:var(--dim);font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:16px;border:1px dashed var(--line);text-align:center}
+
+/* ---------- skeleton ---------- */
+.skel{counter-reset:s}
+.skel .part{display:grid;grid-template-columns:auto 1fr;gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.skel .part .pn{font-family:var(--mono);font-size:.7rem;color:var(--brass)}
+.skel .part h4{margin:0 0 4px;font-size:1.1rem;font-weight:600}
+.skel .part p{margin:0;color:var(--dim);font-size:.95rem;line-height:1.55}
+
+footer{padding:44px 0 70px;color:var(--dim)}
+footer .mono{font-size:.66rem;line-height:2}
+
+@media (max-width:640px){
+  body{font-size:18px}
+  .grid2{grid-template-columns:1fr}
+  section{padding:46px 0}
+  .vitals{top:42px}
+  .strip{height:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;scroll-behavior:auto!important}
+}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  nav.rail,.btnrow,.vitals{display:none}
+  section{page-break-inside:avoid;border-color:#ccc}
+  .pull .body{display:block!important}
+  a{color:#000}
+}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="eyebrow">
+      <span class="tag">Audit Walkthrough</span>
+      <span>A working guide</span>
+      <span>Rev. 01</span>
+    </div>
+    <h1>Let's find what's <em>quietly costing you</em>.</h1>
+    <p class="lede">This doesn't assume anything is wrong. Most businesses are running perfectly well and still leaving real money somewhere nobody thought to look — usually because a number got reported as a total instead of divided by the thing that's actually scarce. Here's the walkthrough: what to gather, what to divide, what you can spot without opening a single file, and how to shape it into an audit someone will actually want to act on.</p>
+  </div>
+</header>
+
+<nav class="rail">
+  <ol>
+    <li><a href="#pull">01 · Pull the evidence</a></li>
+    <li><a href="#ledger">02 · The denominators</a></li>
+    <li><a href="#tells">03 · Tells, no documents</a></li>
+    <li><a href="#thesis">04 · Build the thesis</a></li>
+    <li><a href="#report">05 · The audit itself</a></li>
+  </ol>
+</nav>
+
+<div class="wrap">
+
+<!-- ===================== 01 ===================== -->
+<section id="pull">
+  <div class="sechead"><span class="num">01</span><h2>Pull the evidence</h2></div>
+  <p class="subhead">Ask for documents by what they betray, not by their name. Every request below has a reason attached — if you can't say what a document would reveal, don't ask for it.</p>
+
+  <h3 class="blockhead">Rank your evidence before you trust it</h3>
+  <div class="ladder">
+    <div class="rung r1"><span class="lv">Tier 1 · Hardest</span><span class="lt">Bank and merchant-processor statements. Money that actually moved.</span></div>
+    <div class="rung r2"><span class="lv">Tier 2</span><span class="lt">Filed tax returns and audited statements. Someone signed under penalty.</span></div>
+    <div class="rung r3"><span class="lv">Tier 3</span><span class="lt">Accounting software exports. Accurate only where reconciled — check the last reconciliation date.</span></div>
+    <div class="rung r4"><span class="lv">Tier 4</span><span class="lt">Management reports and internal dashboards. Built by the person being measured.</span></div>
+    <div class="rung r5"><span class="lv">Tier 5 · Softest</span><span class="lt">Recollection. "We usually do about…" is a hypothesis, never a finding.</span></div>
+  </div>
+  <p class="note">Rule of triangulation: any number that enters your audit must be provable two independent ways. Revenue from the P&amp;L should reconcile to deposits. Labor hours from payroll should reconcile to the schedule. Where the two disagree, the gap <em>is</em> the finding.</p>
+
+  <h3 class="blockhead">The request list</h3>
+  <div id="pulllist"></div>
+  <p class="note" style="margin-top:14px">One more request, always: <b>the list of everything they refused to send.</b> Reluctance is data. Note it, date it, and put it in the limitations section rather than pretending you saw it.</p>
+</section>
+
+<!-- ===================== 02 ===================== -->
+<section id="ledger">
+  <div class="sechead"><span class="num">02</span><h2>The denominators</h2></div>
+  <p class="subhead">A weakness hides by being reported as a total. Totals go up while the business gets worse. Divide by the thing that's actually scarce — hours, capacity, clients, days of cash — and the weakness has nowhere to sit. Fill in what you know; leave the rest blank.</p>
+
+  <div class="vitals">
+    <div class="vlabel"><span class="mono">Vital signs</span><span id="vsummary">Awaiting inputs</span></div>
+    <div class="strip" id="strip"></div>
+  </div>
+
+  <div id="ratios"></div>
+
+  <h3 class="blockhead">Denominator traps</h3>
+  <ul class="clean">
+    <li><b>Growth without decomposition.</b> <span>Revenue up 12% means nothing until you split it into price, volume, and mix. Price-driven growth and volume-driven growth demand opposite responses.</span></li>
+    <li><b>Margin measured against revenue instead of capacity.</b> <span>A 40% margin on a job is irrelevant if the job consumed a crew-day you could have sold twice. Margin per unit of the scarce resource is the only version that ranks work correctly.</span></li>
+    <li><b>Averages over bimodal data.</b> <span>An average job value of $800 usually means a pile of $300 jobs and a few $4,000 ones. Always look at the distribution; the average client frequently does not exist.</span></li>
+    <li><b>Profit measured with unpaid labor.</b> <span>Owner and salaried weekend hours are a real cost of goods being donated. Price the donation at market rate and re-run the margin before you call anything profitable.</span></li>
+    <li><b>Counting churn but not shrinkage.</b> <span>Customers rarely quit. They quietly buy less. Cancellations are visible; a 30% spend decline across a third of the base is not, and it's bigger.</span></li>
+    <li><b>Trailing twelve months on a seasonal business.</b> <span>Annual figures smooth away the two months that actually decide the year. Look monthly, and look at the same month last year.</span></li>
+  </ul>
+</section>
+
+<!-- ===================== 03 ===================== -->
+<section id="tells">
+  <div class="sechead"><span class="num">03</span><h2>Tells, no documents required</h2></div>
+  <p class="subhead">These cost nothing to check and appear in no report. Half of them will produce your top finding before the financials arrive.</p>
+  <div id="tellslist"></div>
+</section>
+
+<!-- ===================== 04 ===================== -->
+<section id="thesis">
+  <div class="sechead"><span class="num">04</span><h2>Build the thesis</h2></div>
+  <p class="subhead">A list of problems is not an audit. The thesis is one sentence naming the binding constraint — the single thing that, if unchanged, makes every other fix cosmetic.</p>
+
+  <h3 class="blockhead">Shape of a thesis sentence</h3>
+  <p style="border-left:2px solid var(--brass);padding-left:16px;font-style:italic;color:#E4E9F1">This business is not revenue-constrained, it is quote-latency-constrained: 38% of inbound requests wait more than 48 hours for a price, and those close at 11% against 34% for same-day quotes. Roughly $214k of annual gross profit sits inside that delay, and no capacity investment will reach it.</p>
+  <p class="note">Three parts, always: what people <em>think</em> the constraint is, what it actually is with the number attached, and what the wrong diagnosis would have cost.</p>
+
+  <h3 class="blockhead">Sort findings into four buckets</h3>
+  <ul class="clean">
+    <li><b>Ruin risks.</b> <span>Uninsured exposure, worker misclassification, expired license, single unbacked system, one person who can end the business by leaving. Fixed first regardless of return — you cannot compound from zero.</span></li>
+    <li><b>Leaks.</b> <span>Cash already earned and not collected or not charged. Aged receivables, unbilled work, price drift, discount without approval. Fastest payback in the audit.</span></li>
+    <li><b>Constraints.</b> <span>The ceiling. Whatever limits throughput once the leaks are sealed. Usually latency, scheduling, or a bottleneck person.</span></li>
+    <li><b>Noise.</b> <span>Real but immaterial. Write it down, say it's immaterial, drop it. Volume of findings is not quality of audit.</span></li>
+  </ul>
+
+  <h3 class="blockhead">Rank what survives</h3>
+  <p>Score each remaining finding as <span class="mono" style="text-transform:none;color:var(--brass);font-size:.85rem">(annual $ impact × confidence) ÷ (weeks of effort × disruption)</span>, then check the ordering against reality: sequence matters more than score. Fixing pricing before fixing job costing means pricing off numbers you already know are wrong.</p>
+
+  <h3 class="blockhead">State how you could be wrong</h3>
+  <p>For every finding, write the sentence that would falsify it. <em>"If the callback log is incomplete and true rework is under 3%, this finding collapses."</em> An audit that cannot be wrong is a sales document, and the person reading it can feel the difference.</p>
+
+  <h3 class="blockhead">Findings register</h3>
+  <p class="note">Compose findings here in the discipline above, then export the whole thing — ledger values included — as a markdown draft. Nothing is stored after you close the page, so export before you leave.</p>
+
+  <div class="builder">
+    <div class="grid2">
+      <div class="fullw"><label class="mono" for="f-title" style="display:block;margin-bottom:4px">Finding — one claim, stated as a fact</label><input type="text" id="f-title" placeholder="Quotes over 48h close at one third the rate"></div>
+      <div><label class="mono" for="f-sev" style="display:block;margin-bottom:4px">Bucket</label>
+        <select id="f-sev">
+          <option value="ruin">Ruin risk</option>
+          <option value="leak" selected>Leak</option>
+          <option value="constraint">Constraint</option>
+          <option value="note">Noise / note</option>
+        </select>
+      </div>
+      <div><label class="mono" for="f-cost" style="display:block;margin-bottom:4px">Annual $ at stake</label><input type="number" id="f-cost" placeholder="214000"></div>
+      <div class="fullw"><label class="mono" for="f-eq" style="display:block;margin-bottom:4px">Evidence — two independent sources</label><textarea id="f-eq" placeholder="Quote log Jan–Jun; CRM close dates; reconciled against deposits"></textarea></div>
+      <div class="fullw"><label class="mono" for="f-mech" style="display:block;margin-bottom:4px">Mechanism — why it happens, not that it happens</label><textarea id="f-mech" placeholder="Estimator also runs crews; quotes are written after hours"></textarea></div>
+      <div class="fullw"><label class="mono" for="f-fix" style="display:block;margin-bottom:4px">Fix, owner, and date</label><textarea id="f-fix" placeholder="Templated pricing for the 12 standard jobs; owner: J. Ruiz; live by Oct 15"></textarea></div>
+      <div><label class="mono" for="f-lead" style="display:block;margin-bottom:4px">Leading indicator</label><input type="text" id="f-lead" placeholder="Median hours to quote, weekly"></div>
+      <div><label class="mono" for="f-false" style="display:block;margin-bottom:4px">What would disprove this</label><input type="text" id="f-false" placeholder="If lost quotes were price-driven, not time-driven"></div>
+    </div>
+    <div class="btnrow">
+      <button class="btn" id="addf">Add finding</button>
+      <button class="btn ghost" id="copyall">Copy audit draft</button>
+      <button class="btn ghost" id="clearall">Clear register</button>
+    </div>
+    <div class="register" id="register"></div>
+  </div>
+</section>
+
+<!-- ===================== 05 ===================== -->
+<section id="report">
+  <div class="sechead"><span class="num">05</span><h2>The audit itself</h2></div>
+  <p class="subhead">Structure it so a tired owner reading only the first page still knows what to do on Monday.</p>
+  <div class="skel">
+    <div class="part"><span class="pn">i</span><div><h4>Scope and period</h4><p>What you examined, what period it covers, who you spoke to, what you were not given access to. One paragraph.</p></div></div>
+    <div class="part"><span class="pn">ii</span><div><h4>Thesis — one page, no exceptions</h4><p>The constraint sentence, the three numbers that prove it, and the single decision you're asking for. If it spills to a second page, you haven't found the constraint yet.</p></div></div>
+    <div class="part"><span class="pn">iii</span><div><h4>Method and evidence tiers</h4><p>Which figures came from bank records, which from management reports. This is where your credibility is either established or quietly lost.</p></div></div>
+    <div class="part"><span class="pn">iv</span><div><h4>Findings register</h4><p>Grouped ruin / leak / constraint. Each one: claim, evidence, mechanism, annual cost, fix, owner, date, leading indicator, falsifier. Same shape every time so it can be scanned.</p></div></div>
+    <div class="part"><span class="pn">v</span><div><h4>Remediation sequence — 30 / 60 / 90</h4><p>Sequenced by dependency, not by size. Name one owner per item; two owners is zero owners. Include what you are explicitly choosing not to do this quarter.</p></div></div>
+    <div class="part"><span class="pn">vi</span><div><h4>Instrumentation</h4><p>The handful of numbers that must be computed weekly from now on, and where each one comes from. An audit that doesn't leave behind a measurement habit gets to be repeated in a year.</p></div></div>
+    <div class="part"><span class="pn">vii</span><div><h4>Limitations</h4><p>What you could not verify, what you assumed, what would change your conclusions. Write it before anyone asks.</p></div></div>
+    <div class="part"><span class="pn">viii</span><div><h4>Reassessment date</h4><p>A fixed calendar date to re-run the ledger against the same denominators. Findings without a re-check date become opinions within a month.</p></div></div>
+  </div>
+</section>
+
+<footer>
+  <div class="mono">
+    Weak Point Audit · Rev 01<br>
+    Thresholds are starting bands for owner-operated service businesses. Re-derive them from the industry before you deliver anything.<br>
+    Nothing entered here is saved. Export before closing.
+  </div>
+</footer>
+
+</div>
+
+<script>
+/* ============ 01 · evidence request list ============ */
+const PULL=[
+ {g:"Money — where the truth is",items:[
+  ["Monthly P&amp;L, 36 months","Annual statements hide seasonality and the month the business actually turns. Read <b>variance between months</b>, never the level."],
+  ["Balance sheet, same periods","Shows what the P&amp;L can't: debt creeping, inventory swelling, owner draws disguised as expenses."],
+  ["Bank + merchant statements","The only Tier-1 record. Reconcile revenue to deposits before you believe any report."],
+  ["Filed tax returns, 3 years","Signed under penalty. Where returns and books disagree, ask which one is wrong and why."],
+  ["AR aging","Cash already earned and sitting outside. Look at the &gt;60 day column, not the total."],
+  ["AP aging + debt schedule","Reveals whether the business is quietly financing itself off suppliers."],
+  ["Chart of accounts","A bloated or improvised chart means the reports built on it can't be trusted at the category level."]]},
+ {g:"Revenue — what's actually being sold",items:[
+  ["Customer list with revenue by month","Concentration, shrinkage, and seasonality all live here. Sort descending and look at the top three."],
+  ["Price list with change history","The <b>date of the last increase</b> is often the single most damaging number in the business."],
+  ["Quotes issued vs. jobs won","Conversion and latency. Rarely tracked, almost always where the recoverable money is."],
+  ["Contracts and MSAs","Read the termination, renewal, and scope clauses first — those are the ones that cost money."],
+  ["Credit memos and refunds","A quiet ledger of everything going wrong in delivery."]]},
+ {g:"Delivery — where margin is made or lost",items:[
+  ["Job costing per job","If it doesn't exist, that's the finding. Nobody can price without it; they're guessing at a portfolio level."],
+  ["Payroll register and timesheets","Paid hours are the denominator for almost everything worth knowing."],
+  ["Schedule / dispatch history","Utilization, drive time, and idle capacity. Compare planned against actual, not against ideal."],
+  ["Callback and warranty log","Rework is margin already spent twice. If no log exists, count credit memos instead."],
+  ["Supplier terms and price list","Check whether input cost increases were ever passed through. Usually they weren't."],
+  ["Equipment list with maintenance","Deferred maintenance is borrowed cash with an unknown due date."]]},
+ {g:"People — concentration and classification",items:[
+  ["Org chart drawn by actual duties","Draw it from what people <b>do</b>, not from titles. The real chart is always more concentrated."],
+  ["1099 vs W-2 classification","A common, quiet, retroactive liability in field-service businesses. Check it early."],
+  ["Wage rates against local market","Underpaying is a turnover cost you pay later at 1.5× in retraining."],
+  ["PTO and accrued liability","Sits off the P&amp;L until the moment it doesn't."]]},
+ {g:"Risk — the things that end businesses",items:[
+  ["Insurance certificates","Check the <b>expiry date and coverage limits</b>, not the existence of a certificate."],
+  ["Licenses and permits","Same: dates and scope. Lapsed licensing invalidates contracts and coverage at once."],
+  ["Lease terms","Renewal date, escalation clause, personal guarantee."],
+  ["Open litigation and claims history","Pattern matters more than any single case."]]},
+ {g:"Systems — what's actually running the place",items:[
+  ["Every tool, its cost, its owner","Duplicate subscriptions and orphaned tools are small money and a large signal about decision-making."],
+  ["The shadow spreadsheets","Whatever the software can't do is being done in a file on someone's desktop. That file is the real system."],
+  ["Access list and offboarding record","Who still has keys who shouldn't."],
+  ["Backup: last successful <b>restore</b>","Not last backup. Last restore. An untested backup is a belief, not a control."]]}
+];
+const pl=document.getElementById('pulllist');
+PULL.forEach((grp,gi)=>{
+  const d=document.createElement('details');d.className='pull';if(gi===0)d.open=true;
+  d.innerHTML='<summary>'+grp.g+'<span class="count">'+grp.items.length+' items</span></summary><div class="body">'+
+    grp.items.map((it,i)=>'<label class="doc"><input type="checkbox"><span><span class="d-name">'+it[0]+'</span><span class="d-tell">'+it[1]+'</span></span></label>').join('')+
+  '</div>';
+  pl.appendChild(d);
+});
+
+/* ============ 02 · the denominator ledger ============ */
+const R=[
+ {id:'rlh',n:'Revenue per paid labor hour',f:'revenue ÷ all paid hours ÷ loaded hourly cost',
+  hide:'Payroll looks affordable as a percentage of revenue while every hour sold is barely covering itself. Expressed as a multiple of what an hour actually costs you, loaded.',
+  in:[['Revenue (period)','rev'],['All paid hours','hrs'],['Loaded cost / hr','cost']],
+  calc:v=>v.rev/v.hrs/v.cost, unit:'×', dp:2,
+  bands:[[2.0,'alarm','Below 2× loaded cost. Overhead cannot be carried at this rate — this is a pricing or utilization failure, not a sales problem.'],[2.8,'watch','Thin. Viable only with very low fixed costs; one bad month erases the year.'],[99,'ok','Healthy coverage of labor and overhead.']]},
+ {id:'util',n:'Billable utilization',f:'billable hours ÷ paid hours',
+  hide:'The gap between hours you pay for and hours you can invoice is the largest silent expense in most service businesses, and it appears on no line of the P&L.',
+  in:[['Billable hours','b'],['Paid hours','p']],
+  calc:v=>v.b/v.p*100, unit:'%', dp:1,
+  bands:[[60,'alarm','Four in ten paid hours produce nothing. Look at scheduling and travel before you look at people.'],[75,'watch','Normal-bad. Each point recovered here is nearly pure margin.'],[101,'ok','Tight. Watch for burnout and quality slipping into rework.']]},
+ {id:'conc',n:'Client concentration',f:'top 3 clients ÷ total revenue',
+  hide:'Reads as commercial success right up until one call ends the business. Concentration is a risk number wearing a growth number\u2019s clothes.',
+  in:[['Top 3 clients revenue','t'],['Total revenue','r']],
+  calc:v=>v.t/v.r*100, unit:'%', dp:1,
+  bands:[[25,'ok','Diversified.'],[40,'watch','One departure would hurt badly. Begin deliberate diversification now, while you can choose.'],[999,'alarm','This is not a business, it is a contract. Price and terms are set by the client, whatever the paperwork says.']]},
+ {id:'dso',n:'Days sales outstanding',f:'AR ÷ (annual revenue ÷ 365)',
+  hide:'Profitable businesses fail here. Every day of DSO is a day of your own money funding someone else\u2019s operations.',
+  in:[['Accounts receivable','ar'],['Annual revenue','ar_rev']],
+  calc:v=>v.ar/(v.ar_rev/365), unit:' days', dp:1,
+  bands:[[30,'ok','Collecting well.'],[60,'watch','Roughly two months of work financed for free. Check invoicing lag before blaming customers.'],[9999,'alarm','A collections process failure, not a customer problem. Likely the cause of any cash crisis.']]},
+ {id:'aged',n:'Aged receivable burden',f:'AR over 60 days ÷ total AR',
+  hide:'The AR total looks fine because recent invoices mask a stagnant core that is quietly becoming uncollectible.',
+  in:[['AR over 60 days','o'],['Total AR','t2']],
+  calc:v=>v.o/v.t2*100, unit:'%', dp:1,
+  bands:[[10,'ok','Clean.'],[20,'watch','A fifth of what you\u2019re owed is aging out. Recovery rates fall sharply past 90 days.'],[999,'alarm','Treat as partially written off already. Fix invoicing timing first — most aged AR was invoiced late.']]},
+ {id:'real',n:'Price realization',f:'invoiced ÷ quoted',
+  hide:'Discounts given at the crew or counter level never appear as discounts. They appear as slightly worse margin, everywhere, forever.',
+  in:[['Total invoiced','i'],['Total quoted','q']],
+  calc:v=>v.i/v.q*100, unit:'%', dp:1,
+  bands:[[92,'alarm','Eight or more points leaving on the table without a decision. Almost always unapproved discretionary discounting.'],[97,'watch','Some slippage. Introduce an approval band before it widens.'],[999,'ok','Prices hold.']]},
+ {id:'conv',n:'Quote conversion',f:'jobs won ÷ quotes sent',
+  hide:'Low conversion gets read as a price problem and answered with a discount. Usually it is a speed problem answered with a template.',
+  in:[['Jobs won','w'],['Quotes sent','s']],
+  calc:v=>v.w/v.s*100, unit:'%', dp:1,
+  bands:[[25,'alarm','Three quarters of the effort wasted. Measure hours-to-quote before touching price.'],[40,'watch','Room to move. Test response time as the variable first.'],[999,'ok','Strong — check that you aren\u2019t underpricing to get there.']]},
+ {id:'rework',n:'Rework rate',f:'callbacks ÷ jobs completed',
+  hide:'Rework is invisible because it is booked as ordinary labor. You pay for the same job twice and see one job.',
+  in:[['Callback jobs','c'],['Jobs completed','j']],
+  calc:v=>v.c/v.j*100, unit:'%', dp:1,
+  bands:[[3,'ok','Within tolerance.'],[7,'watch','Costing roughly double this in margin once you count the lost sellable capacity.'],[999,'alarm','A training, spec, or scoping failure. Find which — the three have opposite fixes.']]},
+ {id:'recur',n:'Recurring revenue mix',f:'contracted recurring ÷ total revenue',
+  hide:'Determines whether every January starts from zero. Two businesses with identical revenue and opposite mixes are not comparable in any way that matters.',
+  in:[['Recurring revenue','rr'],['Total revenue','tr']],
+  calc:v=>v.rr/v.tr*100, unit:'%', dp:1,
+  bands:[[30,'alarm','Almost entirely transactional. Valuation, cash predictability, and stress all suffer for it.'],[55,'watch','Building. Convert your best one-off clients first, not your worst.'],[999,'ok','Predictable base.']]},
+ {id:'owner',n:'Owner dependency',f:'owner hours in delivery or admin ÷ total owner hours',
+  hide:'Reported as commitment. Functions as a ceiling on growth and a discount on the sale price of the business.',
+  in:[['Owner hrs in delivery/admin','od'],['Total owner hours','ot']],
+  calc:v=>v.od/v.ot*100, unit:'%', dp:1,
+  bands:[[30,'ok','Working on it, not only in it.'],[50,'watch','Growth is capped at the owner\u2019s calendar. Document and hand off the two most repeated tasks.'],[999,'alarm','The owner is the operating system. Nothing scales and nothing can be sold. Highest-leverage fix in the audit.']]},
+ {id:'fixed',n:'Fixed cost coverage',f:'gross profit ÷ fixed costs (same period)',
+  hide:'Tells you how much of the year is already spoken for before anyone gets paid. Converts directly into months of runway.',
+  in:[['Gross profit','gp'],['Fixed costs','fc']],
+  calc:v=>v.gp/v.fc, unit:'×', dp:2,
+  bands:[[1.2,'alarm','Almost nothing between the business and a bad quarter. Cut fixed cost or raise price; volume won\u2019t arrive fast enough.'],[1.8,'watch','Survives a soft month, not a soft season.'],[999,'ok','Real cushion.']]},
+ {id:'shrink',n:'Silent shrinkage',f:'clients whose spend fell >20% ÷ active clients',
+  hide:'The most under-measured number in small business. Churn reports show quitters; this shows the much larger group deciding to leave slowly.',
+  in:[['Clients down &gt;20% YoY','ds'],['Active clients','ac']],
+  calc:v=>v.ds/v.ac*100, unit:'%', dp:1,
+  bands:[[10,'ok','Normal drift.'],[20,'watch','A fifth of the base is disengaging. Call them this month — the reason is usually one recoverable incident.'],[999,'alarm','Bigger than your churn number and moving faster. Revenue will follow within two quarters.']]},
+ {id:'wind',n:'Windshield ratio',f:'drive time ÷ paid field hours',
+  hide:'Route inefficiency is paid at full wage, billed at zero, and never itemized anywhere. For field businesses this is often the single largest recoverable cost.',
+  in:[['Drive hours','dh'],['Paid field hours','pf']],
+  calc:v=>v.dh/v.pf*100, unit:'%', dp:1,
+  bands:[[15,'ok','Efficient routing.'],[25,'watch','Cluster jobs geographically by day before adding any capacity.'],[999,'alarm','A quarter or more of paid field time is spent driving. Geographic pricing or route density is the fix, not more crews.']]}
+];
+
+const rc=document.getElementById('ratios');
+R.forEach(r=>{
+  const d=document.createElement('div');d.className='ratio';d.id='r_'+r.id;
+  d.innerHTML='<div class="r-top"><span class="r-name">'+r.n+'</span><span class="r-form">'+r.f+'</span><span class="r-hide">'+r.hide+'</span></div>'+
+   '<div class="r-in">'+r.in.map(i=>'<div class="field"><label for="'+r.id+'_'+i[1]+'">'+i[0]+'</label><input type="number" step="any" id="'+r.id+'_'+i[1]+'" data-r="'+r.id+'" data-k="'+i[1]+'"></div>').join('')+'</div>'+
+   '<div class="r-out"><span class="r-val" id="v_'+r.id+'">—</span><span class="chip" id="c_'+r.id+'">no data</span><span class="r-read" id="t_'+r.id+'">Enter both figures to read this one.</span></div>';
+  rc.appendChild(d);
+});
+
+const strip=document.getElementById('strip');
+R.forEach(r=>{const c=document.createElement('div');c.className='cell';c.id='s_'+r.id;c.title=r.n;strip.appendChild(c);});
+
+const state={};
+function compute(r){
+  const v={};let ok=true;
+  r.in.forEach(i=>{const el=document.getElementById(r.id+'_'+i[1]);const n=parseFloat(el.value);if(isNaN(n)){ok=false}else{v[i[1]]=n}});
+  const val=document.getElementById('v_'+r.id),chip=document.getElementById('c_'+r.id),
+        txt=document.getElementById('t_'+r.id),cell=document.getElementById('s_'+r.id);
+  if(!ok){val.textContent='—';chip.textContent='no data';chip.className='chip';txt.textContent='Enter both figures to read this one.';cell.className='cell';delete state[r.id];summarize();return}
+  const x=r.calc(v);
+  if(!isFinite(x)){val.textContent='—';chip.textContent='check inputs';chip.className='chip';txt.textContent='Denominator is zero — that is usually itself the finding.';cell.className='cell';delete state[r.id];summarize();return}
+  let band=r.bands[r.bands.length-1];
+  for(const b of r.bands){if(x<b[0]){band=b;break}}
+  val.textContent=x.toFixed(r.dp)+r.unit;
+  chip.textContent=band[1]==='ok'?'in band':band[1]==='watch'?'watch':'flag';
+  chip.className='chip '+band[1];
+  txt.textContent=band[2];
+  cell.className='cell '+band[1];
+  state[r.id]={name:r.n,value:x.toFixed(r.dp)+r.unit,band:band[1],read:band[2]};
+  summarize();
+}
+function summarize(){
+  const k=Object.values(state);const a=k.filter(x=>x.band==='alarm').length,w=k.filter(x=>x.band==='watch').length;
+  const s=document.getElementById('vsummary');
+  if(!k.length){s.textContent='Awaiting inputs';return}
+  s.textContent=k.length+' computed · '+a+' flagged · '+w+' watch';
+  s.style.color=a?'var(--alarm)':w?'var(--watch)':'var(--ok)';
+}
+document.querySelectorAll('.r-in input').forEach(el=>{
+  el.addEventListener('input',()=>{const r=R.find(x=>x.id===el.dataset.r);compute(r)});
+});
+
+/* ============ 03 · tells ============ */
+const TELLS=[
+ ["The spreadsheet with one author","Whatever the software can't do is happening in a file on one desktop. That file is the real operating system: no backup, no audit trail, no successor. <b>Ask who else can open it and make a change without calling anyone.</b>"],
+ ["The date on the price list","If prices haven't moved in twenty-four months, margin has already been transferred to customers by input inflation. Nobody decided this; it simply happened while the totals kept rising."],
+ ["Hours from request to quote","Almost never measured, almost always the largest recoverable lever in a service business. Time three real inbound requests yourself and watch what happens to conversion."],
+ ["The person everyone calls","Follow the phone for a day. Whoever gets interrupted most is holding undocumented process, and the org chart will not show it."],
+ ["Weekend and after-hours work by salaried staff","Unpaid labor is a real cost of goods being donated. Price the donation at market and re-run margin — the profitable service line often isn't."],
+ ["Missed calls, unreturned","Check the phone log, not the CRM. Missed inbound never enters a system, so it never enters a report, so it is never a problem anyone owns."],
+ ["Shared logins","One password across a team means no attribution, no offboarding, and no way to answer who changed what. It's a control failure long before it's a breach."],
+ ["Data typed more than once","Count how many times one job's details get re-entered between the phone call and the invoice. Each re-entry costs labor and injects errors that surface later as disputes."],
+ ["Verbal-only scope agreements","Scope creep with no written baseline has no defense. Ask to see the last job that went over and what document was used to argue about it."],
+ ["Numbers with no owner","Ask three people who owns gross margin. Three different answers, or a pause, means it drifts by default and no one is accountable for the drift."],
+ ["Discount as reflex","If crews or salespeople can discount without an approval band, price realization is decided by whoever is most tired at the end of the day."],
+ ["The step nobody can explain","Every business has one step that survives only because nobody has re-derived it. It usually protects against something that stopped existing years ago."],
+ ["Expiry dates, not existence","Insurance, licenses, permits, certifications, domain and SSL renewals. Everyone confirms they have them. Read the dates yourself."],
+ ["The last successful restore","Backups get checked; restores rarely do. Ask for the date of the last time data was actually recovered from backup. Silence is the finding."]
+];
+const tl=document.getElementById('tellslist');
+TELLS.forEach((t,i)=>{
+  const d=document.createElement('div');d.className='tell';
+  d.innerHTML='<span class="tn">'+String(i+1).padStart(2,'0')+'</span><div><h4>'+t[0]+'</h4><p>'+t[1]+'</p></div>';
+  tl.appendChild(d);
+});
+
+/* ============ 04 · findings register ============ */
+let FIND=[];
+const reg=document.getElementById('register');
+const LBL={ruin:'Ruin risk',leak:'Leak',constraint:'Constraint',note:'Noise / note'};
+function money(n){return n?'$'+Number(n).toLocaleString():'not quantified'}
+function render(){
+  if(!FIND.length){reg.innerHTML='<div class="empty">No findings yet</div>';return}
+  const order={ruin:0,leak:1,constraint:2,note:3};
+  const sorted=[...FIND].sort((a,b)=>order[a.sev]-order[b.sev]||(Number(b.cost)||0)-(Number(a.cost)||0));
+  reg.innerHTML=sorted.map(f=>
+   '<div class="fcard sev-'+f.sev+'"><div class="fh"><span class="ft">'+esc(f.title)+'</span>'+
+   '<button class="rm" data-id="'+f.id+'">remove</button></div>'+
+   '<div class="fmeta">'+LBL[f.sev]+' · '+money(f.cost)+'/yr</div>'+
+   (f.ev?'<div class="fbody"><b>Evidence:</b> '+esc(f.ev)+'</div>':'')+
+   (f.mech?'<div class="fbody"><b>Mechanism:</b> '+esc(f.mech)+'</div>':'')+
+   (f.fix?'<div class="fbody"><b>Fix:</b> '+esc(f.fix)+'</div>':'')+
+   (f.lead?'<div class="fbody"><b>Watch:</b> '+esc(f.lead)+'</div>':'')+
+   (f.fals?'<div class="fbody"><b>Disproved if:</b> '+esc(f.fals)+'</div>':'')+
+   '</div>').join('');
+  reg.querySelectorAll('.rm').forEach(b=>b.onclick=()=>{FIND=FIND.filter(x=>x.id!=b.dataset.id);render()});
+}
+function esc(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function val(id){return document.getElementById(id).value.trim()}
+document.getElementById('addf').onclick=()=>{
+  const t=val('f-title');
+  if(!t){document.getElementById('f-title').focus();return}
+  FIND.push({id:Date.now(),title:t,sev:val('f-sev'),cost:val('f-cost'),ev:val('f-eq'),
+             mech:val('f-mech'),fix:val('f-fix'),lead:val('f-lead'),fals:val('f-false')});
+  ['f-title','f-cost','f-eq','f-mech','f-fix','f-lead','f-false'].forEach(i=>document.getElementById(i).value='');
+  render();document.getElementById('f-title').focus();
+};
+document.getElementById('clearall').onclick=()=>{if(FIND.length&&confirm('Clear all findings?')){FIND=[];render()}};
+document.getElementById('copyall').onclick=()=>{
+  const led=Object.values(state);
+  const total=FIND.reduce((s,f)=>s+(Number(f.cost)||0),0);
+  let md='# Business audit — draft\n_Generated '+new Date().toLocaleDateString()+'_\n\n';
+  md+='## Thesis\n_One sentence: what people think the constraint is, what it actually is with a number, and what the wrong diagnosis costs._\n\n';
+  md+='## Ledger\n';
+  md+=led.length?led.map(r=>'- **'+r.name+'** — '+r.value+' ['+r.band.toUpperCase()+'] — '+r.read).join('\n'):'_No ratios computed._';
+  md+='\n\n## Findings register\n';
+  if(FIND.length){
+    const order={ruin:0,leak:1,constraint:2,note:3};
+    [...FIND].sort((a,b)=>order[a.sev]-order[b.sev]||(Number(b.cost)||0)-(Number(a.cost)||0)).forEach((f,i)=>{
+      md+='\n### '+(i+1)+'. '+f.title+'\n- Bucket: '+LBL[f.sev]+'\n- Annual $ at stake: '+money(f.cost)+
+          '\n- Evidence: '+(f.ev||'—')+'\n- Mechanism: '+(f.mech||'—')+'\n- Fix / owner / date: '+(f.fix||'—')+
+          '\n- Leading indicator: '+(f.lead||'—')+'\n- Disproved if: '+(f.fals||'—')+'\n';
+    });
+    md+='\n**Total quantified exposure: '+money(total)+'/yr**\n';
+  } else md+='_None recorded._\n';
+  md+='\n## Remediation — 30 / 60 / 90\n_Sequenced by dependency. One owner each. Include what is explicitly deferred._\n\n';
+  md+='## Limitations\n_What could not be verified, what was assumed, what was refused._\n\n## Reassessment date\n_Fixed date to re-run the ledger._\n';
+  navigator.clipboard.writeText(md).then(()=>{
+    const b=document.getElementById('copyall');const o=b.textContent;b.textContent='Copied';setTimeout(()=>b.textContent=o,1600);
+  }).catch(()=>{
+    const w=window.open('','_blank');w.document.write('<pre>'+esc(md)+'</pre>');
+  });
+};
+render();
+</script>
+</body>
+</html>
