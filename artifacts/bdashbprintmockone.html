@@ -1,1 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BDash — System Blueprint</title>
+<meta name="description" content="Feature blueprint, analysis and use cases for BDash, an all-in-one cloud business dashboard for a landscaping operation.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* cyanotype ground — this is a drawing, not an app */
+    --ground:#081729;
+    --ground-2:#0C2039;
+    --panel:#0E2745;
+    --grid-fine:#2C517F26;
+    --grid-bold:#2C517F40;
+    --rule:#2E568C;
+    --rule-soft:#2E568C66;
+    --draft:#D3E2F7;
+    --draft-dim:#8FADD4;
+    --chalk:#F4F8FE;
+    --cobalt:#3B6CFF;        /* carried from BDash itself */
+    --cobalt-soft:#3B6CFF26;
+    --amber:#FFB54D;
+    --pos:#43D68C;
+    --neg:#FF7A63;
+    --disp:'Archivo Narrow', 'Arial Narrow', sans-serif;
+    --body:'IBM Plex Sans', system-ui, sans-serif;
+    --mono:'Share Tech Mono', ui-monospace, monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:96px}
+  body{
+    background-color:var(--ground);
+    background-image:
+      linear-gradient(var(--grid-fine) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid-fine) 1px,transparent 1px),
+      linear-gradient(var(--grid-bold) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid-bold) 1px,transparent 1px);
+    background-size:26px 26px,26px 26px,130px 130px,130px 130px;
+    color:var(--draft);
+    font-family:var(--body);
+    font-size:15px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--cobalt);color:#fff}
+  a{color:var(--chalk);text-decoration:none;border-bottom:1px solid var(--rule)}
+  a:hover{border-color:var(--cobalt)}
+  :focus-visible{outline:2px solid var(--amber);outline-offset:3px}
 
+  .wrap{max-width:1280px;margin:0 auto;padding:0 22px}
+
+  /* ============ TITLE BLOCK (top) ============ */
+  .titleblock{border-bottom:1px solid var(--rule);background:linear-gradient(180deg,#081729ee,#081729aa);backdrop-filter:blur(3px)}
+  .tb-main{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:34px 0 18px;flex-wrap:wrap}
+  .tb-main h1{
+    font-family:var(--disp);font-weight:700;font-size:clamp(34px,6.2vw,64px);
+    line-height:.94;letter-spacing:.02em;text-transform:uppercase;color:var(--chalk);
+  }
+  .tb-main h1 em{font-style:normal;color:var(--cobalt)}
+  .tb-main .lede{max-width:430px;font-size:14.5px;color:var(--draft-dim)}
+  .tb-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    border-top:1px solid var(--rule);border-left:1px solid var(--rule);
+  }
+  .tb-cell{border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:9px 12px}
+  .tb-cell .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--draft-dim);text-transform:uppercase}
+  .tb-cell .v{font-family:var(--disp);font-weight:600;font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:var(--chalk);margin-top:1px}
+  .tb-cell .v.acc{color:var(--cobalt)}
+
+  /* ============ LAYOUT ============ */
+  .sheet{display:grid;grid-template-columns:212px 1fr;gap:44px;padding:40px 0 120px}
+  .index-rail{position:sticky;top:24px;align-self:start;max-height:calc(100vh - 60px);overflow-y:auto}
+  .rail-h{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:var(--draft-dim);text-transform:uppercase;padding-bottom:9px;border-bottom:1px solid var(--rule);margin-bottom:9px}
+  .rail-a{display:flex;gap:9px;align-items:baseline;padding:5px 0;border:none;font-size:13px;color:var(--draft-dim);transition:color .15s}
+  .rail-a code{font-family:var(--mono);font-size:10.5px;color:var(--rule);letter-spacing:.06em}
+  .rail-a:hover,.rail-a.on{color:var(--chalk)}
+  .rail-a.on code{color:var(--cobalt)}
+  .rail-group{font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:#4E76A8;text-transform:uppercase;margin:14px 0 3px}
+
+  section{margin-bottom:66px;scroll-margin-top:96px}
+  .sec-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--rule);padding-bottom:8px;margin-bottom:20px;flex-wrap:wrap}
+  .sec-head .no{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--cobalt)}
+  .sec-head h2{font-family:var(--disp);font-weight:700;font-size:26px;letter-spacing:.05em;text-transform:uppercase;color:var(--chalk)}
+  .sec-head .note{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--draft-dim);margin-left:auto;text-transform:uppercase}
+  .sec-intro{max-width:74ch;color:var(--draft-dim);margin-bottom:24px}
+  .sec-intro strong{color:var(--draft);font-weight:600}
+
+  /* ============ SCHEMATIC ============ */
+  .schem-frame{border:1px solid var(--rule);background:#0A1B30cc;padding:0}
+  .schem-bar{display:flex;justify-content:space-between;gap:12px;padding:8px 12px;border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--draft-dim);text-transform:uppercase;flex-wrap:wrap}
+  .schem-scroll{overflow-x:auto}
+  .schem-scroll svg{display:block;min-width:940px;width:100%;height:auto}
+  .sv-node{fill:#0E2745;stroke:var(--rule);stroke-width:1}
+  .sv-node.core{fill:#12305A;stroke:var(--cobalt)}
+  .sv-lbl{font-family:'Share Tech Mono',monospace;font-size:11px;fill:var(--chalk);letter-spacing:.04em}
+  .sv-sub{font-family:'Share Tech Mono',monospace;font-size:8.5px;fill:#8FADD4;letter-spacing:.08em}
+  .sv-cap{font-family:'Share Tech Mono',monospace;font-size:9px;fill:#5F86BC;letter-spacing:.18em}
+  .sv-flow{stroke:var(--rule);stroke-width:1.1;fill:none}
+  .sv-flow.hot{stroke:var(--cobalt);stroke-width:1.4}
+  .sv-flow.dash{stroke-dasharray:5 4}
+  .sv-arrow{fill:var(--rule)}
+  .sv-arrow.hot{fill:var(--cobalt)}
+  .legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));border-top:1px solid var(--rule)}
+  .legend div{border-right:1px solid var(--rule);padding:9px 12px;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--draft-dim)}
+  .legend div:last-child{border-right:none}
+  .legend b{color:var(--chalk);font-weight:400}
+
+  /* ============ RULES / INVARIANTS ============ */
+  .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:22px}
+  .rule-card{border:1px solid var(--rule);border-left:3px solid var(--cobalt);padding:16px 18px;background:#0A1B30aa}
+  .rule-card .rc-no{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--draft-dim)}
+  .rule-card h3{font-family:var(--disp);font-weight:700;font-size:19px;letter-spacing:.03em;text-transform:uppercase;color:var(--chalk);margin:4px 0 7px}
+  .rule-card p{font-size:14px;color:var(--draft-dim)}
+  .rule-card p + p{margin-top:8px}
+
+  /* threshold detail drawing */
+  .detail{border:1px solid var(--rule);background:#0A1B30aa}
+  .detail-h{padding:9px 14px;border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--draft-dim);text-transform:uppercase}
+  .tanks{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:0}
+  .tank{border-right:1px solid var(--rule-soft);padding:14px 12px 12px;display:flex;flex-direction:column;gap:9px}
+  .tank:last-child{border-right:none}
+  .tank .tn{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--draft-dim);text-transform:uppercase}
+  .well{position:relative;height:92px;background:#061223;border:1px solid var(--rule-soft)}
+  .fill{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,#3B6CFF,#1B3A8F)}
+  .fill.short{background:linear-gradient(180deg,#FF7A63,#7E2A1D)}
+  .req{position:absolute;left:0;right:0;border-top:1px dashed #FFFFFF99}
+  .req::after{content:'REQ';position:absolute;right:2px;top:-12px;font-family:var(--mono);font-size:7.5px;color:#FFFFFFAA}
+  .tank .tv{font-family:var(--mono);font-size:10.5px;color:var(--chalk)}
+  .tank .tv span{color:var(--draft-dim)}
+
+  /* ============ MODULE SPECS ============ */
+  .mod{border:1px solid var(--rule);background:#0A1B30b3;margin-bottom:18px}
+  .mod-head{display:flex;align-items:center;gap:14px;padding:12px 18px;border-bottom:1px solid var(--rule);flex-wrap:wrap}
+  .desig{
+    font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--cobalt);
+    border:1px solid var(--cobalt);padding:3px 8px;flex-shrink:0;
+  }
+  .mod-head h3{font-family:var(--disp);font-weight:700;font-size:21px;letter-spacing:.04em;text-transform:uppercase;color:var(--chalk)}
+  .chip{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;padding:4px 9px;border:1px solid;text-transform:uppercase;margin-left:auto;flex-shrink:0}
+  .chip.ok{color:var(--pos);border-color:#43D68C66}
+  .chip.rev{color:var(--amber);border-color:#FFB54D66}
+  .chip.risk{color:var(--neg);border-color:#FF7A6366}
+  .mod-body{display:grid;grid-template-columns:1.05fr 1fr;gap:0}
+  .mb-col{padding:16px 18px}
+  .mb-col + .mb-col{border-left:1px solid var(--rule-soft)}
+  .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--draft-dim);text-transform:uppercase;margin-bottom:7px}
+  .lbl.mt{margin-top:16px}
+  .mod p{font-size:14px;color:var(--draft-dim)}
+  .feat{list-style:none}
+  .feat li{position:relative;padding-left:17px;font-size:13.5px;color:var(--draft);margin-bottom:5px}
+  .feat li::before{content:'';position:absolute;left:0;top:9px;width:7px;height:1px;background:var(--cobalt)}
+  .feat li b{font-weight:600;color:var(--chalk)}
+  .case{border-left:2px solid var(--cobalt);padding-left:13px;font-size:14px;color:var(--draft)}
+  .case .when{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--cobalt);display:block;margin-bottom:3px;text-transform:uppercase}
+  .xrefs{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+  .xref{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--draft-dim);border:1px solid var(--rule);padding:3px 7px;border-radius:99px}
+  .xref:hover{color:var(--chalk);border-color:var(--cobalt)}
+  .verdict{border-top:1px solid var(--rule-soft);padding:12px 18px;font-size:13.5px;color:var(--draft-dim);grid-column:1/-1}
+  .verdict b{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--chalk);text-transform:uppercase;margin-right:8px}
+
+  /* ============ TABLES ============ */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--rule)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
+  th{
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--draft-dim);text-align:left;padding:10px 13px;border-bottom:1px solid var(--rule);background:#0C2039;
+  }
+  td{padding:11px 13px;border-bottom:1px solid var(--rule-soft);color:var(--draft-dim);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td b{color:var(--chalk);font-weight:600}
+  td code{font-family:var(--mono);font-size:11px;color:var(--cobalt);letter-spacing:.06em}
+  .m{font-family:var(--mono);font-size:12px;letter-spacing:.04em;white-space:nowrap}
+
+  /* ============ SEQUENCE ============ */
+  .seq{border-left:1px solid var(--rule);margin-left:8px}
+  .step{position:relative;padding:0 0 26px 26px}
+  .step:last-child{padding-bottom:0}
+  .step::before{content:'';position:absolute;left:-5px;top:6px;width:9px;height:9px;background:var(--ground);border:1px solid var(--rule)}
+  .step.now::before{background:var(--cobalt);border-color:var(--cobalt);box-shadow:0 0 0 4px #3B6CFF2E}
+  .step.gate::before{background:var(--amber);border-color:var(--amber)}
+  .step .sw{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--draft-dim);text-transform:uppercase}
+  .step.now .sw{color:var(--cobalt)}
+  .step h4{font-family:var(--disp);font-weight:700;font-size:18px;letter-spacing:.04em;text-transform:uppercase;color:var(--chalk);margin:3px 0 5px}
+  .step p{font-size:14px;color:var(--draft-dim);max-width:70ch}
+
+  .callout{border:1px solid var(--amber);border-left-width:3px;background:#FFB54D0F;padding:15px 18px;margin-top:20px}
+  .callout .lbl{color:var(--amber)}
+  .callout p{font-size:14px;color:var(--draft)}
+
+  /* ============ FOOTER TITLE BLOCK ============ */
+  .foot{border-top:1px solid var(--rule);background:#061223}
+  .foot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));border-left:1px solid var(--rule)}
+  .foot-grid div{border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:12px 14px}
+  .foot-grid .k{font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:#4E76A8;text-transform:uppercase}
+  .foot-grid .v{font-family:var(--disp);font-weight:600;font-size:13.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--draft)}
+  .foot-note{padding:16px 0 40px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:#4E76A8;line-height:1.9}
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:1020px){
+    .sheet{grid-template-columns:1fr;gap:0}
+    .index-rail{position:static;max-height:none;margin-bottom:34px;border:1px solid var(--rule);padding:14px}
+    .rail-cols{columns:2;column-gap:20px}
+    .mod-body{grid-template-columns:1fr}
+    .mb-col + .mb-col{border-left:none;border-top:1px solid var(--rule-soft)}
+  }
+  @media (max-width:560px){
+    .rail-cols{columns:1}
+    .tb-main{padding-top:24px}
+    .sec-head h2{font-size:21px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *{transition:none!important;animation:none!important}
+  }
+  @media print{
+    body{background:#fff;color:#000}
+    .index-rail,.schem-bar{display:none}
+    .mod,.detail,.rule-card,.tbl-wrap{break-inside:avoid;border-color:#999}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= TITLE BLOCK ================= -->
+<header class="titleblock">
+  <div class="wrap">
+    <div class="tb-main">
+      <div>
+        <h1>B<em>Dash</em><br>System Blueprint</h1>
+      </div>
+      <p class="lede">A feature-by-feature reading of the BDash concept: what each module does, the situation it exists for, what it depends on, and where it still needs a professional's signature before it touches a real business.</p>
+    </div>
+    <div class="tb-grid">
+      <div class="tb-cell"><div class="k">Subject</div><div class="v">Landscaping ops platform</div></div>
+      <div class="tb-cell"><div class="k">Sheet</div><div class="v acc">BP-01 of 01</div></div>
+      <div class="tb-cell"><div class="k">Modules documented</div><div class="v">13 + platform layer</div></div>
+      <div class="tb-cell"><div class="k">Source</div><div class="v">BDash prototype</div></div>
+      <div class="tb-cell"><div class="k">Data shown</div><div class="v">Simulated</div></div>
+      <div class="tb-cell"><div class="k">Status</div><div class="v acc">Concept — pre-build</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="sheet">
+
+  <!-- ================= SHEET INDEX ================= -->
+  <nav class="index-rail" aria-label="Blueprint index">
+    <div class="rail-h">Sheet index</div>
+    <div class="rail-cols">
+      <a class="rail-a" href="#thesis"><code>00</code><span>System thesis</span></a>
+      <a class="rail-a" href="#rules"><code>01</code><span>Operating rules</span></a>
+      <div class="rail-group">Operate</div>
+      <a class="rail-a" href="#op-01"><code>OP-01</code><span>Overview</span></a>
+      <a class="rail-a" href="#op-02"><code>OP-02</code><span>Day Log</span></a>
+      <a class="rail-a" href="#op-03"><code>OP-03</code><span>Journal</span></a>
+      <a class="rail-a" href="#op-04"><code>OP-04</code><span>Digi-Scan</span></a>
+      <a class="rail-a" href="#op-05"><code>OP-05</code><span>Finance</span></a>
+      <div class="rail-group">Sell</div>
+      <a class="rail-a" href="#sl-01"><code>SL-01</code><span>Services &amp; Pricing</span></a>
+      <a class="rail-a" href="#sl-02"><code>SL-02</code><span>Website &amp; Ads</span></a>
+      <div class="rail-group">People &amp; reach</div>
+      <a class="rail-a" href="#pr-01"><code>PR-01</code><span>Clients</span></a>
+      <a class="rail-a" href="#pr-02"><code>PR-02</code><span>Payroll &amp; HR</span></a>
+      <a class="rail-a" href="#pr-03"><code>PR-03</code><span>Mailbox &amp; Phone</span></a>
+      <div class="rail-group">Records</div>
+      <a class="rail-a" href="#rc-01"><code>RC-01</code><span>Inventory &amp; QC</span></a>
+      <a class="rail-a" href="#rc-02"><code>RC-02</code><span>Files &amp; Exports</span></a>
+      <div class="rail-group">Turnaround</div>
+      <a class="rail-a" href="#ta-01"><code>TA-01</code><span>Recovery Plan</span></a>
+      <div class="rail-group">Analysis</div>
+      <a class="rail-a" href="#platform"><code>02</code><span>Platform layer</span></a>
+      <a class="rail-a" href="#loops"><code>03</code><span>Cross-module loops</span></a>
+      <a class="rail-a" href="#sequence"><code>04</code><span>Build sequence</span></a>
+      <a class="rail-a" href="#risk"><code>05</code><span>Risk register</span></a>
+      <a class="rail-a" href="#verdict"><code>06</code><span>Honest read</span></a>
+    </div>
+  </nav>
+
+  <main>
+
+  <!-- ================= 00 THESIS ================= -->
+  <section id="thesis">
+    <div class="sec-head">
+      <span class="no">00</span><h2>System thesis</h2>
+      <span class="note">One-line schematic</span>
+    </div>
+    <p class="sec-intro">BDash is not thirteen tools sharing a sidebar. It is one claim, repeated in thirteen places: <strong>every piece of paper, call and job in a small field business should land in a single ledger, and that ledger should tell you within one glance whether the month is survivable.</strong> Everything downstream — the buckets, the collections chase, the margin audit — is that claim being enforced.</p>
+
+    <div class="schem-frame">
+      <div class="schem-bar"><span>Fig. 00 — Data flow, capture to decision</span><span>Scroll sideways on small screens →</span></div>
+      <div class="schem-scroll">
+        <svg viewBox="0 0 980 400" role="img" aria-label="Schematic: field capture feeds Digi-Scan, which writes to a triple store, which feeds the ledger, buckets and decision layer, which loops back to pricing and dispatch.">
+          <defs>
+            <marker id="a" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" class="sv-arrow"/></marker>
+            <marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" class="sv-arrow hot"/></marker>
+          </defs>
+
+          <text x="20" y="26" class="sv-cap">01 · FIELD CAPTURE</text>
+          <text x="300" y="26" class="sv-cap">02 · INTAKE PIPELINE</text>
+          <text x="560" y="26" class="sv-cap">03 · RECORD STORE</text>
+          <text x="790" y="26" class="sv-cap">04 · DECISION</text>
+
+          <!-- capture column -->
+          <rect x="20" y="46" width="180" height="46" class="sv-node"/>
+          <text x="34" y="68" class="sv-lbl">JOB SHEETS · RECEIPTS</text><text x="34" y="82" class="sv-sub">PAPER FROM THE TRUCK</text>
+          <rect x="20" y="110" width="180" height="46" class="sv-node"/>
+          <text x="34" y="132" class="sv-lbl">CALLS · TEXTS</text><text x="34" y="146" class="sv-sub">BUSINESS LINE, TRANSCRIBED</text>
+          <rect x="20" y="174" width="180" height="46" class="sv-node"/>
+          <text x="34" y="196" class="sv-lbl">WEB QUOTE FORM</text><text x="34" y="210" class="sv-sub">SITE + AD TRAFFIC</text>
+          <rect x="20" y="238" width="180" height="46" class="sv-node"/>
+          <text x="34" y="260" class="sv-lbl">CONTRACTS · HR FORMS</text><text x="34" y="274" class="sv-sub">SIGNED DOCUMENTS</text>
+          <rect x="20" y="302" width="180" height="46" class="sv-node"/>
+          <text x="34" y="324" class="sv-lbl">COUNTS · QC CHECKS</text><text x="34" y="338" class="sv-sub">STOCK AND EQUIPMENT</text>
+
+          <!-- pipeline -->
+          <rect x="300" y="120" width="180" height="130" class="sv-node core"/>
+          <text x="314" y="146" class="sv-lbl">DIGI-SCAN</text>
+          <text x="314" y="172" class="sv-sub">SCAN</text>
+          <text x="314" y="190" class="sv-sub">TRANSCRIBE</text>
+          <text x="314" y="208" class="sv-sub">HUMAN REVIEW IF LOW CONF.</text>
+          <text x="314" y="226" class="sv-sub">PDF</text>
+
+          <!-- store -->
+          <rect x="560" y="90" width="160" height="40" class="sv-node core"/>
+          <text x="574" y="115" class="sv-lbl">API DATABASE</text>
+          <rect x="560" y="146" width="160" height="40" class="sv-node"/>
+          <text x="574" y="171" class="sv-lbl">GOOGLE DRIVE</text>
+          <rect x="560" y="202" width="160" height="40" class="sv-node"/>
+          <text x="574" y="227" class="sv-lbl">LOCAL MIRROR</text>
+          <text x="560" y="262" class="sv-sub">WRITE ONCE → THREE PLACES</text>
+          <text x="560" y="278" class="sv-sub">CHECKPOINT RESTORE 02:00</text>
+
+          <!-- decision -->
+          <rect x="790" y="70" width="170" height="46" class="sv-node core"/>
+          <text x="804" y="92" class="sv-lbl">SEVEN BUCKETS</text><text x="804" y="106" class="sv-sub">FUNDED VS THRESHOLD</text>
+          <rect x="790" y="134" width="170" height="46" class="sv-node"/>
+          <text x="804" y="156" class="sv-lbl">CASH FLOW</text><text x="804" y="170" class="sv-sub">NET POSITIVE OR NOT</text>
+          <rect x="790" y="198" width="170" height="46" class="sv-node"/>
+          <text x="804" y="220" class="sv-lbl">ATTENTION FEED</text><text x="804" y="234" class="sv-sub">RANKED, ONE SCREEN</text>
+          <rect x="790" y="262" width="170" height="46" class="sv-node"/>
+          <text x="804" y="284" class="sv-lbl">STATEMENTS</text><text x="804" y="298" class="sv-sub">TAX-READY EXPORTS</text>
+
+          <!-- flows in -->
+          <path d="M200,69 L250,69 L250,160 L296,160" class="sv-flow" marker-end="url(#a)"/>
+          <path d="M200,133 L250,133 L250,170 L296,170" class="sv-flow" marker-end="url(#a)"/>
+          <path d="M200,197 L250,197 L250,180 L296,180" class="sv-flow" marker-end="url(#a)"/>
+          <path d="M200,261 L250,261 L250,190 L296,190" class="sv-flow" marker-end="url(#a)"/>
+          <path d="M200,325 L250,325 L250,200 L296,200" class="sv-flow" marker-end="url(#a)"/>
+          <!-- pipeline to store -->
+          <path d="M480,160 L520,160 L520,110 L556,110" class="sv-flow hot" marker-end="url(#ah)"/>
+          <path d="M480,175 L520,175 L520,166 L556,166" class="sv-flow hot" marker-end="url(#ah)"/>
+          <path d="M480,190 L520,190 L520,222 L556,222" class="sv-flow hot" marker-end="url(#ah)"/>
+          <!-- store to decision -->
+          <path d="M720,110 L750,110 L750,93 L786,93" class="sv-flow hot" marker-end="url(#ah)"/>
+          <path d="M720,120 L755,120 L755,157 L786,157" class="sv-flow" marker-end="url(#a)"/>
+          <path d="M720,130 L760,130 L760,221 L786,221" class="sv-flow" marker-end="url(#a)"/>
+          <path d="M720,166 L765,166 L765,285 L786,285" class="sv-flow" marker-end="url(#a)"/>
+          <!-- feedback loop -->
+          <path d="M875,308 L875,368 L110,368 L110,352" class="sv-flow dash" marker-end="url(#a)"/>
+          <text x="392" y="362" class="sv-cap">FEEDBACK — REPRICE · CHASE · RESTOCK · DISPATCH</text>
+        </svg>
+      </div>
+      <div class="legend">
+        <div><b>Solid cobalt</b> — record-of-truth path</div>
+        <div><b>Solid thin</b> — supporting data flow</div>
+        <div><b>Dashed</b> — decision looping back to the field</div>
+        <div><b>Boxed core</b> — cannot be skipped</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 01 RULES ================= -->
+  <section id="rules">
+    <div class="sec-head">
+      <span class="no">01</span><h2>Operating rules</h2>
+      <span class="note">Two invariants, applied everywhere</span>
+    </div>
+    <p class="sec-intro">Most small-business software is a filing cabinet with charts. BDash's design difference is that it holds two rules and refuses to let any module contradict them. Read the rest of the blueprint through these.</p>
+
+    <div class="rules">
+      <div class="rule-card">
+        <div class="rc-no">RULE 01</div>
+        <h3>Cash flow stays net positive</h3>
+        <p>Money in must exceed money out, measured monthly, shown on the first screen. Nothing else in the system is allowed to look healthy while this is red.</p>
+        <p>Consequence: growth decisions — ad spend, hiring, the custom build itself — draw from margin, never from reserve or debt.</p>
+      </div>
+      <div class="rule-card">
+        <div class="rc-no">RULE 02</div>
+        <h3>Every bucket clears its threshold</h3>
+        <p>Spending is divided into seven named buckets, each with a minimum monthly funding requirement. A bucket below its line is flagged before month close, not discovered at tax time.</p>
+        <p>Consequence: pricing is judged against buckets. A service that can't cover its share of the allocation gets repriced or dropped — it doesn't get to hide inside a good month.</p>
+      </div>
+    </div>
+
+    <div class="detail">
+      <div class="detail-h">Detail A — bucket thresholds, month shown</div>
+      <div class="tanks">
+        <div class="tank"><div class="tn">[Operationals]</div><div class="well"><div class="req" style="bottom:74%"></div><div class="fill" style="height:89%"></div></div><div class="tv">1,450 <span>/ 1,200</span></div></div>
+        <div class="tank"><div class="tn">[Equipment]</div><div class="well"><div class="req" style="bottom:74%"></div><div class="fill" style="height:89%"></div></div><div class="tv">600 <span>/ 500</span></div></div>
+        <div class="tank"><div class="tn">[HR Payroll]</div><div class="well"><div class="req" style="bottom:74%"></div><div class="fill" style="height:78%"></div></div><div class="tv">4,200 <span>/ 4,000</span></div></div>
+        <div class="tank"><div class="tn">[Emergency]</div><div class="well"><div class="req" style="bottom:74%"></div><div class="fill short" style="height:43%"></div></div><div class="tv">440 <span>/ 750</span></div></div>
+        <div class="tank"><div class="tn">[MISC]</div><div class="well"><div class="req" style="bottom:74%"></div><div class="fill" style="height:89%"></div></div><div class="tv">180 <span>/ 150</span></div></div>
+        <div class="tank"><div class="tn">[Reserve]</div><div class="well"><div class="req" style="bottom:74%"></div><div class="fill" style="height:74%"></div></div><div class="tv">400 <span>/ 400</span></div></div>
+        <div class="tank"><div class="tn">[Finance]</div><div class="well"><div class="req" style="bottom:74%"></div><div class="fill" style="height:83%"></div></div><div class="tv">1,120 <span>/ 1,000</span></div></div>
+      </div>
+    </div>
+    <div class="callout">
+      <div class="lbl">Why this is the strongest idea in the system</div>
+      <p>A tank you can read from across the room converts an accounting abstraction into a physical fact: the Emergency tank is short, everything else is above the line. Six of seven met is a sentence an owner acts on before dispatch. A profit-and-loss statement is not.</p>
+    </div>
+  </section>
+
+  <!-- ================= MODULE SPECS ================= -->
+  <section id="modules">
+    <div class="sec-head">
+      <span class="no">02</span><h2>Module specifications</h2>
+      <span class="note">13 modules · purpose · features · use case · verdict</span>
+    </div>
+    <p class="sec-intro">Each module below is documented the same way: what it is for, what it actually contains, the concrete moment it earns its place, what it depends on, and a candid verdict. Verdicts are marked <strong>Proven pattern</strong> (this works in real small businesses today), <strong>Needs review</strong> (sound idea, requires a professional or a hard technical decision), or <strong>Scope risk</strong> (this is an entire product category on its own).</p>
+
+    <!-- OP-01 -->
+    <article class="mod" id="op-01">
+      <div class="mod-head"><span class="desig">OP-01</span><h3>Overview</h3><span class="chip ok">Proven pattern</span></div>
+      <div class="mod-body">
+        <div class="mb-col">
+          <div class="lbl">Purpose</div>
+          <p>The forty-second screen. Answers one question before the trucks leave: is this month survivable, and what is the single most expensive thing being ignored right now?</p>
+          <div class="lbl mt">Features</div>
+          <ul class="feat">
+            <li><b>Cash strip</b> — in, out, docs stored, open threads, unpaid invoices, month to date</li>
+            <li><b>Threshold tanks</b> — seven buckets, funded level against a dashed requirement line</li>
+            <li><b>Trailing six-month cash chart</b> — in versus out, so a bad month reads as a trend or a blip</li>
+            <li><b>Attention feed</b> — items pulled from every module and ranked, collections first</li>
+            <li><b>Weekly 20-minute review</b> — a fixed Monday checklist, the system's one required habit</li>
+            <li><b>Build gate tracker</b> — counts consecutive net-positive months toward permission to build</li>
+          </ul>
+        </div>
+        <div class="mb-col">
+          <div class="lbl">Use case</div>
+          <div class="case"><span class="when">The 24th · 6:52 AM · before dispatch</span>Emergency is $310 short with six days left, and $1,180 is sitting in two invoices past thirty days. The owner doesn't open a report to learn this. He taps <em>Chase now</em>, makes two phone calls at 9:00, and the shortfall closes from money already earned rather than from reserve.</div>
+          <div class="lbl mt">Depends on</div>
+          <div class="xrefs">
+            <a class="xref" href="#op-05">OP-05 Finance</a><a class="xref" href="#rc-01">RC-01 Inventory</a><a class="xref" href="#pr-02">PR-02 Payroll</a><a class="xref" href="#op-04">OP-04 Digi-Scan</a>
+          </div>
+        </div>
+        <div class="verdict"><b>Verdict</b> Strongest module. It resists the usual dashboard failure — a wall of metrics with no verb attached — because every row ends in an action or a flag. The one weakness is ranking: "collections first" is hardcoded reasoning that should eventually be a rule the owner can see and change.</div>
+      </div>
+    </article>
+
+    <!-- OP-02 -->
+    <article class="mod" id="op-02">
+      <div class="mod-head"><span class="desig">OP-02</span><h3>Day Log</h3><span class="chip ok">Proven pattern</span></div>
+      <div class="mod-body">
+        <div class="mb-col">
+          <div class="lbl">Purpose</div>
+          <p>Runs the working day and then seals it. Today is a plan; yesterday is a closed file with its paperwork attached.</p>
+          <div class="lbl mt">Features</div>
+          <ul class="feat">
+            <li><b>Task list with times</b> — dispatch, collections calls, quote visits, restock, end-of-day scanning</li>
+            <li><b>Tap to complete</b>; unfinished work rolls forward at close-out rather than vanishing</li>
+            <li><b>Daily notepad</b> — the same entry the Journal owns, edited from either screen</li>
+            <li><b>Close-out</b> — bundles tasks, journal and the day's scans into one dated archive folder</li>
+            <li><b>Yesterday panel</b> — completion count, docs archived, journal excerpt, cash position at close</li>
+          </ul>
+        </div>
+        <div class="mb-col">
+          <div class="lbl">Use case</div>
+          <div class="case"><span class="when">Friday · 6:10 PM · tailgate down</span>Six of seven tasks done, van oil change untouched again. Close-out rolls it to next week, seals eleven scanned documents into the day's folder, and stamps the day's net at +$610. Nothing is remembered; everything is recorded.</div>
+          <div class="lbl mt">Depends on</div>
+          <div class="xrefs"><a class="xref" href="#op-03">OP-03 Journal</a><a class="xref" href="#op-04">OP-04 Digi-Scan</a><a class="xref" href="#rc-01">RC-01 QC blocks dispatch</a></div>
+        </div>
+        <div class="verdict"><b>Verdict</b> The sealed day file is the quiet innovation here — it makes "what happened on August 1st" a single retrievable object instead of a search across five systems. Rolling unfinished tasks forward needs a limit, or the third-rolled task becomes permanent furniture.</div>
+      </div>
+    </article>
+
+    <!-- OP-03 -->
+    <article class="mod" id="op-03">
+      <div class="mod-head"><span class="desig">OP-03</span><h3>Journal</h3><span class="chip ok">Proven pattern</span></div>
+      <div class="mod-body">
+        <div class="mb-col">
+          <div class="lbl">Purpose</div>
+          <p>Institutional memory for a business that otherwise keeps its history in one person's head. Conversations, commitments and decisions, dated.</p>
+          <div class="lbl mt">Features</div>
+          <ul class="feat">
+            <li><b>Autosaving entry</b> for the current workday, synced with the Day Log notepad</li>
+            <li><b>Archive list</b> — every previous day, newest first, with a one-line preview</li>
+            <li><b>Reader pane</b> — full entry as written, plus copy-into-today for carrying a thread forward</li>
+            <li><b>Plain-text export</b> of the whole archive</li>
+            <li><b>Seeded sample days</b> so an empty archive still demonstrates its own shape</li>
+          </ul>
+        </div>
+        <div class="mb-col">
+          <div class="lbl">Use case</div>
+          <div class="case"><span class="when">Six weeks later · a disputed invoice</span>A client insists no payment date was ever agreed. The July 30 entry says otherwise: Alvarez committed to paying the $730 by the 8th. Not a legal instrument, but a contemporaneous record that changes how the conversation goes.</div>
+          <div class="lbl mt">Depends on</div>
+          <div class="xrefs"><a class="xref" href="#op-02">OP-02 Day Log</a><a class="xref" href="#pr-01">PR-01 Clients</a></div>
+        </div>
+        <div class="verdict"><b>Verdict</b> In the prototype this is device-local storage with an in-memory fallback — fine for a demo, fatal in production. Entries about clients and money belong in the same record store as everything else, attached to the client file, backed up with it.</div>
+      </div>
+    </article>
+
+    <!-- OP-04 -->
+    <article class="mod" id="op-04">
+      <div class="mod-head"><span class="desig">OP-04</span><h3>Digi-Scan</h3><span class="chip rev">Needs review</span></div>
+      <div class="mod-body">
+        <div class="mb-col">
+          <div class="lbl">Purpose</div>
+          <p>The intake mouth of the whole system. Paper goes in; a searchable, transcribed, triple-stored record comes out. Every other module's data quality is decided here.</p>
+          <div class="lbl mt">Features</div>
+          <ul class="feat">
+            <li><b>Drop or scan</b> — invoices, receipts, contracts, HR forms, anything on paper</li>
+            <li><b>Four-stage pipeline</b> — scan, transcribe, PDF, write to Drive and database, shown per document</li>
+            <li><b>Low-confidence gate</b> — uncertain totals block storage until a human clears them</li>
+            <li><b>Triple store</b> — cloud drive, API database, local mirror, written in one pass</li>
+            <li><b>Checkpoint restore</b> and archive verification</li>
+          </ul>
+        </div>
+        <div class="mb-col">
+          <div class="lbl">Use case</div>
+          <div class="case"><span class="when">17:30 · fuel receipts on the dash</span>Eleven documents photographed in four minutes. Ten flow straight through and auto-tag as deductibles. One invoice returns a shaky total and refuses to file itself until someone looks — which is the point. A wrong number that enters the ledger silently is worse than a document that never filed.</div>
+          <div class="lbl mt">Depends on</div>
+          <div class="xrefs"><a class="xref" href="#op-05">OP-05 Finance</a><a class="xref" href="#rc-02">RC-02 Files</a><a class="xref" href="#pr-02">PR-02 HR docs</a></div>
+        </div>
+        <div class="verdict"><b>Verdict</b> Conceptually the best-defended module — human-in-the-loop on low confidence is the correct answer and most products skip it. The open questions are engineering ones: which OCR service, what confidence threshold, what happens when the drive sync and the database disagree, and how the local mirror is encrypted on a truck laptop.</div>
+      </div>
+    </article>
+
+    <!-- OP-05 -->
+    <article class="mod" id="op-05">
+      <div class="mod-head"><span class="desig">OP-05</span><h3>Finance</h3><span class="chip rev">Needs review</span></div>
+      <div class="mod-body">
+        <div class="mb-col">
+          <div class="lbl">Purpose</div>
+          <p>The ledger and the two levers that move it fastest: getting paid sooner, and charging correctly.</p>
+          <div class="lbl mt">Features</div>
+          <ul class="feat">
+            <li><b>Six-line ledger</b> — loans, taxes set aside, deductibles, reserves, savings, funds</li>
+            <li><b>Statements</b> — cash flow, expense by bucket, quarterly P&amp;L, year-to-date deductibles package</li>
+            <li><b>Collections</b> — automatic reminders at 7, 14 and 30 days, deposits on new work, tap-to-pay on site</li>
+            <li><b>Price &amp; margin audit</b> — average job against true cost from the bucket model, with a verdict per line</li>
+            <li><b>Auto-tagged deductibles</b> pulled from scan transcriptions</li>
+          </ul>
+        </div>
+        <div class="mb-col">
+          <div class="lbl">Use case</div>
+          <div class="case"><span class="when">Month close · the margin audit</span>Hedge trim bills at $60 and costs $58. The business has been busy doing it for a year and quietly paying for the privilege. The audit reprices it to $85 and the change syncs to the website quote form the same afternoon — the fix reaches customers without a second task.</div>
+          <div class="lbl mt">Depends on</div>
+          <div class="xrefs"><a class="xref" href="#op-04">OP-04 Digi-Scan</a><a class="xref" href="#sl-01">SL-01 Pricing</a><a class="xref" href="#pr-01">PR-01 Clients</a></div>
+        </div>
+        <div class="verdict"><b>Verdict</b> Collections and repricing are the highest-return, lowest-cost features in the entire blueprint, and correctly placed in phase one. Tax set-aside and deductible classification, however, are accountant territory — the module should present the numbers and export cleanly rather than imply it has made a tax determination.</div>
+      </div>
+    </article>
+
+    <!-- SL-01 -->
+    <article class="mod" id="sl-01">
+      <div class="mod-head"><span class="desig">SL-01</span><h3>Services &amp; Pricing</h3><span class="chip ok">Proven pattern</span></div>
+      <div class="mod-body">
+        <div class="mb-col">
+          <div class="lbl">Purpose</div>
+          <p>One price book, with margin attached to every line, and a disciplined place to put the exceptions.</p>
+          <div class="lbl mt">Features</div>
+          <ul class="feat">
+            <li><b>Catalog by category</b> — maintenance, cleanup, trim, add-ons — with current price and live margin</li>
+            <li><b>Repricing state</b> shown inline as old price → new price</li>
+            <li><b>MISC register</b> — custom and special prices with the reason and the approver recorded</li>
+            <li><b>Floor check</b> — a custom price must still clear its bucket allocation to be saved</li>
+            <li><b>Sync to the website quote form</b> on change</li>
+          </ul>
+        </div>
+        <div class="mb-col">
+          <div class="lbl">Use case</div>
+          <div class="case"><span class="when">A twelve-property HOA bid</span>Book rate is $240; the volume bid needs $205. Instead of a handshake, the price is logged with the reason, the approver, and a floor check confirming 27% margin. Two years later nobody has to reconstruct why that account is cheaper than the others.</div>
+          <div class="lbl mt">Depends on</div>
+          <div class="xrefs"><a class="xref" href="#op-05">OP-05 Cost model</a><a class="xref" href="#sl-02">SL-02 Quote form</a><a class="xref" href="#pr-01">PR-01 Clients</a></div>
+        </div>
+        <div class="verdict"><b>Verdict</b> The MISC register is the underrated feature — undocumented discounts are how small service businesses bleed without noticing. Requiring a reason and an approver on every exception is a governance control disguised as a form field.</div>
+      </div>
+    </article>
+
+    <!-- SL-02 -->
+    <article class="mod" id="sl-02">
+      <div class="mod-head"><span class="desig">SL-02</span><h3>Website &amp; Ads</h3><span class="chip rev">Needs review</span></div>
+      <div class="mod-body">
+        <div class="mb-col">
+          <div class="lbl">Purpose</div>
+          <p>Demand generation with a closed loop: traffic must arrive somewhere that converts, and finished jobs must produce reviews that lower the cost of the next lead.</p>
+          <div class="lbl mt">Features</div>
+          <ul class="feat">
+            <li><b>Traffic panel</b> — weekly visits and leads from the business site</li>
+            <li><b>Campaign manager</b> — create, schedule and monitor ads with spend, leads and cost per lead</li>
+            <li><b>Review engine</b> — job marked complete triggers a review request text two hours later</li>
+            <li><b>Online booking and instant quotes</b> — form to mailbox to auto-response, measured in seconds</li>
+            <li><b>Deposit at booking</b> — 50% upfront on new work, feeding collections</li>
+            <li>Ad spend charges the <b>[Operationals]</b> bucket automatically</li>
+          </ul>
+        </div>
+        <div class="mb-col">
+          <div class="lbl">Use case</div>
+          <div class="case"><span class="when">Nineteen quote requests, one month</span>Each gets an auto-response inside 45 seconds promising a call before 5 PM. Eleven convert to booked jobs with deposits collected. The reviews from those jobs move the rating from 12 reviews to 47 — and the cost per lead in the panel above falls without raising ad spend a dollar.</div>
+          <div class="lbl mt">Depends on</div>
+          <div class="xrefs"><a class="xref" href="#pr-03">PR-03 Mailbox</a><a class="xref" href="#sl-01">SL-01 Pricing</a><a class="xref" href="#op-05">OP-05 Deposits</a></div>
+        </div>
+        <div class="verdict"><b>Verdict</b> The review engine is close to free and compounds — correctly identified as the cheapest campaign available. The ad management side is the weakest fit: rebuilding campaign tooling that the ad platforms already provide is effort spent away from the system's actual advantage. Read the numbers in, leave the buying where it lives.</div>
+      </div>
+    </article>
+
+    <!-- PR-01 -->
+    <article class="mod" id="pr-01">
+      <div class="mod-head"><span class="desig">PR-01</span><h3>Clients</h3><span class="chip ok">Proven pattern</span></div>
+      <div class="mod-body">
+        <div class="mb-col">
+          <div class="lbl">Purpose</div>
+          <p>A relationship record, not a contact list. It stores the things that keep an account, which are rarely the things in the invoice.</p>
+          <div class="lbl mt">Features</div>
+          <ul class="feat">
+            <li><b>VIP cards</b> — private notes, preferred service day, communication style, active custom rate</li>
+            <li><b>One-tap call, text, and full history</b> per client</li>
+            <li><b>Regulars table</b> — cadence, last touch, balance and days outstanding</li>
+            <li><b>Unified client file</b> — invoices, calls, texts, emails, contracts and notes in one view</li>
+          </ul>
+        </div>
+        <div class="mb-col">
+          <div class="lbl">Use case</div>
+          <div class="case"><span class="when">A two-year account, worth three referrals</span>The note says: prefers Friday service, ask about the dog. The crew lead who has never met her asks about Biscuit. That is the entire retention strategy, and it survives staff turnover only because it was written down.</div>
+          <div class="lbl mt">Depends on</div>
+          <div class="xrefs"><a class="xref" href="#pr-03">PR-03 Comms trail</a><a class="xref" href="#op-05">OP-05 Balances</a><a class="xref" href="#rc-02">RC-02 Documents</a></div>
+        </div>
+        <div class="verdict"><b>Verdict</b> Right instinct, and cheap to build. Note that "notes are private to you" is a promise about access control — once a crew lead can open a client file, the personal notes need a permission boundary or the promise quietly becomes false.</div>
+      </div>
+    </article>
+
+    <!-- PR-02 -->
+    <article class="mod" id="pr-02">
+      <div class="mod-head"><span class="desig">PR-02</span><h3>Payroll &amp; HR</h3><span class="chip risk">Scope risk</span></div>
+      <div class="mod-body">
+        <div class="mb-col">
+          <div class="lbl">Purpose</div>
+          <p>Handles a workforce that is never all one thing: employees, subcontractors, temp-to-hire, and crews borrowed from other companies.</p>
+          <div class="lbl mt">Features</div>
+          <ul class="feat">
+            <li><b>Mixed roster</b> — in-house, sub/contract, temp-to-hire with week counters, partner transfers</li>
+            <li><b>Payroll run</b> and HR document export</li>
+            <li><b>Partner exchange board</b> — rent, trade or swap crews and trucks under contract</li>
+            <li><b>Contract generation</b> — every transfer produces a PDF routed through attorney review and Digi-Scan</li>
+            <li><b>Mandatory legal gate</b> on classification and labor-law review before any transfer executes</li>
+          </ul>
+        </div>
+        <div class="mb-col">
+          <div class="lbl">Use case</div>
+          <div class="case"><span class="when">Peak season, no permanent hire</span>Riverside Lawn Co. offers two crew and a box truck for two weeks. Capacity doubles for a fortnight with no payroll commitment afterward — provided the contract survives attorney review, which the board treats as a blocking step rather than a formality.</div>
+          <div class="lbl mt">Depends on</div>
+          <div class="xrefs"><a class="xref" href="#op-04">OP-04 Digi-Scan</a><a class="xref" href="#op-05">OP-05 Payroll bucket</a><a class="xref" href="#risk">05 Risk register</a></div>
+        </div>
+        <div class="verdict"><b>Verdict</b> The partner exchange is a genuinely original idea — elastic capacity without hiring, which is the hardest problem in seasonal field work. It is also the highest-liability feature in the blueprint. Worker classification and crew-lending arrangements carry IRS and labor-law exposure that no dashboard can absorb. Build the board as a contract tracker; do not build a payroll tax engine.</div>
+      </div>
+    </article>
+
+    <!-- PR-03 -->
+    <article class="mod" id="pr-03">
+      <div class="mod-head"><span class="desig">PR-03</span><h3>Mailbox &amp; Phone</h3><span class="chip rev">Needs review</span></div>
+      <div class="mod-body">
+        <div class="mb-col">
+          <div class="lbl">Purpose</div>
+          <p>Puts every client conversation — email, call, text — inside the same system that holds their invoices, and rescues the leads a working crew inevitably misses.</p>
+          <div class="lbl mt">Features</div>
+          <ul class="feat">
+            <li><b>In-house mailbox</b> — business email threads alongside the record they concern</li>
+            <li><b>Phone and text box</b> — business-line SMS and call log</li>
+            <li><b>Missed-call auto text-back</b> within 60 seconds</li>
+            <li><b>Voicemail and call transcription</b>, attached to the client file automatically</li>
+            <li><b>Web-form auto-response</b> with a stated callback time</li>
+          </ul>
+        </div>
+        <div class="mb-col">
+          <div class="lbl">Use case</div>
+          <div class="case"><span class="when">11:02 AM · nobody can answer, everyone is on a mower</span>The call goes unanswered. Forty-one seconds later the caller has a text offering a quote. Seven leads recovered this month — roughly $1,680 of work that would otherwise have gone to whoever picked up second.</div>
+          <div class="lbl mt">Depends on</div>
+          <div class="xrefs"><a class="xref" href="#pr-01">PR-01 Clients</a><a class="xref" href="#sl-02">SL-02 Lead capture</a></div>
+        </div>
+        <div class="verdict"><b>Verdict</b> Missed-call text-back is the highest return per dollar in the whole document and available off the shelf this week. Building an in-house mail client, by contrast, is a decade-old solved problem — sync the threads, don't rebuild the inbox. Call recording also carries consent requirements that vary by state and need checking before it ships.</div>
+      </div>
+    </article>
+
+    <!-- RC-01 -->
+    <article class="mod" id="rc-01">
+      <div class="mod-head"><span class="desig">RC-01</span><h3>Inventory &amp; Quality Check</h3><span class="chip ok">Proven pattern</span></div>
+      <div class="mod-body">
+        <div class="mb-col">
+          <div class="lbl">Purpose</div>
+          <p>Protects billable hours. A missing spool of trimmer line and a mower that won't start cost the same thing: a day.</p>
+          <div class="lbl mt">Features</div>
+          <ul class="feat">
+            <li><b>Stock counts against reorder points</b>, with below-line items flagged to the Overview feed</li>
+            <li><b>Reorder list builder</b> and count logging</li>
+            <li><b>Weekly equipment QC</b> — mowers, trimmers, blower, van, card reader</li>
+            <li><b>Overdue detection</b> — a check not logged becomes a flag on its own</li>
+            <li><b>Dispatch block</b> — failed or overdue equipment cannot be assigned to tomorrow's jobs</li>
+          </ul>
+        </div>
+        <div class="mb-col">
+          <div class="lbl">Use case</div>
+          <div class="case"><span class="when">Saturday flag, Monday saved</span>Trimmer line reads 2 against a reorder point of 5. The restock lands on Saturday's task list, not on Monday morning at a customer's gate with three properties still to cut.</div>
+          <div class="lbl mt">Depends on</div>
+          <div class="xrefs"><a class="xref" href="#op-02">OP-02 Day Log</a><a class="xref" href="#op-05">OP-05 Equipment bucket</a><a class="xref" href="#op-01">OP-01 Attention feed</a></div>
+        </div>
+        <div class="verdict"><b>Verdict</b> Small module, disproportionate value, and the dispatch block is the right kind of enforcement — the system refuses an unsafe assignment rather than warning about it. Watch for override fatigue: if the block can be dismissed with one tap, it becomes decoration within a month.</div>
+      </div>
+    </article>
+
+    <!-- RC-02 -->
+    <article class="mod" id="rc-02">
+      <div class="mod-head"><span class="desig">RC-02</span><h3>Files &amp; Exports</h3><span class="chip ok">Proven pattern</span></div>
+      <div class="mod-body">
+        <div class="mb-col">
+          <div class="lbl">Purpose</div>
+          <p>The retrieval side of Digi-Scan. Filing is only worth doing if finding is fast, and if the whole set can leave the building for an accountant or an auditor.</p>
+          <div class="lbl mt">Features</div>
+          <ul class="feat">
+            <li><b>File cabinet</b> — invoices, contracts, HR records, tax and deductibles, receipts, with volume indicators</li>
+            <li><b>Auto-tagging</b> of tax documents from transcription</li>
+            <li><b>Client relations view</b> — paper and communication trail per account</li>
+            <li><b>Packaged export</b> — HR and finance bundles for outside professionals</li>
+          </ul>
+        </div>
+        <div class="mb-col">
+          <div class="lbl">Use case</div>
+          <div class="case"><span class="when">Tax season · one email instead of one weekend</span>The accountant asks for the year. The year-to-date deductibles package is already compiled from documents that were tagged the day they were photographed. The shoebox never existed.</div>
+          <div class="lbl mt">Depends on</div>
+          <div class="xrefs"><a class="xref" href="#op-04">OP-04 Digi-Scan</a><a class="xref" href="#op-05">OP-05 Finance</a><a class="xref" href="#pr-01">PR-01 Clients</a></div>
+        </div>
+        <div class="verdict"><b>Verdict</b> Sound, and the export path is what keeps the system honest — data that can leave cleanly is data the owner still owns. Search is the missing feature: a file cabinet with counts but no full-text search across transcriptions wastes the transcription step.</div>
+      </div>
+    </article>
+
+    <!-- TA-01 -->
+    <article class="mod" id="ta-01">
+      <div class="mod-head"><span class="desig">TA-01</span><h3>Recovery Plan</h3><span class="chip ok">Proven pattern</span></div>
+      <div class="mod-body">
+        <div class="mb-col">
+          <div class="lbl">Purpose</div>
+          <p>The module that governs the other twelve. It sequences the turnaround and holds the permission slip for building anything custom.</p>
+          <div class="lbl mt">Features</div>
+          <ul class="feat">
+            <li><b>Phased sequence</b> — cash first, spending discipline second, capacity third, build last</li>
+            <li><b>Bridge stack</b> — off-the-shelf tools running each function today, under $150/month total</li>
+            <li><b>Build gate</b> — the custom platform is unlocked only by three consecutive net-positive months</li>
+            <li><b>Risk register</b> — named risks with owners and mitigations, not disclaimers</li>
+          </ul>
+        </div>
+        <div class="mb-col">
+          <div class="lbl">Use case</div>
+          <div class="case"><span class="when">The moment the project would normally die</span>A struggling business decides to fix itself by building software, spends six months and its reserve, and ends up with a half-finished app and the same cash problem. The gate makes that impossible: until the business is provably profitable, this document is a target architecture running on rented rails.</div>
+          <div class="lbl mt">Depends on</div>
+          <div class="xrefs"><a class="xref" href="#op-01">OP-01 Gate tracker</a><a class="xref" href="#sequence">04 Build sequence</a><a class="xref" href="#risk">05 Risk register</a></div>
+        </div>
+        <div class="verdict"><b>Verdict</b> This is the most mature thinking in the entire concept and it is unusual to find it inside the product it constrains. "Buy before you build, and let profit fund the build" is the single sentence that makes the rest of the blueprint credible rather than aspirational.</div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ================= PLATFORM ================= -->
+  <section id="platform">
+    <div class="sec-head">
+      <span class="no">03</span><h2>Platform layer</h2>
+      <span class="note">Applies across all modules</span>
+    </div>
+    <p class="sec-intro">Features that aren't a screen. These matter more than they look: the accessibility and language layer is the difference between software the owner uses and software the crew uses.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Capability</th><th>What it does</th><th>Why it belongs in a field business</th></tr></thead>
+        <tbody>
+          <tr><td><b>Four languages</b><br><span class="m">EN · ES · HT · FR-CA</span></td><td>Runtime translation of navigation, section titles and descriptions, with English as the fallback dictionary.</td><td>English, Spanish and Haitian Creole are the working languages of South and Central Florida field crews. A dispatch tool nobody on the truck can read is an owner's tool, not a company's.</td></tr>
+          <tr><td><b>Three themes</b><br><span class="m">Dark · Light · High contrast</span></td><td>Full token swap including chart restyling; preference persists between visits.</td><td>Light mode exists for one reason: a phone screen in Florida sun at 1 PM. High contrast serves low-vision users and the same glare problem.</td></tr>
+          <tr><td><b>Keyboard access</b><br><span class="m">ALT+A · ESC</span></td><td>Shortcut to the accessibility panel, escape to close, visible focus rings on every control, ARIA roles on the dialog.</td><td>Office-side work happens on a keyboard; the field side happens on a thumb. Both have to work.</td></tr>
+          <tr><td><b>Reduced motion</b></td><td>Honors the system preference and disables animation entirely.</td><td>A baseline courtesy, and one most business dashboards skip.</td></tr>
+          <tr><td><b>Responsive collapse</b></td><td>Sidebar becomes a horizontal scroller under 760px; grids reflow to single column.</td><td>The people entering data are standing next to a truck, not sitting at a desk.</td></tr>
+          <tr><td><b>Resilient storage</b></td><td>Local persistence with an in-memory fallback when storage is unavailable, so a blocked browser degrades instead of crashing.</td><td>Correct instinct for a prototype. In production the same defensive posture belongs around the network, not the browser.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= LOOPS ================= -->
+  <section id="loops">
+    <div class="sec-head">
+      <span class="no">04</span><h2>Cross-module loops</h2>
+      <span class="note">Where the value actually lives</span>
+    </div>
+    <p class="sec-intro">Individually, most of these modules have off-the-shelf equivalents. The argument for one system is that three loops close automatically instead of depending on someone remembering to connect them.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:120px">Loop</th><th>Path</th><th>What closing it is worth</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>Cash loop</b></td>
+            <td><code>Job done → invoice → reminders 7/14/30 → payment → bucket funded → threshold met → Overview clears</code></td>
+            <td>Turns collections from a task someone remembers into a state the system reports. $1,570 outstanding is the first leak, and it's visible before it's overdue.</td>
+          </tr>
+          <tr>
+            <td><b>Paper loop</b></td>
+            <td><code>Receipt photographed → transcribed → reviewed if uncertain → PDF → Drive + DB + mirror → auto-tagged → statement → export</code></td>
+            <td>One capture produces a deductible, a searchable record, a backup and a line in a statement. The alternative is the same document handled four times, or not at all.</td>
+          </tr>
+          <tr>
+            <td><b>Lead loop</b></td>
+            <td><code>Ad or missed call → auto text-back → quote form → booked with deposit → job → review request → rating up → cost per lead down</code></td>
+            <td>Marketing that pays for itself twice: once in the booked job, once in the review that makes the next lead cheaper.</td>
+          </tr>
+          <tr>
+            <td><b>Discipline loop</b></td>
+            <td><code>True cost from buckets → margin audit → reprice → syncs to quote form → next job priced correctly</code></td>
+            <td>The only loop that fixes the root cause. Underpricing is usually invisible until the cost model is attached to the price book.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= SEQUENCE ================= -->
+  <section id="sequence">
+    <div class="sec-head">
+      <span class="no">05</span><h2>Build sequence</h2>
+      <span class="note">Six months to the gate</span>
+    </div>
+    <p class="sec-intro">The order is deliberate and worth defending: revenue before discipline, discipline before capacity, capacity before code. Each phase funds the next.</p>
+    <div class="seq">
+      <div class="step now">
+        <div class="sw">Months 1–2 · active</div>
+        <h4>Cash up, near-zero cost</h4>
+        <p>Collections reminders, deposits on new work, tap-to-pay, the margin audit, missed-call text-back, and the review engine. Every item here raises revenue or recovers it, and none requires building anything. This is where the money to do the rest comes from.</p>
+      </div>
+      <div class="step">
+        <div class="sw">Months 3–4</div>
+        <h4>Spending controlled</h4>
+        <p>Bucket thresholds enforced weekly rather than admired monthly. The statement rhythm locks in. Any service line that cannot cover its allocation is repriced or retired — the audit becomes a habit instead of an event.</p>
+      </div>
+      <div class="step">
+        <div class="sw">Months 5–6</div>
+        <h4>Capacity and scale</h4>
+        <p>Partner exchange covers peak season without permanent payroll. Ad spend increases only from margin, never from reserve. Growth is allowed to be slower than demand.</p>
+      </div>
+      <div class="step gate">
+        <div class="sw">The gate</div>
+        <h4>Build BDash — after three consecutive net-positive months</h4>
+        <p>Until then the bridge stack runs every function for under $150 a month and this document stays a specification. When the gate opens, build in loop order: paper loop first, because it feeds everything else, then cash, then lead.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= RISK ================= -->
+  <section id="risk">
+    <div class="sec-head">
+      <span class="no">06</span><h2>Risk register</h2>
+      <span class="note">Named, owned, mitigated</span>
+    </div>
+    <p class="sec-intro">Carried forward from the source concept and extended. The prototype already names most of these, which is unusual and to its credit — the additions below are the ones a build would hit first.</p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:180px">Risk</th><th>Exposure</th><th style="width:230px">Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td><b>Scope</b></td><td>Accounting, OCR, telephony, payroll, CRM and ad management are six separate industries with six sets of incumbents.</td><td>The build gate, plus a standing rule: integrate where a mature product exists, build only the connective tissue.</td></tr>
+          <tr><td><b>Payroll, tax &amp; worker classification</b></td><td>Withholding errors and crew rent/swap arrangements carry IRS and labor-law penalties that fall on the business, not the software.</td><td>Accountant and attorney review before any transfer executes. The system tracks contracts; it does not determine status.</td></tr>
+          <tr><td><b>Single point of failure</b></td><td>If the dashboard is down, mail, phone, invoicing and payroll are down with it — on a day crews are already dispatched.</td><td>Triple store, checkpoint restore, and bridge tools that remain usable standalone. Restores tested, not assumed.</td></tr>
+          <tr><td><b>Data concentration</b></td><td>Client contact details, employee records and financial data in one store raises the consequence of any single breach.</td><td>Encryption at rest, per-role access, tested restores, and a real answer for the local mirror on portable hardware.</td></tr>
+          <tr><td><b>OCR corruption</b></td><td>A misread total enters the ledger silently and poisons every statement downstream.</td><td>Low-confidence documents block storage until cleared by a person. Already enforced in the design.</td></tr>
+          <tr><td><b>Adoption</b></td><td>Software changes nothing if the crew keeps the old habits. This is the most common cause of death for tools like this.</td><td>One non-negotiable habit — the weekly 20-minute review — plus multilingual UI so adoption isn't gated on English.</td></tr>
+          <tr><td><b>Call recording consent</b></td><td>Transcribing calls without appropriate notice creates legal exposure that varies by state.</td><td>Confirm requirements for the operating state before transcription ships; add notice to the business line greeting.</td></tr>
+          <tr><td><b>Payment handling</b></td><td>Card data touches tap-to-pay and payment links.</td><td>Use a processor's hosted flow. Card data should never reach this system's storage in any form.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================= VERDICT ================= -->
+  <section id="verdict">
+    <div class="sec-head">
+      <span class="no">07</span><h2>Honest read</h2>
+      <span class="note">What to keep, cut, and defer</span>
+    </div>
+    <p class="sec-intro">A blueprint that only praises the design isn't a blueprint. Summary judgement across all thirteen modules:</p>
+    <div class="rules">
+      <div class="rule-card" style="border-left-color:var(--pos)">
+        <div class="rc-no">KEEP — BUILD FIRST</div>
+        <h3>The spine</h3>
+        <p><b>Digi-Scan → triple store → buckets → Overview.</b> This chain is the product. It is coherent, defensible, and nothing else in the system works without it. The human-in-the-loop gate on uncertain transcriptions is a better decision than most commercial OCR products make.</p>
+        <p>Alongside it: collections, the margin audit and missed-call text-back — the three features that raise cash without requiring the platform to exist yet.</p>
+      </div>
+      <div class="rule-card" style="border-left-color:var(--amber)">
+        <div class="rc-no">CUT OR INTEGRATE</div>
+        <h3>The rebuilt wheels</h3>
+        <p><b>The in-house mail client and the ad campaign manager.</b> Both duplicate mature products, both are large builds, and neither is where this system's advantage lies. Sync mail threads onto the client file; read ad numbers in through an API. The value was always the attachment to the record, not the interface.</p>
+      </div>
+      <div class="rule-card" style="border-left-color:var(--neg)">
+        <div class="rc-no">DEFER — NEEDS A PROFESSIONAL</div>
+        <h3>The liability surface</h3>
+        <p><b>Payroll processing, tax determination and crew-transfer contracts.</b> The concept correctly gates these behind attorney and accountant review. Hold that line: track and export, don't calculate and file. The partner exchange board should generate contracts for review, never execute them.</p>
+      </div>
+      <div class="rule-card">
+        <div class="rc-no">THE REAL FINDING</div>
+        <h3>The plan outranks the platform</h3>
+        <p>The most valuable artifact in this concept isn't the dashboard — it's the Recovery Plan and the build gate attached to it. A struggling business that ran phase one and never wrote a line of code would be better off than one that built all thirteen modules first.</p>
+        <p>That the concept says so about itself, inside itself, is the reason it deserves to be built at all.</p>
+      </div>
+    </div>
+    <div class="callout">
+      <div class="lbl">Standing note</div>
+      <p>All figures in the source concept are simulated. Payroll, tax, worker-classification and contract structures require a qualified accountant and attorney before any implementation touches a real business.</p>
+    </div>
+  </section>
+
+  </main>
+</div>
+</div>
+
+<!-- ================= FOOTER TITLE BLOCK ================= -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div><div class="k">Document</div><div class="v">BDash system blueprint</div></div>
+      <div><div class="k">Scope</div><div class="v">13 modules · 4 loops · 8 risks</div></div>
+      <div><div class="k">Sheet</div><div class="v">BP-01</div></div>
+      <div><div class="k">Revision</div><div class="v">A — concept analysis</div></div>
+      <div><div class="k">Basis</div><div class="v">BDash prototype</div></div>
+      <div><div class="k">Classification</div><div class="v">Planning document</div></div>
+    </div>
+    <p class="foot-note">
+      NOT AN ACCOUNTING, LEGAL OR TAX INSTRUMENT · FIGURES SIMULATED FOR ILLUSTRATION<br>
+      READ WITH THE RECOVERY PLAN · BUY BEFORE BUILDING · PROFIT FUNDS THE BUILD
+    </p>
+  </div>
+</footer>
+
+<script>
+/* Sheet index highlighting — passive, no layout thrash */
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('.rail-a'));
+  var map = {};
+  links.forEach(function(a){
+    var t = document.querySelector(a.getAttribute('href'));
+    if(t) map[t.id] = a;
+  });
+  var targets = Object.keys(map).map(function(id){ return document.getElementById(id); });
+  if(!('IntersectionObserver' in window) || !targets.length) return;
+
+  var visible = new Set();
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting) visible.add(e.target.id); else visible.delete(e.target.id);
+    });
+    var first = targets.filter(function(t){ return visible.has(t.id); })[0];
+    links.forEach(function(a){ a.classList.remove('on'); });
+    if(first && map[first.id]) map[first.id].classList.add('on');
+  }, { rootMargin: '-90px 0px -65% 0px', threshold: 0 });
+
+  targets.forEach(function(t){ io.observe(t); });
+})();
+</script>
+</body>
+</html>
