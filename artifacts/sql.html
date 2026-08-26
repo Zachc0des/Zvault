@@ -1,1 +1,757 @@
-sql
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beginner's Guide to SQL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e5e7eb;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            color: #6b7280;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            color: #1f2937;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .section h3 {
+            color: #374151;
+            margin: 20px 0 10px;
+            font-size: 1.3em;
+        }
+
+        .section p {
+            color: #4b5563;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .table-visual {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tr:hover {
+            background: #f3f4f6;
+        }
+
+        .query-box {
+            background: #1f2937;
+            color: #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .query-box pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .keyword {
+            color: #60a5fa;
+            font-weight: bold;
+        }
+
+        .string {
+            color: #fbbf24;
+        }
+
+        .comment {
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        .interactive-builder {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .builder-section {
+            margin-bottom: 20px;
+        }
+
+        .builder-section label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .result-box {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 100px;
+        }
+
+        .tip {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .tip strong {
+            color: #1e40af;
+        }
+
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .command-card {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .command-card h4 {
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .command-card code {
+            background: #1f2937;
+            color: #10b981;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Beginner's Guide to SQL</h1>
+            <p>Master the language of databases with interactive examples</p>
+        </div>
+
+        <div class="content">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('intro')">Introduction</button>
+                <button class="tab" onclick="showTab('select')">SELECT</button>
+                <button class="tab" onclick="showTab('where')">WHERE</button>
+                <button class="tab" onclick="showTab('join')">JOIN</button>
+                <button class="tab" onclick="showTab('aggregate')">Aggregate</button>
+                <button class="tab" onclick="showTab('practice')">Interactive Practice</button>
+            </div>
+
+            <!-- Introduction Tab -->
+            <div id="intro" class="tab-content active">
+                <div class="section">
+                    <h2>What is SQL?</h2>
+                    <p>SQL (Structured Query Language) is a programming language designed for managing and manipulating data in relational databases. It's the standard language for relational database management systems.</p>
+
+                    <h3>Why Learn SQL?</h3>
+                    <ul style="color: #4b5563; line-height: 2; margin-left: 20px;">
+                        <li>Used by data analysts, scientists, and engineers worldwide</li>
+                        <li>Essential for working with databases</li>
+                        <li>Relatively easy to learn compared to other programming languages</li>
+                        <li>In high demand across industries</li>
+                    </ul>
+
+                    <h3>Sample Database: Students</h3>
+                    <p>Throughout this guide, we'll use a simple students database:</p>
+                    
+                    <div class="table-visual">
+                        <table id="studentsTable">
+                            <thead>
+                                <tr>
+                                    <th>id</th>
+                                    <th>name</th>
+                                    <th>age</th>
+                                    <th>grade</th>
+                                    <th>major</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>Alice Johnson</td>
+                                    <td>20</td>
+                                    <td>A</td>
+                                    <td>Computer Science</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Bob Smith</td>
+                                    <td>22</td>
+                                    <td>B</td>
+                                    <td>Mathematics</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Carol White</td>
+                                    <td>21</td>
+                                    <td>A</td>
+                                    <td>Physics</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>David Brown</td>
+                                    <td>23</td>
+                                    <td>C</td>
+                                    <td>Computer Science</td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>Emma Davis</td>
+                                    <td>20</td>
+                                    <td>B</td>
+                                    <td>Biology</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SELECT Tab -->
+            <div id="select" class="tab-content">
+                <div class="section">
+                    <h2>SELECT Statement</h2>
+                    <p>The SELECT statement is used to retrieve data from a database. It's the most commonly used SQL command.</p>
+
+                    <h3>Basic Syntax</h3>
+                    <div class="query-box">
+                        <pre><span class="keyword">SELECT</span> column1, column2
+<span class="keyword">FROM</span> table_name;</pre>
+                    </div>
+
+                    <h3>Examples</h3>
+                    
+                    <div class="command-card">
+                        <h4>Select All Columns</h4>
+                        <div class="query-box">
+                            <pre><span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> students;</pre>
+                        </div>
+                        <p style="color: #4b5563; margin-top: 10px;">Returns all columns and all rows from the students table.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <h4>Select Specific Columns</h4>
+                        <div class="query-box">
+                            <pre><span class="keyword">SELECT</span> name, major
+<span class="keyword">FROM</span> students;</pre>
+                        </div>
+                        <p style="color: #4b5563; margin-top: 10px;">Returns only the name and major columns.</p>
+                    </div>
+
+                    <div class="tip">
+                        <strong>💡 Tip:</strong> Using * selects all columns, but it's better practice to specify column names for better performance and clarity.
+                    </div>
+                </div>
+            </div>
+
+            <!-- WHERE Tab -->
+            <div id="where" class="tab-content">
+                <div class="section">
+                    <h2>WHERE Clause</h2>
+                    <p>The WHERE clause filters records based on specified conditions.</p>
+
+                    <h3>Basic Syntax</h3>
+                    <div class="query-box">
+                        <pre><span class="keyword">SELECT</span> column1, column2
+<span class="keyword">FROM</span> table_name
+<span class="keyword">WHERE</span> condition;</pre>
+                    </div>
+
+                    <h3>Common Operators</h3>
+                    <div class="command-grid">
+                        <div class="command-card">
+                            <h4>=</h4>
+                            <p style="color: #4b5563;">Equal to</p>
+                            <div class="query-box" style="font-size: 0.85em;">
+                                <pre><span class="keyword">WHERE</span> age = 20</pre>
+                            </div>
+                        </div>
+                        <div class="command-card">
+                            <h4>!=, &lt;&gt;</h4>
+                            <p style="color: #4b5563;">Not equal to</p>
+                            <div class="query-box" style="font-size: 0.85em;">
+                                <pre><span class="keyword">WHERE</span> grade != <span class="string">'A'</span></pre>
+                            </div>
+                        </div>
+                        <div class="command-card">
+                            <h4>&gt;, &lt;, &gt;=, &lt;=</h4>
+                            <p style="color: #4b5563;">Comparison operators</p>
+                            <div class="query-box" style="font-size: 0.85em;">
+                                <pre><span class="keyword">WHERE</span> age &gt;= 21</pre>
+                            </div>
+                        </div>
+                        <div class="command-card">
+                            <h4>LIKE</h4>
+                            <p style="color: #4b5563;">Pattern matching</p>
+                            <div class="query-box" style="font-size: 0.85em;">
+                                <pre><span class="keyword">WHERE</span> name <span class="keyword">LIKE</span> <span class="string">'A%'</span></pre>
+                            </div>
+                        </div>
+                        <div class="command-card">
+                            <h4>IN</h4>
+                            <p style="color: #4b5563;">Match any value in list</p>
+                            <div class="query-box" style="font-size: 0.85em;">
+                                <pre><span class="keyword">WHERE</span> major <span class="keyword">IN</span> (<span class="string">'CS'</span>, <span class="string">'Math'</span>)</pre>
+                            </div>
+                        </div>
+                        <div class="command-card">
+                            <h4>BETWEEN</h4>
+                            <p style="color: #4b5563;">Range of values</p>
+                            <div class="query-box" style="font-size: 0.85em;">
+                                <pre><span class="keyword">WHERE</span> age <span class="keyword">BETWEEN</span> 20 <span class="keyword">AND</span> 22</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Examples</h3>
+                    <div class="query-box">
+                        <pre><span class="comment">-- Find all Computer Science students</span>
+<span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> students
+<span class="keyword">WHERE</span> major = <span class="string">'Computer Science'</span>;
+
+<span class="comment">-- Find students older than 21</span>
+<span class="keyword">SELECT</span> name, age
+<span class="keyword">FROM</span> students
+<span class="keyword">WHERE</span> age &gt; 21;
+
+<span class="comment">-- Find students with grade A or B</span>
+<span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> students
+<span class="keyword">WHERE</span> grade <span class="keyword">IN</span> (<span class="string">'A'</span>, <span class="string">'B'</span>);</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JOIN Tab -->
+            <div id="join" class="tab-content">
+                <div class="section">
+                    <h2>JOIN Clauses</h2>
+                    <p>JOINs combine rows from two or more tables based on a related column.</p>
+
+                    <h3>Types of JOINs</h3>
+                    
+                    <div class="command-card">
+                        <h4>INNER JOIN</h4>
+                        <p style="color: #4b5563; margin: 10px 0;">Returns records with matching values in both tables.</p>
+                        <div class="query-box">
+                            <pre><span class="keyword">SELECT</span> students.name, courses.course_name
+<span class="keyword">FROM</span> students
+<span class="keyword">INNER JOIN</span> enrollments <span class="keyword">ON</span> students.id = enrollments.student_id
+<span class="keyword">INNER JOIN</span> courses <span class="keyword">ON</span> enrollments.course_id = courses.id;</pre>
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <h4>LEFT JOIN</h4>
+                        <p style="color: #4b5563; margin: 10px 0;">Returns all records from the left table and matched records from the right table.</p>
+                        <div class="query-box">
+                            <pre><span class="keyword">SELECT</span> students.name, enrollments.course_id
+<span class="keyword">FROM</span> students
+<span class="keyword">LEFT JOIN</span> enrollments <span class="keyword">ON</span> students.id = enrollments.student_id;</pre>
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <h4>RIGHT JOIN</h4>
+                        <p style="color: #4b5563; margin: 10px 0;">Returns all records from the right table and matched records from the left table.</p>
+                        <div class="query-box">
+                            <pre><span class="keyword">SELECT</span> students.name, enrollments.course_id
+<span class="keyword">FROM</span> students
+<span class="keyword">RIGHT JOIN</span> enrollments <span class="keyword">ON</span> students.id = enrollments.student_id;</pre>
+                        </div>
+                    </div>
+
+                    <div class="tip">
+                        <strong>💡 Tip:</strong> INNER JOIN is the most commonly used join type. It only returns rows where there's a match in both tables.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aggregate Tab -->
+            <div id="aggregate" class="tab-content">
+                <div class="section">
+                    <h2>Aggregate Functions</h2>
+                    <p>Aggregate functions perform calculations on multiple rows and return a single result.</p>
+
+                    <h3>Common Aggregate Functions</h3>
+                    <div class="command-grid">
+                        <div class="command-card">
+                            <h4>COUNT()</h4>
+                            <p style="color: #4b5563;">Counts rows</p>
+                            <div class="query-box" style="font-size: 0.85em;">
+                                <pre><span class="keyword">SELECT COUNT</span>(*)
+<span class="keyword">FROM</span> students;</pre>
+                            </div>
+                        </div>
+                        <div class="command-card">
+                            <h4>SUM()</h4>
+                            <p style="color: #4b5563;">Adds values</p>
+                            <div class="query-box" style="font-size: 0.85em;">
+                                <pre><span class="keyword">SELECT SUM</span>(age)
+<span class="keyword">FROM</span> students;</pre>
+                            </div>
+                        </div>
+                        <div class="command-card">
+                            <h4>AVG()</h4>
+                            <p style="color: #4b5563;">Calculates average</p>
+                            <div class="query-box" style="font-size: 0.85em;">
+                                <pre><span class="keyword">SELECT AVG</span>(age)
+<span class="keyword">FROM</span> students;</pre>
+                            </div>
+                        </div>
+                        <div class="command-card">
+                            <h4>MAX() / MIN()</h4>
+                            <p style="color: #4b5563;">Finds highest/lowest</p>
+                            <div class="query-box" style="font-size: 0.85em;">
+                                <pre><span class="keyword">SELECT MAX</span>(age)
+<span class="keyword">FROM</span> students;</pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>GROUP BY</h3>
+                    <p>GROUP BY groups rows with the same values into summary rows.</p>
+                    <div class="query-box">
+                        <pre><span class="comment">-- Count students by major</span>
+<span class="keyword">SELECT</span> major, <span class="keyword">COUNT</span>(*) <span class="keyword">AS</span> student_count
+<span class="keyword">FROM</span> students
+<span class="keyword">GROUP BY</span> major;
+
+<span class="comment">-- Average age by grade</span>
+<span class="keyword">SELECT</span> grade, <span class="keyword">AVG</span>(age) <span class="keyword">AS</span> avg_age
+<span class="keyword">FROM</span> students
+<span class="keyword">GROUP BY</span> grade;</pre>
+                    </div>
+
+                    <h3>HAVING</h3>
+                    <p>HAVING filters groups (similar to WHERE, but for aggregated data).</p>
+                    <div class="query-box">
+                        <pre><span class="comment">-- Find majors with more than 1 student</span>
+<span class="keyword">SELECT</span> major, <span class="keyword">COUNT</span>(*) <span class="keyword">AS</span> count
+<span class="keyword">FROM</span> students
+<span class="keyword">GROUP BY</span> major
+<span class="keyword">HAVING COUNT</span>(*) &gt; 1;</pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practice Tab -->
+            <div id="practice" class="tab-content">
+                <div class="section">
+                    <h2>Interactive Query Builder</h2>
+                    <p>Build your own SQL queries and see the results!</p>
+
+                    <div class="interactive-builder">
+                        <div class="builder-section">
+                            <label>Select Columns:</label>
+                            <select id="columnsSelect" multiple style="height: 100px;">
+                                <option value="*">* (All Columns)</option>
+                                <option value="id">id</option>
+                                <option value="name">name</option>
+                                <option value="age">age</option>
+                                <option value="grade">grade</option>
+                                <option value="major">major</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-section">
+                            <label>Filter by Major (optional):</label>
+                            <select id="majorFilter">
+                                <option value="">All Majors</option>
+                                <option value="Computer Science">Computer Science</option>
+                                <option value="Mathematics">Mathematics</option>
+                                <option value="Physics">Physics</option>
+                                <option value="Biology">Biology</option>
+                            </select>
+                        </div>
+
+                        <div class="builder-section">
+                            <label>Filter by Grade (optional):</label>
+                            <select id="gradeFilter">
+                                <option value="">All Grades</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                            </select>
+                        </div>
+
+                        <button class="btn" onclick="buildQuery()">Generate Query</button>
+
+                        <div class="result-box" id="generatedQuery" style="display:none;">
+                            <h3 style="color: #374151; margin-bottom: 10px;">Generated SQL Query:</h3>
+                            <div class="query-box" id="queryOutput"></div>
+                        </div>
+
+                        <div class="result-box" id="queryResult" style="display:none;">
+                            <h3 style="color: #374151; margin-bottom: 10px;">Query Result:</h3>
+                            <div class="table-visual" id="resultTable"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const students = [
+            { id: 1, name: 'Alice Johnson', age: 20, grade: 'A', major: 'Computer Science' },
+            { id: 2, name: 'Bob Smith', age: 22, grade: 'B', major: 'Mathematics' },
+            { id: 3, name: 'Carol White', age: 21, grade: 'A', major: 'Physics' },
+            { id: 4, name: 'David Brown', age: 23, grade: 'C', major: 'Computer Science' },
+            { id: 5, name: 'Emma Davis', age: 20, grade: 'B', major: 'Biology' }
+        ];
+
+        function showTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function buildQuery() {
+            const columnsSelect = document.getElementById('columnsSelect');
+            const majorFilter = document.getElementById('majorFilter').value;
+            const gradeFilter = document.getElementById('gradeFilter').value;
+
+            // Get selected columns
+            const selectedOptions = Array.from(columnsSelect.selectedOptions);
+            let columns = selectedOptions.map(opt => opt.value).join(', ');
+            
+            if (columns === '' || selectedOptions.some(opt => opt.value === '*')) {
+                columns = '*';
+            }
+
+            // Build query
+            let query = `SELECT ${columns}\nFROM students`;
+            
+            const conditions = [];
+            if (majorFilter) {
+                conditions.push(`major = '${majorFilter}'`);
+            }
+            if (gradeFilter) {
+                conditions.push(`grade = '${gradeFilter}'`);
+            }
+
+            if (conditions.length > 0) {
+                query += `\nWHERE ` + conditions.join(' AND ');
+            }
+            query += ';';
+
+            // Display query
+            document.getElementById('queryOutput').innerHTML = 
+                `<pre><span class="keyword">SELECT</span> ${columns.replace(/\*/g, '<span class="keyword">*</span>')}\n` +
+                `<span class="keyword">FROM</span> students` +
+                (conditions.length > 0 ? `\n<span class="keyword">WHERE</span> ${conditions.join(' <span class="keyword">AND</span> ').replace(/'/g, '<span class="string">\'').replace(/Computer Science|Mathematics|Physics|Biology|A|B|C/g, match => match + '</span>')}` : '') +
+                `;</pre>`;
+            
+            document.getElementById('generatedQuery').style.display = 'block';
+
+            // Execute query (simulate)
+            executeQuery(columns, majorFilter, gradeFilter);
+        }
+
+        function executeQuery(columns, majorFilter, gradeFilter) {
+            let results = students.filter(student => {
+                if (majorFilter && student.major !== majorFilter) return false;
+                if (gradeFilter && student.grade !== gradeFilter) return false;
+                return true;
+            });
+
+            // Determine which columns to show
+            let columnsToShow = [];
+            if (columns === '*') {
+                columnsToShow = ['id', 'name', 'age', 'grade', 'major'];
+            } else {
+                columnsToShow = columns.split(',').map(c => c.trim());
+            }
+
+            // Build table
+            let tableHTML = '<table><thead><tr>';
+            columnsToShow.forEach(col => {
+                tableHTML += `<th>${col}</th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+
+            results.forEach(student => {
+                tableHTML += '<tr>';
+                columnsToShow.forEach(col => {
+                    tableHTML += `<td>${student[col]}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+
+            tableHTML += '</tbody></table>';
+
+            document.getElementById('resultTable').innerHTML = tableHTML;
+            document.getElementById('queryResult').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
