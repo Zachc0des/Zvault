@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Silicon — A Biography in Sand, Fire &amp; Circuitry</title>
+<style>
+  :root{
+    --graphite:#14181d;
+    --graphite-2:#1c2229;
+    --wafer:#aeb8c2;
+    --wafer-dim:#7c8894;
+    --oxide-blue:#3d7ea6;
+    --oxide-blue-bright:#6fb3d9;
+    --copper:#c17a4a;
+    --copper-bright:#e0955f;
+    --paper:#e9e6de;
+    --line:#333c45;
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+    --sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--graphite);
+    color:var(--paper);
+    font-family:var(--serif);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:0 28px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:120px 0 90px;
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+  }
+  .hero::before{
+    content:"";
+    position:absolute;
+    top:-40%;
+    right:-15%;
+    width:640px;height:640px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, var(--oxide-blue-bright), var(--oxide-blue) 45%, transparent 70%);
+    opacity:.18;
+    filter:blur(2px);
+  }
+  .hero .eyebrow{
+    font-family:var(--sans);
+    font-size:13px;
+    letter-spacing:.02em;
+    color:var(--wafer-dim);
+    margin:0 0 18px;
+  }
+  .hero h1{
+    font-size:clamp(42px, 7vw, 80px);
+    line-height:1.02;
+    margin:0 0 22px;
+    font-weight:400;
+    max-width:780px;
+    letter-spacing:-0.01em;
+  }
+  .hero h1 em{
+    font-style:italic;
+    color:var(--oxide-blue-bright);
+  }
+  .hero p.lede{
+    font-family:var(--sans);
+    max-width:560px;
+    font-size:17px;
+    color:#c7cdd3;
+    margin:0;
+  }
+  .element-card{
+    position:absolute;
+    top:110px;
+    right:28px;
+    width:132px;
+    height:132px;
+    border:1px solid var(--wafer-dim);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:14px;
+    font-family:var(--sans);
+    background:rgba(20,24,29,.55);
+    backdrop-filter:blur(2px);
+  }
+  .element-card .num{font-size:13px;color:var(--wafer-dim);}
+  .element-card .sym{font-size:44px;line-height:1;}
+  .element-card .mass{font-size:12px;color:var(--wafer-dim);}
+  @media (max-width:700px){ .element-card{position:static;margin-top:32px;width:110px;height:110px;} }
+
+  /* ---------- SECTION HEADS ---------- */
+  section{padding:80px 0;border-bottom:1px solid var(--line);}
+  section:last-of-type{border-bottom:none;}
+  h2.section-title{
+    font-family:var(--sans);
+    font-size:15px;
+    color:var(--oxide-blue-bright);
+    margin:0 0 8px;
+    font-weight:700;
+  }
+  h2.section-title .n{color:var(--wafer-dim); font-weight:400; margin-right:8px;}
+  h3.section-sub{
+    font-size:clamp(26px,4vw,36px);
+    font-weight:400;
+    margin:0 0 28px;
+    max-width:640px;
+  }
+  p.section-intro{
+    font-family:var(--sans);
+    color:#c7cdd3;
+    max-width:620px;
+    font-size:16px;
+    margin:0 0 40px;
+  }
+
+  /* ---------- INDEX NAV ---------- */
+  nav.index{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    margin-top:50px;
+  }
+  nav.index a{
+    display:block;
+    background:var(--graphite);
+    color:var(--paper);
+    text-decoration:none;
+    padding:20px 18px;
+    font-family:var(--sans);
+    font-size:14px;
+  }
+  nav.index a .idx{color:var(--copper-bright); display:block; font-size:12px; margin-bottom:6px;}
+  nav.index a:hover{background:var(--graphite-2);}
+
+  /* ---------- TIMELINE ---------- */
+  .timeline{position:relative; margin-top:10px;}
+  .timeline::before{
+    content:"";
+    position:absolute;
+    left:70px;
+    top:8px;
+    bottom:8px;
+    width:1px;
+    background:var(--line);
+  }
+  .tl-item{
+    position:relative;
+    display:grid;
+    grid-template-columns:70px 1fr;
+    gap:28px;
+    padding:26px 0;
+  }
+  .tl-item:not(:last-child){border-bottom:1px dashed var(--line);}
+  .tl-year{
+    font-family:var(--sans);
+    font-size:14px;
+    color:var(--wafer-dim);
+    padding-top:2px;
+    text-align:right;
+  }
+  .tl-dot{
+    position:absolute;
+    left:65px;
+    top:32px;
+    width:11px;height:11px;
+    border-radius:50%;
+    background:var(--graphite);
+    border:2px solid var(--oxide-blue-bright);
+  }
+  .tl-item.milestone .tl-dot{background:var(--copper-bright); border-color:var(--copper-bright);}
+  .tl-body h4{
+    font-family:var(--sans);
+    font-size:17px;
+    font-weight:700;
+    margin:0 0 6px;
+    color:var(--paper);
+  }
+  .tl-body p{margin:0; color:#c2c9d0; font-size:15.5px;}
+  .tl-loc{
+    font-family:var(--sans);
+    font-size:12px;
+    color:var(--oxide-blue-bright);
+    margin-top:8px;
+    display:inline-block;
+  }
+
+  /* ---------- PROCESS ---------- */
+  .process{
+    display:flex;
+    flex-direction:column;
+    counter-reset:step;
+  }
+  .step{
+    display:grid;
+    grid-template-columns:64px 1fr;
+    gap:24px;
+    padding:24px 0;
+    border-top:1px solid var(--line);
+    align-items:start;
+  }
+  .step:last-child{border-bottom:1px solid var(--line);}
+  .step .step-num{
+    counter-increment:step;
+    font-family:var(--sans);
+    font-size:26px;
+    color:var(--wafer-dim);
+  }
+  .step .step-num::before{content: counter(step, decimal-leading-zero);}
+  .step h4{font-family:var(--sans); font-size:17px; margin:0 0 8px; color:var(--paper);}
+  .step p{margin:0; color:#c2c9d0; font-size:15.5px; max-width:560px;}
+  .step .purity{
+    font-family:var(--sans);
+    font-size:12.5px;
+    color:var(--copper-bright);
+    margin-top:8px;
+    display:inline-block;
+  }
+
+  /* ---------- GEOGRAPHY ---------- */
+  .geo-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  .geo-cell{
+    background:var(--graphite);
+    padding:26px 22px;
+  }
+  .geo-cell .stage{
+    font-family:var(--sans);
+    font-size:11.5px;
+    color:var(--wafer-dim);
+    margin-bottom:10px;
+  }
+  .geo-cell h4{
+    font-family:var(--sans);
+    font-size:18px;
+    margin:0 0 12px;
+    color:var(--oxide-blue-bright);
+  }
+  .geo-cell ul{
+    margin:0; padding:0; list-style:none;
+  }
+  .geo-cell li{
+    font-family:var(--sans);
+    font-size:14.5px;
+    color:#c2c9d0;
+    padding:6px 0;
+    border-top:1px solid var(--line);
+  }
+  .geo-cell li:first-child{border-top:none;}
+  .geo-cell li .share{color:var(--copper-bright); float:right;}
+
+  /* ---------- CULTURE / BIOGRAPHY ---------- */
+  .culture-list{display:flex; flex-direction:column; gap:36px;}
+  .culture-item{display:grid; grid-template-columns:1fr; gap:8px; max-width:680px;}
+  .culture-item h4{
+    font-family:var(--sans);
+    font-size:19px;
+    margin:0;
+    color:var(--paper);
+  }
+  .culture-item p{margin:0; color:#c2c9d0; font-size:15.5px;}
+  .culture-item .tag{
+    font-family:var(--sans);
+    font-size:12px;
+    color:var(--wafer-dim);
+  }
+
+  footer{
+    padding:50px 0 80px;
+    font-family:var(--sans);
+    color:var(--wafer-dim);
+    font-size:13px;
+  }
+  footer a{color:var(--oxide-blue-bright);}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">An element's biography</p>
+    <h1>Silicon: forged in stars,<br>refined by <em>hand and machine</em></h1>
+    <p class="lede">From beach sand to the transistor that reads this sentence — the geologic, industrial, and cultural life of the element that built the modern world.</p>
+  </div>
+  <div class="element-card">
+    <span class="num">14</span>
+    <span class="sym">Si</span>
+    <span class="mass">28.085 u</span>
+  </div>
+</header>
+
+<section id="index">
+  <div class="wrap">
+    <h2 class="section-title"><span class="n">00</span>Index</h2>
+    <h3 class="section-sub">Four ways to read this element</h3>
+    <p class="section-intro">Silicon's story is geological, industrial, geopolitical, and cultural all at once. Jump to any thread.</p>
+    <nav class="index">
+      <a href="#timeline"><span class="idx">01</span>Timeline — 1824 to today</a>
+      <a href="#process"><span class="idx">02</span>Sand to circuit — the process</a>
+      <a href="#geography"><span class="idx">03</span>Where it's made — world map</a>
+      <a href="#culture"><span class="idx">04</span>Adoption &amp; culture</a>
+    </nav>
+  </div>
+</section>
+
+<section id="timeline">
+  <div class="wrap">
+    <h2 class="section-title"><span class="n">01</span>Development timeline</h2>
+    <h3 class="section-sub">Two centuries, one element</h3>
+    <p class="section-intro">Silicon was isolated as a curiosity of 19th-century chemistry. It took over a century of parallel work in metallurgy, radio engineering, and materials science before it became the substrate of computing.</p>
+
+    <div class="timeline">
+      <div class="tl-item milestone">
+        <div class="tl-year">1824</div>
+        <div class="tl-dot"></div>
+        <div class="tl-body">
+          <h4>First isolation</h4>
+          <p>Jöns Jacob Berzelius purifies silicon from potassium fluorosilicate, identifying it as a distinct element.</p>
+          <span class="tl-loc">Stockholm, Sweden</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-year">1906</div>
+        <div class="tl-dot"></div>
+        <div class="tl-body">
+          <h4>The "cat's whisker" detector</h4>
+          <p>Greenleaf Whittier Pickard patents a silicon crystal radio detector — silicon's first job as a semiconductor, decades before the word existed.</p>
+          <span class="tl-loc">Massachusetts, USA</span>
+        </div>
+      </div>
+
+      <div class="tl-item milestone">
+        <div class="tl-year">1947</div>
+        <div class="tl-dot"></div>
+        <div class="tl-body">
+          <h4>The transistor — but germanium first</h4>
+          <p>Bardeen, Brattain, and Shockley build the first working transistor at Bell Labs. It uses germanium, silicon's chemical cousin; silicon was still too hard to purify.</p>
+          <span class="tl-loc">New Jersey, USA</span>
+        </div>
+      </div>
+
+      <div class="tl-item milestone">
+        <div class="tl-year">1954</div>
+        <div class="tl-dot"></div>
+        <div class="tl-body">
+          <h4>The first silicon transistor</h4>
+          <p>Gordon Teal at Texas Instruments grows single-crystal silicon and builds the first practical silicon transistor, prizing its heat tolerance over germanium.</p>
+          <span class="tl-loc">Texas, USA</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-year">1955–56</div>
+        <div class="tl-dot"></div>
+        <div class="tl-body">
+          <h4>Crystal growing goes industrial</h4>
+          <p>The Czochralski method — originally developed for metals in Poland in 1916 — is adapted to pull large, defect-free silicon crystals into cylindrical ingots.</p>
+          <span class="tl-loc">Adapted in the USA, method rooted in Poland</span>
+        </div>
+      </div>
+
+      <div class="tl-item milestone">
+        <div class="tl-year">1958–59</div>
+        <div class="tl-dot"></div>
+        <div class="tl-body">
+          <h4>The integrated circuit</h4>
+          <p>Jack Kilby (Texas Instruments) demonstrates the first integrated circuit; Robert Noyce (Fairchild) independently files a practical silicon-based design months later.</p>
+          <span class="tl-loc">Texas &amp; California, USA</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-year">1968</div>
+        <div class="tl-dot"></div>
+        <div class="tl-body">
+          <h4>Intel is founded</h4>
+          <p>Noyce and Gordon Moore leave Fairchild to found Intel in Santa Clara, anchoring what will become Silicon Valley's semiconductor core.</p>
+          <span class="tl-loc">Santa Clara, California, USA</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-year">1971</div>
+        <div class="tl-dot"></div>
+        <div class="tl-body">
+          <h4>First commercial microprocessor</h4>
+          <p>The Intel 4004 packs an entire CPU onto one silicon chip, built with roughly 10-micron process technology.</p>
+          <span class="tl-loc">California, USA</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-year">1980s</div>
+        <div class="tl-dot"></div>
+        <div class="tl-body">
+          <h4>Japan's memory era</h4>
+          <p>NEC, Toshiba, and Hitachi come to dominate global DRAM production, briefly overtaking US manufacturers on yield and cost.</p>
+          <span class="tl-loc">Japan</span>
+        </div>
+      </div>
+
+      <div class="tl-item milestone">
+        <div class="tl-year">1987</div>
+        <div class="tl-dot"></div>
+        <div class="tl-body">
+          <h4>The foundry model is born</h4>
+          <p>Morris Chang founds TSMC on a new idea: a fab that only manufactures chips designed by others. It reshapes the entire industry's geography.</p>
+          <span class="tl-loc">Hsinchu, Taiwan</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-year">1990s–2000s</div>
+        <div class="tl-dot"></div>
+        <div class="tl-body">
+          <h4>Korea scales memory</h4>
+          <p>Samsung and SK Hynix invest heavily to lead global DRAM and NAND flash production.</p>
+          <span class="tl-loc">South Korea</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-year">2010s</div>
+        <div class="tl-dot"></div>
+        <div class="tl-body">
+          <h4>Extreme ultraviolet lithography</h4>
+          <p>ASML commercializes EUV machines, the only tools in the world capable of patterning the smallest modern transistor features.</p>
+          <span class="tl-loc">Veldhoven, Netherlands</span>
+        </div>
+      </div>
+
+      <div class="tl-item milestone">
+        <div class="tl-year">2020s</div>
+        <div class="tl-dot"></div>
+        <div class="tl-body">
+          <h4>Silicon as strategic asset</h4>
+          <p>Export controls, the US CHIPS Act, and EU/Japan/India subsidy programs turn silicon manufacturing into a matter of national policy, as fabs push past 3-nanometer nodes.</p>
+          <span class="tl-loc">Global — USA, Taiwan, EU, Japan, India</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="process">
+  <div class="wrap">
+    <h2 class="section-title"><span class="n">02</span>The creation process</h2>
+    <h3 class="section-sub">From beach to chip: nine orders of purity</h3>
+    <p class="section-intro">Ordinary sand is roughly 99% silica. A processor chip needs silicon purified to 99.9999999% — "nine nines" — then grown into a flawless single crystal before it can hold a transistor.</p>
+
+    <div class="process">
+      <div class="step">
+        <div class="step-num"></div>
+        <div>
+          <h4>Quartz mining</h4>
+          <p>High-purity quartzite and silica sand are quarried — not ordinary beach sand, but specific deposits low in metal impurities.</p>
+          <span class="purity">~99% SiO₂</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div>
+          <h4>Carbothermic reduction</h4>
+          <p>Quartz is smelted with carbon in an electric arc furnace at around 2,000°C, yielding metallurgical-grade silicon.</p>
+          <span class="purity">~98–99% pure</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div>
+          <h4>Siemens purification</h4>
+          <p>Silicon is converted to trichlorosilane gas, distilled, and deposited back onto a heated rod, stripping out nearly all remaining impurities.</p>
+          <span class="purity">"Electronic grade" — 9N to 11N pure</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div>
+          <h4>Czochralski crystal growth</h4>
+          <p>A seed crystal is dipped into molten silicon and slowly withdrawn while rotating, pulling up a single flawless cylindrical ingot several feet long.</p>
+          <span class="purity">Single-crystal boule</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div>
+          <h4>Wafer slicing &amp; polishing</h4>
+          <p>A diamond wire saw slices the ingot into wafers thinner than a human hair, which are then lapped and polished to a mirror finish.</p>
+          <span class="purity">300mm standard wafers</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div>
+          <h4>Photolithography &amp; doping</h4>
+          <p>Layer by layer, UV or EUV light etches circuit patterns while ion implantation introduces boron or phosphorus to create transistor junctions.</p>
+          <span class="purity">Features as small as 2–3nm</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <div>
+          <h4>Dicing, bonding &amp; packaging</h4>
+          <p>The finished wafer is cut into individual dies, wired to a package with gold or copper leads, and sealed for the outside world.</p>
+          <span class="purity">Ready-to-ship chip</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="geography">
+  <div class="wrap">
+    <h2 class="section-title"><span class="n">03</span>Geography of production</h2>
+    <h3 class="section-sub">No single country makes a chip alone</h3>
+    <p class="section-intro">Each stage of silicon's life happens in a different place, making the modern chip one of the most geographically distributed objects ever manufactured.</p>
+
+    <div class="geo-grid">
+      <div class="geo-cell">
+        <div class="stage">Raw quartz &amp; polysilicon</div>
+        <h4>Mining &amp; refining</h4>
+        <ul>
+          <li>China <span class="share">largest polysilicon output</span></li>
+          <li>USA — Hemlock, Michigan</li>
+          <li>Germany — Wacker Chemie</li>
+          <li>Norway &amp; Brazil — quartz deposits</li>
+        </ul>
+      </div>
+      <div class="geo-cell">
+        <div class="stage">Ingots &amp; wafers</div>
+        <h4>Crystal growth</h4>
+        <ul>
+          <li>Japan <span class="share">~50% of world wafers</span></li>
+          <li>Shin-Etsu &amp; SUMCO, Japan</li>
+          <li>Taiwan — GlobalWafers</li>
+          <li>South Korea — SK Siltron</li>
+        </ul>
+      </div>
+      <div class="geo-cell">
+        <div class="stage">Lithography equipment</div>
+        <h4>Toolmaking</h4>
+        <ul>
+          <li>Netherlands — ASML (sole EUV maker)</li>
+          <li>Japan — Nikon, Canon</li>
+          <li>USA — Applied Materials, Lam Research</li>
+        </ul>
+      </div>
+      <div class="geo-cell">
+        <div class="stage">Fabrication (the fab)</div>
+        <h4>Chipmaking</h4>
+        <ul>
+          <li>Taiwan — TSMC, leading-edge nodes</li>
+          <li>South Korea — Samsung Foundry</li>
+          <li>USA — Intel, GlobalFoundries</li>
+          <li>China — SMIC</li>
+        </ul>
+      </div>
+      <div class="geo-cell">
+        <div class="stage">Assembly, test &amp; packaging</div>
+        <h4>Finishing</h4>
+        <ul>
+          <li>China — largest packaging base</li>
+          <li>Malaysia &amp; Vietnam — growing hubs</li>
+          <li>Philippines — long-standing assembly hub</li>
+        </ul>
+      </div>
+      <div class="geo-cell">
+        <div class="stage">Design</div>
+        <h4>Architecture &amp; IP</h4>
+        <ul>
+          <li>USA — Nvidia, AMD, Apple, Qualcomm</li>
+          <li>UK — Arm, Cambridge</li>
+          <li>Taiwan &amp; South Korea — integrated design-fab firms</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="culture">
+  <div class="wrap">
+    <h2 class="section-title"><span class="n">04</span>Adoption &amp; culture</h2>
+    <h3 class="section-sub">How an element became a place, an era, a value chain</h3>
+    <p class="section-intro">Silicon's biography isn't just technical — it reshaped language, geography, and geopolitics in its own image.</p>
+
+    <div class="culture-list">
+      <div class="culture-item">
+        <span class="tag">Naming a place</span>
+        <h4>"Silicon Valley," 1971</h4>
+        <p>Journalist Don Hoefler coined the term for California's Santa Clara Valley in a trade paper, naming a region after the material its companies manufactured — a naming convention later exported worldwide.</p>
+      </div>
+      <div class="culture-item">
+        <span class="tag">Exported branding</span>
+        <h4>A template repeated globally</h4>
+        <p>The "Silicon ___" formula spread far beyond California: Silicon Fen (Cambridge, UK), Silicon Wadi (Israel), Silicon Saxony (Dresden, Germany), and Silicon Glen (Scotland) each borrowed the name to signal a tech cluster, even where little silicon was physically made.</p>
+      </div>
+      <div class="culture-item">
+        <span class="tag">Consumer adoption</span>
+        <h4>From lab curiosity to household object</h4>
+        <p>Between the 1970s pocket calculator and the 2007 smartphone, silicon chips moved from specialist labs into nearly every home appliance, car, and pocket on Earth, compressing decades of adoption curves that once took a generation.</p>
+      </div>
+      <div class="culture-item">
+        <span class="tag">Geopolitical shift</span>
+        <h4>The chip as a strategic resource</h4>
+        <p>By the 2020s, silicon supply chains were treated with the seriousness once reserved for oil — export restrictions, national subsidy packages, and "friend-shoring" strategies now shape where fabs are built.</p>
+      </div>
+      <div class="culture-item">
+        <span class="tag">Cultural residue</span>
+        <h4>A material that became a metaphor</h4>
+        <p>"Silicon" now stands in for computing itself, much as "steel" once stood for industrial might — shorthand used in film, fiction, and political speech long after most people have never seen a wafer.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    Compiled as a visual reference. Dates and locations reflect widely documented industry history; company market shares shift year to year.
+  </div>
+</footer>
+
+</body>
+</html>
