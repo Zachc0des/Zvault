@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A field guide to artificial intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E8E1CE;
+    --paper-2:#DDD4BC;
+    --ink:#24211B;
+    --ink-soft:#57534A;
+    --rust:#A8472D;
+    --rust-deep:#7A3220;
+    --teal:#35635A;
+    --teal-deep:#254440;
+    --mustard:#C1932E;
+    --line:#B9AF95;
+    --card:#F1ECDD;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:64px 24px 96px;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    margin:0;
+    color:var(--ink);
+  }
+  .kicker{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-weight:400;
+    font-size:15px;
+    color:var(--rust-deep);
+    margin:0 0 10px;
+  }
+  .hero h1{
+    font-size:44px;
+    line-height:1.12;
+    letter-spacing:-0.01em;
+  }
+  .hero p.sub{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:520px;
+    margin:18px 0 0;
+  }
+
+  /* ---- nested diagram ---- */
+  .diagram{
+    margin:52px 0 8px;
+    display:flex;
+    justify-content:center;
+  }
+  .diagram svg{ width:100%; max-width:640px; height:auto; }
+  .diagram-caption{
+    text-align:center;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-style:italic;
+    font-family:'Fraunces', serif;
+    margin:6px 0 0;
+  }
+
+  .intro{
+    margin:56px 0 8px;
+    font-size:17px;
+    max-width:640px;
+  }
+  .intro p{ margin:0 0 14px; }
+
+  hr.rule{
+    border:none;
+    border-top:1px solid var(--line);
+    margin:56px 0;
+  }
+
+  /* ---- specimen cards ---- */
+  .specimen{
+    position:relative;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:36px 36px 32px;
+    margin:0 0 40px;
+  }
+  .specimen.unconfirmed{
+    background:transparent;
+    border-style:dashed;
+    border-color:var(--ink-soft);
+  }
+  .specimen-tag{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin:0 0 6px;
+  }
+  .specimen-head{
+    display:flex;
+    align-items:flex-start;
+    gap:20px;
+    margin-bottom:18px;
+  }
+  .specimen-icon{
+    flex:0 0 auto;
+    width:64px;
+    height:64px;
+  }
+  .specimen-icon svg{ width:100%; height:100%; }
+  .specimen h2{
+    font-size:26px;
+    margin:2px 0 0;
+  }
+  .specimen .also{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin:4px 0 0;
+  }
+  .specimen .field-block{
+    margin-top:20px;
+  }
+  .field-label{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:14px;
+    color:var(--teal-deep);
+    margin:0 0 6px;
+  }
+  .field-label.rust{ color:var(--rust-deep); }
+  .field-block p{ margin:0; font-size:15.5px; }
+  .field-block + .field-block{ margin-top:18px; }
+
+  .unconfirmed .field-label{ color:var(--ink-soft); }
+
+  /* ---- trail map ---- */
+  .trailmap h2{ font-size:28px; margin-bottom:6px; }
+  .trailmap .kicker{ margin-bottom:6px; }
+  .steps{
+    margin-top:28px;
+    border-left:1px solid var(--line);
+    padding-left:28px;
+  }
+  .step{
+    position:relative;
+    padding-bottom:32px;
+  }
+  .step:last-child{ padding-bottom:0; }
+  .step::before{
+    content:attr(data-n);
+    position:absolute;
+    left:-40px;
+    top:0;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    background:var(--paper);
+    border:1px solid var(--rust);
+    color:var(--rust-deep);
+    font-family:'Fraunces', serif;
+    font-size:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .step h3{
+    font-size:18px;
+    margin-bottom:6px;
+  }
+  .step p{
+    margin:0;
+    font-size:15px;
+    color:var(--ink-soft);
+  }
+
+  footer{
+    margin-top:64px;
+    padding-top:24px;
+    border-top:1px solid var(--line);
+    font-size:14px;
+    color:var(--ink-soft);
+    font-style:italic;
+    font-family:'Fraunces', serif;
+  }
+
+  @media (max-width:560px){
+    .wrap{ padding:44px 18px 72px; }
+    .hero h1{ font-size:32px; }
+    .specimen{ padding:26px 22px 24px; }
+    .specimen-head{ gap:14px; }
+    .specimen-icon{ width:48px; height:48px; }
+    .steps{ padding-left:22px; }
+    .step::before{ left:-34px; width:20px; height:20px; font-size:11px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <section class="hero">
+    <p class="kicker">a beginner's field guide</p>
+    <h1>A field guide to artificial intelligence</h1>
+    <p class="sub">Five things people mean when they say "AI," in the order you'll usually meet them — what each one actually is, where you've already run into it, and one small thing you can go do today to see it for yourself.</p>
+  </section>
+
+  <div class="diagram">
+    <svg viewBox="0 0 640 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="diagTitle diagDesc">
+      <title id="diagTitle">Nested diagram of AI concepts</title>
+      <desc id="diagDesc">Artificial intelligence contains machine learning, which contains deep learning, which contains large language models at its core. AI agents sit just outside the core, built from LLMs plus the ability to take action. AGI floats apart, unconnected and drawn with a dashed outline, marked as not yet achieved.</desc>
+
+      <circle cx="270" cy="230" r="190" fill="none" stroke="var(--ink)" stroke-width="1" opacity="0.35"/>
+      <circle cx="270" cy="230" r="142" fill="none" stroke="var(--ink)" stroke-width="1" opacity="0.45"/>
+      <circle cx="270" cy="230" r="96"  fill="none" stroke="var(--ink)" stroke-width="1" opacity="0.6"/>
+      <circle cx="270" cy="230" r="52"  fill="var(--rust)" opacity="0.16" stroke="var(--rust)" stroke-width="1.2"/>
+
+      <text x="270" y="60" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="14" fill="var(--ink-soft)">artificial intelligence</text>
+      <text x="270" y="104" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="13.5" fill="var(--ink-soft)">machine learning</text>
+      <text x="270" y="146" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="13" fill="var(--ink-soft)">deep learning</text>
+      <text x="270" y="228" text-anchor="middle" font-family="Fraunces, serif" font-weight="500" font-size="14" fill="var(--rust-deep)">large</text>
+      <text x="270" y="246" text-anchor="middle" font-family="Fraunces, serif" font-weight="500" font-size="14" fill="var(--rust-deep)">language</text>
+      <text x="270" y="264" text-anchor="middle" font-family="Fraunces, serif" font-weight="500" font-size="14" fill="var(--rust-deep)">models</text>
+
+      <line x1="318" y1="215" x2="470" y2="150" stroke="var(--teal)" stroke-width="1" stroke-dasharray="3 4"/>
+      <circle cx="470" cy="150" r="34" fill="none" stroke="var(--teal)" stroke-width="1.2"/>
+      <text x="470" y="146" text-anchor="middle" font-family="Fraunces, serif" font-weight="500" font-size="13" fill="var(--teal-deep)">agents</text>
+      <text x="470" y="162" text-anchor="middle" font-family="Work Sans, sans-serif" font-size="10.5" fill="var(--teal-deep)">LLM + actions</text>
+
+      <circle cx="500" cy="360" r="46" fill="none" stroke="var(--ink-soft)" stroke-width="1" stroke-dasharray="4 5" opacity="0.75"/>
+      <text x="500" y="356" text-anchor="middle" font-family="Fraunces, serif" font-style="italic" font-size="13" fill="var(--ink-soft)">AGI</text>
+      <text x="500" y="372" text-anchor="middle" font-family="Work Sans, sans-serif" font-size="10" fill="var(--ink-soft)">not yet sighted</text>
+    </svg>
+  </div>
+  <p class="diagram-caption">each ring sits inside the one before it — an LLM is a kind of deep learning, which is a kind of machine learning, which is a kind of AI. agents and AGI are drawn separately because they aren't just narrower categories.</p>
+
+  <div class="intro">
+    <p>Think of this less like a technical manual and more like a naturalist's notebook. Every entry below follows the same three questions: what is this thing, plainly, without jargon? Where have you likely already crossed paths with it? And what's the smallest possible thing you could go do, right now, with no prior experience, to actually see it in action rather than just read about it?</p>
+  </div>
+
+  <hr class="rule">
+
+  <!-- 1 ML -->
+  <article class="specimen">
+    <p class="specimen-tag">specimen no. 1 · the broadest one</p>
+    <div class="specimen-head">
+      <div class="specimen-icon">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 20 L50 20 L38 46 L62 46 L30 82" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="66" cy="24" r="4" fill="var(--rust)"/>
+          <circle cx="78" cy="40" r="4" fill="var(--rust)"/>
+          <circle cx="70" cy="58" r="4" fill="var(--teal)"/>
+          <circle cx="82" cy="72" r="4" fill="var(--teal)"/>
+        </svg>
+      </div>
+      <div>
+        <h2>Machine learning</h2>
+        <p class="also">the parent category everything else here belongs to</p>
+      </div>
+    </div>
+    <div class="field-block">
+      <p class="field-label">what it is</p>
+      <p>Software that gets better at a task by studying examples, instead of being handed a list of rules by a programmer. Rather than writing "if the email contains the phrase 'act now', mark it spam," you show the software thousands of real spam and real non-spam emails, and it works out the pattern on its own.</p>
+    </div>
+    <div class="field-block">
+      <p class="field-label rust">spotted in the wild</p>
+      <p>The spam filter quietly cleaning your inbox. Netflix or Spotify guessing what you'll want next, based on what you and people like you watched or played before. Your bank flagging a card charge made on the other side of the world.</p>
+    </div>
+    <div class="field-block">
+      <p class="field-label">try this today</p>
+      <p>Open Google's <strong>Teachable Machine</strong> in a browser (free, no account needed). Show it your webcam holding two different objects — a mug, then a book — and watch it learn to tell them apart in real time. That ten-minute exercise is machine learning end to end.</p>
+    </div>
+  </article>
+
+  <!-- 2 DL -->
+  <article class="specimen">
+    <p class="specimen-tag">specimen no. 2 · found inside specimen no. 1</p>
+    <div class="specimen-head">
+      <div class="specimen-icon">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <g fill="none" stroke="var(--ink)" stroke-width="2">
+            <circle cx="18" cy="28" r="5"/><circle cx="18" cy="50" r="5"/><circle cx="18" cy="72" r="5"/>
+            <circle cx="50" cy="18" r="5"/><circle cx="50" cy="40" r="5"/><circle cx="50" cy="62" r="5"/><circle cx="50" cy="84" r="5"/>
+            <circle cx="82" cy="35" r="5" stroke="var(--rust)"/><circle cx="82" cy="65" r="5" stroke="var(--rust)"/>
+          </g>
+          <g stroke="var(--ink)" stroke-width="0.8" opacity="0.5">
+            <line x1="23" y1="28" x2="45" y2="18"/><line x1="23" y1="28" x2="45" y2="40"/>
+            <line x1="23" y1="50" x2="45" y2="40"/><line x1="23" y1="50" x2="45" y2="62"/>
+            <line x1="23" y1="72" x2="45" y2="62"/><line x1="23" y1="72" x2="45" y2="84"/>
+            <line x1="55" y1="18" x2="77" y2="35"/><line x1="55" y1="40" x2="77" y2="35"/>
+            <line x1="55" y1="62" x2="77" y2="65"/><line x1="55" y1="84" x2="77" y2="65"/>
+          </g>
+        </svg>
+      </div>
+      <div>
+        <h2>Deep learning</h2>
+        <p class="also">a specific way of doing machine learning</p>
+      </div>
+    </div>
+    <div class="field-block">
+      <p class="field-label">what it is</p>
+      <p>A style of machine learning built from stacked layers loosely inspired by neurons in a brain. Each layer notices slightly more complicated patterns than the layer before it — the first layer might notice edges and colors, the next shapes, the next whole objects like "a face" or "a stop sign."</p>
+    </div>
+    <div class="field-block">
+      <p class="field-label rust">spotted in the wild</p>
+      <p>The face unlock on your phone. A self-driving car's cameras picking out pedestrians and lane markings. Siri or Google Assistant turning your voice into words on a screen.</p>
+    </div>
+    <div class="field-block">
+      <p class="field-label">try this today</p>
+      <p>Open your phone's photo app and search "dog" or "beach," even for photos you never tagged. That search works because a deep learning model already looked at every picture and recognized what's in it. Try a tricky photo — a friend's dog wearing a costume — and notice where it gets confused; the mistakes are as informative as the hits.</p>
+    </div>
+  </article>
+
+  <!-- 3 LLM -->
+  <article class="specimen">
+    <p class="specimen-tag">specimen no. 3 · the innermost ring</p>
+    <div class="specimen-head">
+      <div class="specimen-icon">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 20 h55 a8 8 0 0 1 8 8 v28 a8 8 0 0 1 -8 8 h-35 l-14 16 v-16 h-6 a8 8 0 0 1 -8 -8 v-28 a8 8 0 0 1 8 -8 z" fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linejoin="round"/>
+          <line x1="25" y1="38" x2="66" y2="38" stroke="var(--rust)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="25" y1="48" x2="58" y2="48" stroke="var(--rust)" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="25" y1="58" x2="50" y2="58" stroke="var(--rust)" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <h2>Large language models</h2>
+        <p class="also">a deep learning model trained on text</p>
+      </div>
+    </div>
+    <div class="field-block">
+      <p class="field-label">what it is</p>
+      <p>A deep learning model trained on an enormous pile of text, whose whole job is predicting a plausible next word (or word-fragment). That sounds trivial, but string enough good next-word guesses together and you get something that can hold a conversation, answer questions, translate, and write.</p>
+    </div>
+    <div class="field-block">
+      <p class="field-label rust">spotted in the wild</p>
+      <p>Claude and ChatGPT. The autocomplete that finishes your sentences in Gmail. The newer, noticeably more fluent translations from Google Translate or DeepL compared to a decade ago.</p>
+    </div>
+    <div class="field-block">
+      <p class="field-label">try this today</p>
+      <p>Open a chat with an LLM — this one included — and ask it to explain something you already understand well. Then check where it's wrong. LLMs sound equally confident whether they're right or not, and finding a "confidently wrong" moment is the fastest way to build real intuition for how they work.</p>
+    </div>
+  </article>
+
+  <!-- 4 Agents -->
+  <article class="specimen">
+    <p class="specimen-tag">specimen no. 4 · built on top of no. 3</p>
+    <div class="specimen-head">
+      <div class="specimen-icon">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="82" r="5" fill="var(--teal)"/>
+          <circle cx="38" cy="66" r="5" fill="var(--teal)"/>
+          <circle cx="60" cy="52" r="5" fill="var(--teal)"/>
+          <circle cx="84" cy="30" r="5" fill="var(--rust)"/>
+          <path d="M18 82 Q28 74 38 66 Q49 59 60 52 Q72 41 84 30" fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="1 6" stroke-linecap="round"/>
+          <path d="M74 24 L84 30 L74 36" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div>
+        <h2>AI agents (agentic AI)</h2>
+        <p class="also">an LLM given a goal, tools, and repeated turns</p>
+      </div>
+    </div>
+    <div class="field-block">
+      <p class="field-label">what it is</p>
+      <p>An LLM that's been given tools and permission to take more than one step on its own — searching, running code, checking results, adjusting — instead of just producing a single chat reply. The "agentic" part is that loop: plan, act, look at what actually happened, correct course, repeat until the goal is met.</p>
+    </div>
+    <div class="field-block">
+      <p class="field-label rust">spotted in the wild</p>
+      <p>A coding assistant that reads your project, writes a fix, runs the tests, and rewrites the fix if the tests fail. A travel-planning agent that checks prices across sites and assembles a full itinerary. A customer service bot that doesn't just answer your question but actually processes the refund.</p>
+    </div>
+    <div class="field-block">
+      <p class="field-label">try this today</p>
+      <p>Give an AI assistant with tool access a task with a checkable, multi-step outcome — "find three flights to Chicago next weekend under $300 and summarize them" — rather than a single question. Pay attention to the work happening between your request and the final answer; that in-between work is the agentic part.</p>
+    </div>
+  </article>
+
+  <!-- 5 AGI -->
+  <article class="specimen unconfirmed">
+    <p class="specimen-tag">specimen no. 5 · unconfirmed sighting</p>
+    <div class="specimen-head">
+      <div class="specimen-icon">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="34" fill="none" stroke="var(--ink-soft)" stroke-width="2" stroke-dasharray="4 5"/>
+          <text x="50" y="62" text-anchor="middle" font-family="Fraunces, serif" font-size="34" fill="var(--ink-soft)">?</text>
+        </svg>
+      </div>
+      <div>
+        <h2>AGI</h2>
+        <p class="also">artificial general intelligence — a target, not a product</p>
+      </div>
+    </div>
+    <div class="field-block">
+      <p class="field-label">what it is</p>
+      <p>A hypothetical AI that could learn and reason across any domain at least as well as a person can — the way one human can learn to cook, do their taxes, and play chess without being separately "trained" for each. Every specimen above this one is narrow: good at what it was built for, unreliable outside it. AGI doesn't exist yet. It's a target researchers are working toward, not something you can currently open an app and try.</p>
+    </div>
+    <div class="field-block">
+      <p class="field-label rust">spotted in the wild</p>
+      <p>Nowhere confirmed. The closest cultural reference points are fiction — HAL 9000, Data from Star Trek — rather than any deployed system. This is the one entry in the guide that no one has actually caught.</p>
+    </div>
+    <div class="field-block">
+      <p class="field-label">try this today</p>
+      <p>Stay skeptical of anything marketed as "AGI" right now. A useful habit instead: notice where today's AI actually breaks — ask an LLM to track a long chess game move by move, or to do reliable multi-digit long division — and you're looking directly at the gap between narrow AI and general intelligence.</p>
+    </div>
+  </article>
+
+  <hr class="rule">
+
+  <section class="trailmap">
+    <p class="kicker">for the total beginner</p>
+    <h2>A four-stop trail, in order</h2>
+    <p style="color:var(--ink-soft); max-width:560px; margin-top:8px;">If you only have an afternoon, do these four things in this order. Each one takes under twenty minutes and needs nothing installed.</p>
+    <div class="steps">
+      <div class="step" data-n="1">
+        <h3>Play before you study</h3>
+        <p>Open a chat with an LLM with no task in mind — just curiosity. Ask it to explain something, write something odd, or disagree with you. You're building a feel for how it talks before you worry about how it works.</p>
+      </div>
+      <div class="step" data-n="2">
+        <h3>Watch a model learn, live</h3>
+        <p>Use Google's Teachable Machine to train a tiny image classifier yourself, in your browser, with your own webcam. This is the full machine learning loop — examples in, a working model out — in about ten minutes.</p>
+      </div>
+      <div class="step" data-n="3">
+        <h3>Watch an agent work, not just answer</h3>
+        <p>Give an AI assistant with tool access a small multi-step task and actually read through what it did along the way, not just the final result. That's the difference between a chat reply and an agent.</p>
+      </div>
+      <div class="step" data-n="4">
+        <h3>Read one plain-language explainer</h3>
+        <p>Skip the research paper. The labs building these systems — Anthropic, OpenAI, Google DeepMind — all publish plain-English explainers on their own sites about what their models can and can't actually do.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    field notes are meant to be revised — go get some of these wrong in person.
+  </footer>
+
+</div>
+</body>
+</html>
