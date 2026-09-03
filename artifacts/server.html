@@ -1,1 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Field Guide to Building Your Own Server</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Spectral:ital@1&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDE8DC;
+    --paper-dim:#E2DCCB;
+    --ink:#1F2421;
+    --ink-soft:#4A4F49;
+    --panel:#182620;
+    --panel-line:#2E4437;
+    --copper:#B8743B;
+    --copper-deep:#8F5A2C;
+    --signal:#4C7A63;
+    --rule:#C9BFA4;
+    --rule-strong:#9C927A;
+    --max:920px;
+  }
 
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    font-size:16px;
+    line-height:1.6;
+  }
+
+  h1,h2,h3{
+    font-family:'Spectral', serif;
+    font-weight:600;
+    margin:0;
+    color:var(--ink);
+  }
+
+  .mono{
+    font-family:'IBM Plex Mono', monospace;
+  }
+
+  a{color:var(--copper-deep);}
+
+  /* ---------- background texture ---------- */
+  .grid-bg{
+    background-image:
+      linear-gradient(var(--panel-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--panel-line) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    background:var(--panel);
+    color:var(--paper);
+    position:relative;
+    overflow:hidden;
+    padding:76px 24px 64px;
+  }
+  header .grid-bg{
+    position:absolute; inset:0;
+    opacity:0.16;
+  }
+  .header-inner{
+    max-width:var(--max);
+    margin:0 auto;
+    position:relative;
+  }
+  .plate{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.02em;
+    color:var(--paper);
+    opacity:0.72;
+    border:1px solid rgba(237,232,220,0.35);
+    padding:5px 11px;
+    border-radius:2px;
+    margin-bottom:28px;
+  }
+  .plate .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--signal);
+    box-shadow:0 0 6px var(--signal);
+  }
+  header h1{
+    font-size:44px;
+    line-height:1.14;
+    max-width:11.5ch;
+    color:var(--paper);
+  }
+  header .lede{
+    margin-top:22px;
+    max-width:56ch;
+    font-size:17px;
+    color:#CFC9B8;
+  }
+  .rack-art{
+    position:absolute;
+    right:0; top:8px;
+    width:200px; height:260px;
+    opacity:0.9;
+  }
+
+  /* ---------- shared section frame ---------- */
+  main{max-width:var(--max); margin:0 auto; padding:0 24px;}
+  section{padding:72px 0; border-bottom:1px solid var(--rule);}
+  section:last-of-type{border-bottom:none;}
+  .kicker{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--copper-deep);
+    margin-bottom:10px;
+  }
+  section h2{
+    font-size:30px;
+    max-width:20ch;
+  }
+  section > .intro{
+    margin-top:14px;
+    max-width:62ch;
+    color:var(--ink-soft);
+    font-size:16px;
+  }
+
+  /* ---------- use case grid ---------- */
+  .use-grid{
+    margin-top:40px;
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:1px;
+    background:var(--rule-strong);
+    border:1px solid var(--rule-strong);
+  }
+  .use-card{
+    background:var(--paper);
+    padding:24px 22px;
+    min-height:168px;
+    display:flex;
+    flex-direction:column;
+  }
+  .use-card .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--signal);
+    margin-bottom:12px;
+  }
+  .use-card h3{
+    font-size:18px;
+    margin-bottom:8px;
+  }
+  .use-card p{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin:0;
+    flex-grow:1;
+  }
+  .use-card .stack{
+    margin-top:14px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--copper-deep);
+  }
+
+  /* ---------- budget panels ---------- */
+  .panel-pair{
+    margin-top:40px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:22px;
+  }
+  .spec-panel{
+    border:1px solid var(--rule-strong);
+    background:var(--paper-dim);
+  }
+  .spec-panel .head{
+    padding:18px 22px;
+    border-bottom:1px solid var(--rule-strong);
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+  }
+  .spec-panel .head h3{font-size:19px;}
+  .spec-panel .head span{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+  .spec-row{
+    display:grid;
+    grid-template-columns:118px 1fr;
+    gap:16px;
+    padding:15px 22px;
+    border-bottom:1px solid var(--rule);
+    font-size:14.5px;
+  }
+  .spec-row:last-child{border-bottom:none;}
+  .spec-row .label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--copper-deep);
+    padding-top:2px;
+  }
+  .spec-row .value{color:var(--ink);}
+  .spec-row .value .sub{
+    display:block;
+    color:var(--ink-soft);
+    font-size:13px;
+    margin-top:2px;
+  }
+
+  /* ---------- matrix ---------- */
+  .matrix{
+    margin-top:40px;
+    display:grid;
+    grid-template-columns:140px 1fr 1fr;
+    grid-template-rows:auto 1fr 1fr;
+    border:1px solid var(--rule-strong);
+  }
+  .matrix > div{
+    padding:20px 20px;
+    border-right:1px solid var(--rule-strong);
+    border-bottom:1px solid var(--rule-strong);
+  }
+  .matrix > div:nth-child(3n){border-right:none;}
+  .matrix-corner{background:var(--panel); }
+  .matrix-h{
+    background:var(--panel);
+    color:var(--paper);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    display:flex;
+    align-items:center;
+  }
+  .matrix-v{
+    background:var(--paper-dim);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    display:flex;
+    align-items:center;
+    writing-mode:vertical-rl;
+    transform:rotate(180deg);
+    justify-content:center;
+  }
+  .matrix-cell{background:var(--paper);}
+  .matrix-cell h4{
+    font-family:'Spectral', serif;
+    font-weight:600;
+    font-size:16.5px;
+    margin:0 0 8px;
+  }
+  .matrix-cell p{
+    margin:0;
+    font-size:13.5px;
+    color:var(--ink-soft);
+  }
+
+  /* ---------- benefits ---------- */
+  .benefit-list{
+    margin-top:40px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:36px 44px;
+  }
+  .benefit{
+    display:flex;
+    gap:16px;
+  }
+  .benefit svg{flex:none; width:34px; height:34px; margin-top:2px;}
+  .benefit h3{font-size:17px; margin-bottom:6px;}
+  .benefit p{margin:0; font-size:14.5px; color:var(--ink-soft);}
+
+  /* ---------- checklist / footer ---------- */
+  .checklist{
+    margin-top:36px;
+    counter-reset:step;
+  }
+  .checklist li{
+    list-style:none;
+    display:grid;
+    grid-template-columns:34px 1fr;
+    gap:14px;
+    padding:14px 0;
+    border-top:1px solid var(--rule);
+    font-size:14.5px;
+    color:var(--ink-soft);
+  }
+  .checklist li:last-child{border-bottom:1px solid var(--rule);}
+  .checklist li::before{
+    counter-increment:step;
+    content: counter(step);
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--copper-deep);
+    font-size:13px;
+  }
+  .checklist strong{color:var(--ink); font-weight:600;}
+
+  footer{
+    background:var(--panel);
+    color:#CFC9B8;
+    padding:40px 24px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    text-align:center;
+  }
+
+  @media (max-width:760px){
+    header{padding:56px 20px 44px;}
+    header h1{font-size:32px;}
+    .rack-art{display:none;}
+    section{padding:52px 0;}
+    .use-grid{grid-template-columns:1fr;}
+    .panel-pair{grid-template-columns:1fr;}
+    .benefit-list{grid-template-columns:1fr;}
+    .matrix{grid-template-columns:90px 1fr; grid-template-rows:auto auto auto auto;}
+    .matrix-h:nth-child(3){display:none;}
+    .matrix > div:nth-child(3n){border-right:1px solid var(--rule-strong);}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="grid-bg"></div>
+  <svg class="rack-art" viewBox="0 0 160 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="6" width="140" height="208" rx="2" stroke="#CFC9B8" stroke-opacity="0.55"/>
+    <rect x="22" y="20" width="116" height="22" stroke="#CFC9B8" stroke-opacity="0.5"/>
+    <circle cx="34" cy="31" r="3" fill="#4C7A63"/>
+    <line x1="46" y1="31" x2="120" y2="31" stroke="#CFC9B8" stroke-opacity="0.35"/>
+    <rect x="22" y="50" width="116" height="22" stroke="#CFC9B8" stroke-opacity="0.5"/>
+    <circle cx="34" cy="61" r="3" fill="#B8743B"/>
+    <line x1="46" y1="61" x2="120" y2="61" stroke="#CFC9B8" stroke-opacity="0.35"/>
+    <rect x="22" y="80" width="116" height="22" stroke="#CFC9B8" stroke-opacity="0.5"/>
+    <circle cx="34" cy="91" r="3" fill="#4C7A63"/>
+    <line x1="46" y1="91" x2="120" y2="91" stroke="#CFC9B8" stroke-opacity="0.35"/>
+    <rect x="22" y="110" width="116" height="22" stroke="#CFC9B8" stroke-opacity="0.35"/>
+    <rect x="22" y="140" width="116" height="60" stroke="#CFC9B8" stroke-opacity="0.5"/>
+    <line x1="30" y1="150" x2="130" y2="150" stroke="#CFC9B8" stroke-opacity="0.3"/>
+    <line x1="30" y1="160" x2="130" y2="160" stroke="#CFC9B8" stroke-opacity="0.3"/>
+    <line x1="30" y1="170" x2="130" y2="170" stroke="#CFC9B8" stroke-opacity="0.3"/>
+    <line x1="30" y1="180" x2="130" y2="180" stroke="#CFC9B8" stroke-opacity="0.3"/>
+  </svg>
+  <div class="header-inner">
+    <div class="plate"><span class="dot"></span> personal infrastructure, field notes</div>
+    <h1>A field guide to building your own server</h1>
+    <p class="lede">A server is just a computer you've decided to keep running for someone else's benefit &mdash; usually your own, at 2 a.m., when you need a file, a movie, or a light switch to respond. This guide walks through what a home server can become, what it costs to get there, and where to start depending on your budget and your comfort with a terminal.</p>
+  </div>
+</header>
+
+<main>
+
+  <section id="uses">
+    <div class="kicker">01 &mdash; what you can build</div>
+    <h2>One box, many jobs</h2>
+    <p class="intro">A single machine can run several of these at once. Most people start with one need &mdash; usually media or backup &mdash; and quietly accumulate the rest over a year.</p>
+
+    <div class="use-grid">
+      <div class="use-card">
+        <div class="tag">media &amp; streaming</div>
+        <h3>Your own streaming service</h3>
+        <p>Rip, organize, and stream your movie and music library to any TV or phone in the house &mdash; or anywhere, over a VPN.</p>
+        <div class="stack">Plex &middot; Jellyfin &middot; Emby</div>
+      </div>
+      <div class="use-card">
+        <div class="tag">storage</div>
+        <h3>Private cloud storage</h3>
+        <p>A folder that syncs across every device you own, with no subscription and no company scanning what's inside it.</p>
+        <div class="stack">Nextcloud &middot; Syncthing</div>
+      </div>
+      <div class="use-card">
+        <div class="tag">smart home</div>
+        <h3>A local home automation hub</h3>
+        <p>Run lights, sensors, and routines from inside your own network, so the house still works when the internet doesn't.</p>
+        <div class="stack">Home Assistant</div>
+      </div>
+      <div class="use-card">
+        <div class="tag">networking</div>
+        <h3>Network-wide ad blocking</h3>
+        <p>Filter ads and trackers for every device on the network at once, from a router-level setting instead of a browser extension.</p>
+        <div class="stack">Pi-hole &middot; AdGuard Home</div>
+      </div>
+      <div class="use-card">
+        <div class="tag">access</div>
+        <h3>A private VPN gateway</h3>
+        <p>Reach your home network securely from anywhere &mdash; your files, your cameras, your printer &mdash; without opening ports to the open internet.</p>
+        <div class="stack">Tailscale &middot; WireGuard</div>
+      </div>
+      <div class="use-card">
+        <div class="tag">gaming</div>
+        <h3>A dedicated game server</h3>
+        <p>Host a world that stays up whether or not you're the one playing, with save files that live under your control.</p>
+        <div class="stack">Minecraft &middot; Valheim &middot; ARK</div>
+      </div>
+      <div class="use-card">
+        <div class="tag">memories</div>
+        <h3>A photo and video library</h3>
+        <p>Automatic backup from every phone in the family, with face and location search, and no per-gigabyte bill.</p>
+        <div class="stack">Immich &middot; PhotoPrism</div>
+      </div>
+      <div class="use-card">
+        <div class="tag">security</div>
+        <h3>A password vault</h3>
+        <p>Store and sync logins across your devices from a vault you host, rather than trusting a third party with the keys.</p>
+        <div class="stack">Vaultwarden</div>
+      </div>
+      <div class="use-card">
+        <div class="tag">resilience</div>
+        <h3>Backup, done properly</h3>
+        <p>Automated, versioned backups of every machine in the house, landing on hardware you can see and touch.</p>
+        <div class="stack">Restic &middot; Borg &middot; Duplicati</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="budget">
+    <div class="kicker">02 &mdash; equipment by budget</div>
+    <h2>What it costs to get running</h2>
+    <p class="intro">Hardware is the one decision you don't have to get right on the first try &mdash; most people start small and outgrow their first box within a year. These are two honest starting points.</p>
+
+    <div class="panel-pair">
+      <div class="spec-panel">
+        <div class="head"><h3>Low budget</h3><span class="mono">~$50&ndash;250</span></div>
+        <div class="spec-row"><div class="label">compute</div><div class="value">Raspberry Pi 4/5, or a decade-old laptop or office PC pulled out of a closet<span class="sub">Anything with 4GB+ RAM and a spare USB port will run several services at once.</span></div></div>
+        <div class="spec-row"><div class="label">storage</div><div class="value">A single external USB hard drive<span class="sub">2&ndash;4TB is plenty for a first media or backup server.</span></div></div>
+        <div class="spec-row"><div class="label">network</div><div class="value">Whatever router you already own<span class="sub">Built-in Wi-Fi or a wired connection to the existing router is enough to start.</span></div></div>
+        <div class="spec-row"><div class="label">power</div><div class="value">Standard wall outlet<span class="sub">A Pi draws about as much power as a phone charger.</span></div></div>
+        <div class="spec-row"><div class="label">software</div><div class="value">Free, open-source<span class="sub">Raspberry Pi OS or a lightweight Linux distribution, no license cost.</span></div></div>
+      </div>
+
+      <div class="spec-panel">
+        <div class="head"><h3>High budget</h3><span class="mono">$1,000&ndash;5,000+</span></div>
+        <div class="spec-row"><div class="label">compute</div><div class="value">A dedicated NAS unit or small rack server<span class="sub">Synology/QNAP multi-bay units, or a used enterprise server (Dell PowerEdge, HP ProLiant).</span></div></div>
+        <div class="spec-row"><div class="label">storage</div><div class="value">Multiple drives in a redundant array<span class="sub">RAID or a similar scheme so one failed drive doesn't cost you the data.</span></div></div>
+        <div class="spec-row"><div class="label">network</div><div class="value">A managed switch and dedicated router<span class="sub">10 gigabit networking if you're moving large video files regularly.</span></div></div>
+        <div class="spec-row"><div class="label">power</div><div class="value">A UPS (battery backup)<span class="sub">Protects against data loss during outages and lets the server shut down cleanly.</span></div></div>
+        <div class="spec-row"><div class="label">extras</div><div class="value">Rack cabinet, spare drives, offsite backup<span class="sub">The kind of setup built to run unattended for years.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="knowledge">
+    <div class="kicker">03 &mdash; equipment by experience</div>
+    <h2>Appliance, or workshop?</h2>
+    <p class="intro">Budget decides what you can buy. Experience decides how much of it you want to configure yourself &mdash; and both are independent of each other; a beginner can spend a lot on a box that just works, and a veteran can build something powerful for very little.</p>
+
+    <div class="panel-pair">
+      <div class="spec-panel">
+        <div class="head"><h3>Zero server knowledge</h3><span class="mono">appliance path</span></div>
+        <div class="spec-row"><div class="label">hardware</div><div class="value">A pre-built NAS<span class="sub">Synology and QNAP boxes ship with an app store &mdash; no command line required.</span></div></div>
+        <div class="spec-row"><div class="label">smart home</div><div class="value">Home Assistant Green or Yellow<span class="sub">Purpose-built hardware that arrives configured out of the box.</span></div></div>
+        <div class="spec-row"><div class="label">setup</div><div class="value">Guided web installers<span class="sub">Click-to-install apps, automatic updates, phone-app management.</span></div></div>
+        <div class="spec-row"><div class="label">support</div><div class="value">Vendor documentation and community forums<span class="sub">A large enough user base that most problems already have a written answer.</span></div></div>
+      </div>
+
+      <div class="spec-panel">
+        <div class="head"><h3>Deep technical knowledge</h3><span class="mono">workshop path</span></div>
+        <div class="spec-row"><div class="label">hardware</div><div class="value">Bare-metal builds, salvaged enterprise gear<span class="sub">Whatever's cheapest per core and per drive bay &mdash; brand stops mattering.</span></div></div>
+        <div class="spec-row"><div class="label">platform</div><div class="value">Proxmox or TrueNAS Scale for virtualization<span class="sub">Run a dozen isolated services on one physical machine.</span></div></div>
+        <div class="spec-row"><div class="label">deployment</div><div class="value">Docker containers, orchestration, infrastructure as code<span class="sub">Every service defined in a file, rebuildable in minutes if hardware dies.</span></div></div>
+        <div class="spec-row"><div class="label">networking</div><div class="value">VLANs, reverse proxies, self-managed certificates<span class="sub">Full control of how traffic moves in and out of the network.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="matrix">
+    <div class="kicker">04 &mdash; putting it together</div>
+    <h2>Where to start, by profile</h2>
+    <p class="intro">Budget on one axis, comfort with the tools on the other. Find your square.</p>
+
+    <div class="matrix">
+      <div class="matrix-corner"></div>
+      <div class="matrix-h">Low budget</div>
+      <div class="matrix-h">High budget</div>
+
+      <div class="matrix-v">New to this</div>
+      <div class="matrix-cell">
+        <h4>Raspberry Pi + one app</h4>
+        <p>A Pi running Home Assistant or Pi-hole from an SD card. One job, done well, with an active community to lean on.</p>
+      </div>
+      <div class="matrix-cell">
+        <h4>A consumer NAS</h4>
+        <p>Synology or QNAP with their app store. Media, backup, and photos running within an afternoon, no terminal touched.</p>
+      </div>
+
+      <div class="matrix-v">Experienced</div>
+      <div class="matrix-cell">
+        <h4>A repurposed old PC</h4>
+        <p>Free hardware running Proxmox or TrueNAS, several services virtualized on top. The best ratio of capability to cost.</p>
+      </div>
+      <div class="matrix-cell">
+        <h4>A proper rack build</h4>
+        <p>Redundant storage, a UPS, managed networking, and a stack of containers &mdash; a small home datacenter, tuned to taste.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="benefits">
+    <div class="kicker">05 &mdash; benefits &amp; potential</div>
+    <h2>What you're actually buying</h2>
+    <p class="intro">Not just hardware &mdash; a different relationship with your own data, your bills, and your skills.</p>
+
+    <div class="benefit-list">
+      <div class="benefit">
+        <svg viewBox="0 0 34 34" fill="none"><path d="M17 3 L28 8 V16 C28 23 23 28 17 31 C11 28 6 23 6 16 V8 Z" stroke="#4C7A63" stroke-width="1.6"/></svg>
+        <div>
+          <h3>Privacy you can verify</h3>
+          <p>Your photos, messages, and files sit on a drive in your house, governed by a policy you wrote, not one you scrolled past.</p>
+        </div>
+      </div>
+      <div class="benefit">
+        <svg viewBox="0 0 34 34" fill="none"><rect x="5" y="12" width="24" height="16" rx="2" stroke="#B8743B" stroke-width="1.6"/><path d="M10 12 V9 a7 7 0 0 1 14 0 v3" stroke="#B8743B" stroke-width="1.6"/></svg>
+        <div>
+          <h3>Fewer subscriptions</h3>
+          <p>One-time hardware and free software replace a pile of monthly fees for storage, streaming, and password management.</p>
+        </div>
+      </div>
+      <div class="benefit">
+        <svg viewBox="0 0 34 34" fill="none"><path d="M6 27 V15 M14 27 V9 M22 27 V18 M30 27 V12" stroke="#4C7A63" stroke-width="1.6"/></svg>
+        <div>
+          <h3>Skills that transfer</h3>
+          <p>Networking, Linux, containers, and troubleshooting under real stakes &mdash; the same skills that show up on infrastructure job postings.</p>
+        </div>
+      </div>
+      <div class="benefit">
+        <svg viewBox="0 0 34 34" fill="none"><circle cx="17" cy="17" r="5" stroke="#B8743B" stroke-width="1.6"/><path d="M17 4 V9 M17 25 V30 M4 17 H9 M25 17 H30 M8 8 L11.5 11.5 M22.5 22.5 L26 26 M26 8 L22.5 11.5 M11.5 22.5 L8 26" stroke="#B8743B" stroke-width="1.4"/></svg>
+        <div>
+          <h3>Total customization</h3>
+          <p>No app store to work around &mdash; if you can imagine the automation, the server can probably run it exactly the way you pictured.</p>
+        </div>
+      </div>
+      <div class="benefit">
+        <svg viewBox="0 0 34 34" fill="none"><rect x="4" y="5" width="26" height="8" rx="1" stroke="#4C7A63" stroke-width="1.6"/><rect x="4" y="15" width="26" height="8" rx="1" stroke="#4C7A63" stroke-width="1.6"/><rect x="4" y="25" width="26" height="4" rx="1" stroke="#4C7A63" stroke-width="1.6"/></svg>
+        <div>
+          <h3>Grows with you</h3>
+          <p>Start with one Pi running one app; add drives, add services, or add a second machine, whenever the need actually shows up.</p>
+        </div>
+      </div>
+      <div class="benefit">
+        <svg viewBox="0 0 34 34" fill="none"><path d="M6 17 a11 11 0 1 1 4.5 8.9" stroke="#B8743B" stroke-width="1.6"/><path d="M6 24 V17 H13" stroke="#B8743B" stroke-width="1.6"/></svg>
+        <div>
+          <h3>Works when the internet doesn't</h3>
+          <p>Local automation, local media, and local files keep running through an outage &mdash; the cloud version of your setup can't say that.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="start">
+    <div class="kicker">06 &mdash; getting started</div>
+    <h2>The first afternoon</h2>
+    <ol class="checklist">
+      <li><span><strong>Pick one job.</strong> Media, backup, or ad-blocking are the easiest first wins &mdash; resist setting up everything on day one.</span></li>
+      <li><span><strong>Match hardware to that one job.</strong> A Pi for a light service, a NAS if storage is the whole point.</span></li>
+      <li><span><strong>Install one piece of software and use it for a week</strong> before adding a second. Confidence compounds faster than complexity should.</span></li>
+      <li><span><strong>Write down what you changed.</strong> A short text file of settings and passwords saves hours the day something breaks.</span></li>
+      <li><span><strong>Add the next service once the first one is boring.</strong> Boring means reliable &mdash; that's the goal, every time.</span></li>
+    </ol>
+  </section>
+
+</main>
+
+<footer>
+  built to run quietly, in the corner, indefinitely
+</footer>
+
+</body>
+</html>
