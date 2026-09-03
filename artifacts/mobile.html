@@ -1,1 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ship It — Android, iOS &amp; Mobile Web Deployment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
 
+  :root{
+    --bg: #12151a;
+    --panel: #181c23;
+    --panel-alt: #1e232b;
+    --border: #2a3039;
+    --border-soft: #232830;
+    --text: #eae7df;
+    --text-dim: #9aa2b1;
+    --text-faint: #626a78;
+
+    --android: #a7cf6b;
+    --android-dim: #3d4a30;
+    --ios: #7ea6d9;
+    --ios-dim: #2f3d4f;
+    --web: #e3a24a;
+    --web-dim: #4a3b25;
+
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html{ scroll-behavior: smooth; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection{ background: var(--android-dim); color: var(--text); }
+
+  a{ color: inherit; }
+
+  .wrap{ max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+
+  /* ---------- NAV ---------- */
+  nav.topnav{
+    position: sticky; top:0; z-index: 50;
+    background: rgba(18,21,26,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border-soft);
+  }
+  nav.topnav .wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    height: 56px;
+  }
+  .brand{
+    font-family: var(--mono); font-size: 13.5px; font-weight:600;
+    color: var(--text); letter-spacing: 0.02em;
+    display:flex; align-items:center; gap:8px;
+  }
+  .brand .dot{ width:7px; height:7px; border-radius:50%; background: var(--android); display:inline-block; }
+  .navlinks{ display:flex; gap: 26px; font-size: 13.5px; }
+  .navlinks a{
+    color: var(--text-dim); text-decoration:none;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 3px;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .navlinks a:hover{ color: var(--text); border-color: var(--border); }
+  @media (max-width: 760px){ .navlinks{ display:none; } }
+
+  /* ---------- HERO ---------- */
+  header.hero{ padding: 88px 0 56px; border-bottom: 1px solid var(--border-soft); }
+  .kicker{
+    font-family: var(--mono); font-size: 12.5px; color: var(--text-faint);
+    margin-bottom: 18px;
+  }
+  h1.title{
+    font-family: var(--sans); font-weight: 800;
+    font-size: clamp(34px, 5.2vw, 58px);
+    line-height: 1.06; letter-spacing: -0.02em;
+    max-width: 15ch;
+    color: var(--text);
+  }
+  .lede{
+    margin-top: 22px; max-width: 62ch;
+    font-size: 17px; color: var(--text-dim);
+  }
+  .terminal{
+    margin-top: 36px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 13px;
+    overflow: hidden;
+  }
+  .terminal .bar{
+    display:flex; gap:7px; padding: 10px 14px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .terminal .bar span{ width:9px; height:9px; border-radius:50%; background:#333a45; }
+  .terminal .body{ padding: 16px 18px; color: var(--text-dim); }
+  .terminal .body div{ padding: 3px 0; }
+  .terminal .prompt{ color: var(--text-faint); }
+  .terminal .p-android{ color: var(--android); }
+  .terminal .p-ios{ color: var(--ios); }
+  .terminal .p-web{ color: var(--web); }
+
+  /* ---------- SECTION SCAFFOLD ---------- */
+  section{ padding: 64px 0; border-bottom: 1px solid var(--border-soft); }
+  .sec-head{ margin-bottom: 34px; display:flex; align-items:baseline; gap: 14px; flex-wrap: wrap; }
+  .sec-num{ font-family: var(--mono); font-size: 13px; color: var(--text-faint); }
+  h2.sec-title{ font-size: 27px; font-weight: 800; letter-spacing: -0.01em; }
+  .sec-sub{ color: var(--text-dim); max-width: 68ch; margin-top: -18px; margin-bottom: 30px; font-size: 15px; }
+
+  /* ---------- PLATFORM OVERVIEW STRIP ---------- */
+  .platgrid{ display:grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  @media (max-width: 780px){ .platgrid{ grid-template-columns: 1fr; } }
+  .platcard{ background: var(--panel); padding: 26px 24px; }
+  .platcard .plabel{ font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .platcard.android .plabel{ color: var(--android); }
+  .platcard.ios .plabel{ color: var(--ios); }
+  .platcard.web .plabel{ color: var(--web); }
+  .platcard h3{ font-size: 21px; margin-top: 8px; font-weight: 700; }
+  .platcard p{ margin-top: 10px; font-size: 14px; color: var(--text-dim); }
+  .statrow{ margin-top: 18px; display:flex; flex-direction:column; gap:8px; font-size: 13.5px; }
+  .statrow div{ display:flex; justify-content:space-between; border-top: 1px solid var(--border-soft); padding-top: 8px; }
+  .statrow span:first-child{ color: var(--text-faint); }
+  .statrow span:last-child{ color: var(--text); font-family: var(--mono); font-size: 12.5px; }
+
+  /* ---------- PIPELINE STEPS ---------- */
+  .pipeline{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  @media (max-width: 900px){ .pipeline{ grid-template-columns: 1fr; } }
+  .pipe-col .pipe-head{ display:flex; align-items:center; gap:10px; margin-bottom: 18px; }
+  .pipe-swatch{ width:10px; height:10px; border-radius:2px; }
+  .android .pipe-swatch{ background: var(--android); }
+  .ios .pipe-swatch{ background: var(--ios); }
+  .web .pipe-swatch{ background: var(--web); }
+  .pipe-head h4{ font-size: 15px; font-weight: 700; }
+
+  .step{ display:flex; gap: 14px; padding: 14px 0; border-top: 1px solid var(--border-soft); }
+  .step:first-of-type{ border-top: none; }
+  .step-n{ font-family: var(--mono); font-size: 12px; color: var(--text-faint); padding-top: 2px; min-width: 20px; }
+  .step-body h5{ font-size: 14.5px; font-weight: 600; margin-bottom: 4px; }
+  .step-body p{ font-size: 13.5px; color: var(--text-dim); }
+
+  /* ---------- TOOLS TABLE ---------- */
+  .toolstable{ width:100%; border-collapse: collapse; font-size: 14px; }
+  .toolstable th, .toolstable td{ text-align:left; padding: 13px 16px; border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+  .toolstable thead th{
+    font-family: var(--mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-faint); border-bottom: 1px solid var(--border);
+  }
+  .toolstable td.cat{ color: var(--text); font-weight: 600; white-space: nowrap; }
+  .toolstable tbody tr:hover{ background: var(--panel-alt); }
+  .tag{ display:inline-block; font-family: var(--mono); font-size: 11px; padding: 2px 7px; border-radius: 3px; border:1px solid var(--border); color: var(--text-dim); margin-right:6px; margin-bottom:4px;}
+
+  /* ---------- RIGHTS PANELS ---------- */
+  .rightsgrid{ display:grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  @media (max-width: 780px){ .rightsgrid{ grid-template-columns: 1fr; } }
+  .rightscard{ background: var(--panel); padding: 24px; }
+  .rightscard h4{ font-family: var(--mono); font-size: 12.5px; margin-bottom: 16px; }
+  .rightscard.android h4{ color: var(--android); }
+  .rightscard.ios h4{ color: var(--ios); }
+  .rightscard.web h4{ color: var(--web); }
+  .rightscard ul{ list-style: none; display:flex; flex-direction:column; gap: 11px; }
+  .rightscard li{ font-size: 13.5px; color: var(--text-dim); padding-left: 16px; position: relative; }
+  .rightscard li::before{ content:'—'; position:absolute; left:0; color: var(--text-faint); }
+  .rightscard li b{ color: var(--text); font-weight: 600; }
+
+  /* ---------- COMPARISON MATRIX ---------- */
+  .matrix-scroll{ overflow-x: auto; border: 1px solid var(--border); border-radius: 6px; }
+  table.matrix{ width:100%; border-collapse: collapse; min-width: 680px; font-size: 13.8px; }
+  table.matrix th, table.matrix td{ padding: 13px 18px; border-bottom: 1px solid var(--border-soft); text-align:left; }
+  table.matrix thead th{
+    background: var(--panel-alt); font-family: var(--mono); font-size: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  table.matrix thead th:not(:first-child){ text-align:left; }
+  table.matrix th.rowlabel{ color: var(--text-dim); font-weight: 500; white-space: nowrap; }
+  table.matrix td{ color: var(--text); }
+  table.matrix tbody tr:last-child td, table.matrix tbody tr:last-child th{ border-bottom:none; }
+  table.matrix thead th.h-android{ color: var(--android); }
+  table.matrix thead th.h-ios{ color: var(--ios); }
+  table.matrix thead th.h-web{ color: var(--web); }
+  table.matrix tbody tr:hover{ background: rgba(255,255,255,0.02); }
+
+  /* ---------- FOOTER ---------- */
+  footer{ padding: 44px 0 70px; }
+  footer p{ font-size: 13px; color: var(--text-faint); max-width: 70ch; }
+  footer p + p{ margin-top: 10px; }
+
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>deploy.compare</div>
+    <div class="navlinks">
+      <a href="#overview">Overview</a>
+      <a href="#testing">Testing</a>
+      <a href="#publishing">Publishing</a>
+      <a href="#tools">Tools</a>
+      <a href="#rights">Rights &amp; Fees</a>
+      <a href="#matrix">Compare</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">MOBILE APP DEPLOYMENT — REFERENCE</div>
+    <h1 class="title">Three platforms. Three pipelines. One shared finish line.</h1>
+    <p class="lede">
+      Android, iOS, and the mobile web each test and ship differently — different tools, different gatekeepers,
+      different paperwork. This page lines the three pipelines up side by side: how you test a build, how you
+      submit it, what tools the work actually requires, and what rights or agreements you need before anyone
+      outside your team can install it.
+    </p>
+    <div class="terminal">
+      <div class="bar"><span></span><span></span><span></span></div>
+      <div class="body">
+        <div><span class="prompt">$</span> <span class="p-android">./gradlew bundleRelease</span> &nbsp;&&nbsp; upload to Play Console</div>
+        <div><span class="prompt">$</span> <span class="p-ios">xcodebuild archive</span> &nbsp;&&nbsp; xcrun altool --upload-app</div>
+        <div><span class="prompt">$</span> <span class="p-web">npm run build</span> &nbsp;&&nbsp; deploy to CDN — no review queue</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="overview">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">01</span><h2 class="sec-title">Overview</h2></div>
+    <div class="platgrid">
+      <div class="platcard android">
+        <div class="plabel">Native · Android</div>
+        <h3>Google Play</h3>
+        <p>Distributed as a signed App Bundle through Play Console. Gatekeeping is lighter than iOS but personal
+        accounts must clear a mandatory closed test before reaching production.</p>
+        <div class="statrow">
+          <div><span>Account fee</span><span>$25 one-time</span></div>
+          <div><span>Typical review</span><span>Hours – few days</span></div>
+          <div><span>Package format</span><span>.aab</span></div>
+        </div>
+      </div>
+      <div class="platcard ios">
+        <div class="plabel">Native · iOS</div>
+        <h3>Apple App Store</h3>
+        <p>Distributed through App Store Connect after code signing with a certificate and provisioning profile.
+        Review is stricter and, in 2026, running slower than Apple's historic 24-hour target.</p>
+        <div class="statrow">
+          <div><span>Account fee</span><span>$99 / year</span></div>
+          <div><span>Typical review</span><span>2 – 5 days</span></div>
+          <div><span>Package format</span><span>.ipa</span></div>
+        </div>
+      </div>
+      <div class="platcard web">
+        <div class="plabel">Progressive · Mobile Web</div>
+        <h3>Browser / PWA</h3>
+        <p>No app store, no reviewer, no binary. Ship a responsive site or installable Progressive Web App straight
+        to a URL; it runs in Safari, Chrome, and every other mobile browser at once.</p>
+        <div class="statrow">
+          <div><span>Account fee</span><span>$0 (hosting only)</span></div>
+          <div><span>Typical review</span><span>None — you control release</span></div>
+          <div><span>Package format</span><span>HTML/JS + manifest</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="testing">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">02</span><h2 class="sec-title">Testing, step by step</h2></div>
+    <p class="sec-sub">Each pipeline has its own pre-release gate — from local emulators to mandatory tester pools to nothing more than a staging URL.</p>
+    <div class="pipeline">
+
+      <div class="pipe-col android">
+        <div class="pipe-head"><span class="pipe-swatch"></span><h4>Android</h4></div>
+        <div class="step"><div class="step-n">01</div><div class="step-body"><h5>Emulate locally</h5><p>Run the app across virtual devices and API levels in Android Studio's built-in emulator.</p></div></div>
+        <div class="step"><div class="step-n">02</div><div class="step-body"><h5>Automate at scale</h5><p>Run instrumented tests across real hardware profiles with Firebase Test Lab.</p></div></div>
+        <div class="step"><div class="step-n">03</div><div class="step-body"><h5>Internal testing track</h5><p>Push a build to up to 100 internal testers via Play Console for a fast sanity check.</p></div></div>
+        <div class="step"><div class="step-n">04</div><div class="step-body"><h5>Closed testing (mandatory)</h5><p>Personal accounts must run a closed test with at least 12 opted-in testers for 14 continuous days before production access unlocks.</p></div></div>
+      </div>
+
+      <div class="pipe-col ios">
+        <div class="pipe-head"><span class="pipe-swatch"></span><h4>iOS</h4></div>
+        <div class="step"><div class="step-n">01</div><div class="step-body"><h5>Simulate locally</h5><p>Run the app in Xcode's Simulator across iPhone, iPad, and OS version combinations.</p></div></div>
+        <div class="step"><div class="step-n">02</div><div class="step-body"><h5>Device testing</h5><p>Install signed debug builds on physical devices to catch hardware-specific issues (camera, sensors, performance).</p></div></div>
+        <div class="step"><div class="step-n">03</div><div class="step-body"><h5>Internal TestFlight</h5><p>Distribute to up to 100 internal testers immediately after upload — no review needed.</p></div></div>
+        <div class="step"><div class="step-n">04</div><div class="step-body"><h5>External TestFlight</h5><p>Once a build clears a lightweight beta review, invite up to 10,000 external testers before submitting for full review.</p></div></div>
+      </div>
+
+      <div class="pipe-col web">
+        <div class="pipe-head"><span class="pipe-swatch"></span><h4>Mobile Web</h4></div>
+        <div class="step"><div class="step-n">01</div><div class="step-body"><h5>Responsive checks</h5><p>Test breakpoints and touch targets in Chrome DevTools' device-emulation mode.</p></div></div>
+        <div class="step"><div class="step-n">02</div><div class="step-body"><h5>Audit performance</h5><p>Run Lighthouse for performance, accessibility, and PWA-installability scores.</p></div></div>
+        <div class="step"><div class="step-n">03</div><div class="step-body"><h5>Cross-browser pass</h5><p>Verify real rendering across iOS Safari and Android Chrome with BrowserStack or Sauce Labs.</p></div></div>
+        <div class="step"><div class="step-n">04</div><div class="step-body"><h5>Staging deploy</h5><p>Push to a staging subdomain for a final walkthrough — no external gatekeeper required.</p></div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="publishing">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">03</span><h2 class="sec-title">Publishing, step by step</h2></div>
+    <p class="sec-sub">From a finished build to something a stranger can open on their own phone.</p>
+    <div class="pipeline">
+
+      <div class="pipe-col android">
+        <div class="pipe-head"><span class="pipe-swatch"></span><h4>Android</h4></div>
+        <div class="step"><div class="step-n">01</div><div class="step-body"><h5>Build the release AAB</h5><p>Generate a signed Android App Bundle with Gradle.</p></div></div>
+        <div class="step"><div class="step-n">02</div><div class="step-body"><h5>Complete the store listing</h5><p>Add screenshots, description, content rating questionnaire, and the Data Safety form in Play Console.</p></div></div>
+        <div class="step"><div class="step-n">03</div><div class="step-body"><h5>Roll out</h5><p>Release to a staged rollout percentage or straight to 100% of users.</p></div></div>
+        <div class="step"><div class="step-n">04</div><div class="step-body"><h5>Automated + policy review</h5><p>Google's review is largely automated; most listings go live within hours to a couple of days.</p></div></div>
+      </div>
+
+      <div class="pipe-col ios">
+        <div class="pipe-head"><span class="pipe-swatch"></span><h4>iOS</h4></div>
+        <div class="step"><div class="step-n">01</div><div class="step-body"><h5>Archive and sign</h5><p>Create a distribution build in Xcode signed with an App Store certificate and provisioning profile.</p></div></div>
+        <div class="step"><div class="step-n">02</div><div class="step-body"><h5>Upload via Transporter</h5><p>Push the .ipa to App Store Connect through Xcode Organizer or the Transporter app.</p></div></div>
+        <div class="step"><div class="step-n">03</div><div class="step-body"><h5>Submit for review</h5><p>Fill in metadata, screenshots, privacy “nutrition label,” and reviewer test credentials, then submit.</p></div></div>
+        <div class="step"><div class="step-n">04</div><div class="step-body"><h5>Human review</h5><p>A person reviews the app against the App Store Review Guidelines — typically 2–5 days in 2026, longer at peak submission periods.</p></div></div>
+      </div>
+
+      <div class="pipe-col web">
+        <div class="pipe-head"><span class="pipe-swatch"></span><h4>Mobile Web</h4></div>
+        <div class="step"><div class="step-n">01</div><div class="step-body"><h5>Build for production</h5><p>Bundle and minify the app; generate the web app manifest and service worker for PWA installability.</p></div></div>
+        <div class="step"><div class="step-n">02</div><div class="step-body"><h5>Deploy to hosting/CDN</h5><p>Push to a host with HTTPS enabled — Vercel, Netlify, Cloudflare Pages, or your own infrastructure.</p></div></div>
+        <div class="step"><div class="step-n">03</div><div class="step-body"><h5>Point the domain</h5><p>Update DNS; the new version is live the moment it propagates.</p></div></div>
+        <div class="step"><div class="step-n">04</div><div class="step-body"><h5>Optional: wrap for a store</h5><p>Package the PWA as a Trusted Web Activity for Google Play, or list it in the Microsoft Store — each then follows that store's own review.</p></div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="tools">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">04</span><h2 class="sec-title">Tools &amp; resources</h2></div>
+    <p class="sec-sub">The working toolkit for each stage of the pipeline.</p>
+    <table class="toolstable">
+      <thead>
+        <tr><th style="width:16%">Stage</th><th>Android</th><th>iOS</th><th>Mobile Web</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="cat">Build</td>
+          <td><span class="tag">Android Studio</span><span class="tag">Gradle</span><span class="tag">Kotlin/Java</span></td>
+          <td><span class="tag">Xcode</span><span class="tag">Swift/Obj-C</span><span class="tag">Xcode Organizer</span></td>
+          <td><span class="tag">Vite/Webpack</span><span class="tag">React/Vue/Svelte</span><span class="tag">Workbox</span></td>
+        </tr>
+        <tr>
+          <td class="cat">Test</td>
+          <td><span class="tag">Emulator</span><span class="tag">Firebase Test Lab</span><span class="tag">Espresso</span></td>
+          <td><span class="tag">Simulator</span><span class="tag">TestFlight</span><span class="tag">XCTest</span></td>
+          <td><span class="tag">Lighthouse</span><span class="tag">DevTools</span><span class="tag">BrowserStack</span></td>
+        </tr>
+        <tr>
+          <td class="cat">Sign / Package</td>
+          <td><span class="tag">Play App Signing</span><span class="tag">Keystore</span></td>
+          <td><span class="tag">Certificates</span><span class="tag">Provisioning profiles</span></td>
+          <td><span class="tag">TLS/HTTPS cert</span><span class="tag">Web app manifest</span></td>
+        </tr>
+        <tr>
+          <td class="cat">Submit</td>
+          <td><span class="tag">Google Play Console</span></td>
+          <td><span class="tag">App Store Connect</span><span class="tag">Transporter</span></td>
+          <td><span class="tag">Vercel</span><span class="tag">Netlify</span><span class="tag">Cloudflare Pages</span></td>
+        </tr>
+        <tr>
+          <td class="cat">Monitor</td>
+          <td><span class="tag">Play Console vitals</span><span class="tag">Crashlytics</span></td>
+          <td><span class="tag">App Store Connect analytics</span><span class="tag">Crashlytics</span></td>
+          <td><span class="tag">Google Analytics</span><span class="tag">Sentry</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="rights">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">05</span><h2 class="sec-title">Publishing rights &amp; requirements</h2></div>
+    <p class="sec-sub">What you have to agree to, register, or hold before you're allowed to distribute.</p>
+    <div class="rightsgrid">
+      <div class="rightscard android">
+        <h4>ANDROID · GOOGLE PLAY</h4>
+        <ul>
+          <li><b>$25 one-time</b> registration fee, no renewal, unlimited apps under one account.</li>
+          <li>Accept the <b>Google Play Developer Distribution Agreement</b>.</li>
+          <li>Personal accounts require passing the <b>12-tester / 14-day</b> closed test before production.</li>
+          <li>Organization accounts require a <b>D-U-N-S number</b> for business verification.</li>
+          <li>Complete the <b>content rating (IARC)</b> questionnaire and <b>Data Safety</b> disclosure.</li>
+          <li>Commission: <b>15%</b> on the first $1M/year in-app revenue, <b>30%</b> above that.</li>
+        </ul>
+      </div>
+      <div class="rightscard ios">
+        <h4>IOS · APPLE APP STORE</h4>
+        <ul>
+          <li><b>$99/year</b> for the Apple Developer Program (individual or organization).</li>
+          <li>Accept the <b>Apple Developer Program License Agreement</b> and, for paid apps, the <b>Paid Applications Agreement</b>.</li>
+          <li>Organization accounts also require a <b>D-U-N-S number</b>.</li>
+          <li>Apps must pass human review against the <b>App Store Review Guidelines</b>.</li>
+          <li>$299/year <b>Enterprise Program</b> exists only for internal-staff distribution, no App Store review.</li>
+          <li>Commission: <b>15%</b> under the Small Business Program (revenue under $1M/year), <b>30%</b> above.</li>
+        </ul>
+      </div>
+      <div class="rightscard web">
+        <h4>MOBILE WEB · BROWSER / PWA</h4>
+        <ul>
+          <li><b>No platform account or fee</b> — you own the domain, so you own the terms.</li>
+          <li>Requirements are self-imposed: <b>HTTPS</b>, a valid <b>web app manifest</b>, and a <b>service worker</b> if you want installability.</li>
+          <li>No revenue share — payments run through whatever processor you integrate directly (e.g. Stripe).</li>
+          <li>If you later wrap the PWA for a store (Trusted Web Activity, Microsoft Store), that store's fees and agreements then apply on top.</li>
+          <li>You're still bound by general law — privacy regulations (GDPR/CCPA), accessibility standards, and payment-industry rules.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="matrix" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">06</span><h2 class="sec-title">Compare at a glance</h2></div>
+    <p class="sec-sub">The same questions, answered for all three pipelines side by side.</p>
+    <div class="matrix-scroll">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="h-android">Android</th>
+            <th class="h-ios">iOS</th>
+            <th class="h-web">Mobile Web</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th class="rowlabel">Account cost</th><td>$25 one-time</td><td>$99 / year</td><td>$0 (hosting only)</td></tr>
+          <tr><th class="rowlabel">Mandatory pre-release testing</th><td>12 testers, 14 days (personal accounts)</td><td>Not required, but TestFlight strongly used</td><td>None required</td></tr>
+          <tr><th class="rowlabel">Review type</th><td>Mostly automated</td><td>Human reviewer</td><td>No review — you control release</td></tr>
+          <tr><th class="rowlabel">Typical turnaround</th><td>Hours to a few days</td><td>2–5 days (longer at peaks)</td><td>Immediate</td></tr>
+          <tr><th class="rowlabel">Release control</th><td>Staged rollout %</td><td>All-or-nothing per version</td><td>Full — deploy any time, to anyone</td></tr>
+          <tr><th class="rowlabel">Commission on sales</th><td>15% / 30%</td><td>15% / 30%</td><td>None (bring your own processor)</td></tr>
+          <tr><th class="rowlabel">Org verification</th><td>D-U-N-S number</td><td>D-U-N-S number</td><td>None</td></tr>
+          <tr><th class="rowlabel">Package format</th><td>.aab</td><td>.ipa</td><td>HTML/JS + manifest</td></tr>
+          <tr><th class="rowlabel">Update speed post-approval</th><td>Fast, incremental rollouts</td><td>Each update re-reviewed</td><td>Instant, no re-review</td></tr>
+          <tr><th class="rowlabel">Offline / native device access</th><td>Full</td><td>Full</td><td>Partial (via PWA APIs)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Fees, review timelines, and testing requirements are set by Google and Apple and change without much notice — figures above reflect 2026 policy as published by each platform. Confirm current terms in Play Console and App Store Connect before budgeting a launch around them.</p>
+    <p>Commission rates shown are standard tiers; regional rules (e.g. the EU Digital Markets Act, South Korea's alternative-billing mandate) can alter them for specific markets.</p>
+  </div>
+</footer>
+
+</body>
+</html>
