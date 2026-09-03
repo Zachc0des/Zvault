@@ -1,1 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Running Your Own Linux — A Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14181d;
+    --paper:#f6f3ec;
+    --panel:#ece7db;
+    --panel-line:#d9d2bf;
+    --amber:#b8722c;
+    --amber-deep:#8f551d;
+    --teal:#2f6e63;
+    --muted:#6b6255;
+    --code-bg:#1c211f;
+    --code-text:#e9e3d1;
+    --serif:'Fraunces', serif;
+    --sans:'Inter', sans-serif;
+    --mono:'IBM Plex Mono', monospace;
+    --maxw:760px;
+  }
 
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{color:var(--amber-deep);}
+  a:hover{color:var(--amber);}
+
+  code, .cmd{
+    font-family:var(--mono);
+    font-size:0.88em;
+    background:var(--panel);
+    padding:0.12em 0.4em;
+    border-radius:3px;
+    border:1px solid var(--panel-line);
+  }
+
+  pre{
+    background:var(--code-bg);
+    color:var(--code-text);
+    padding:1.1rem 1.3rem;
+    border-radius:6px;
+    overflow-x:auto;
+    font-family:var(--mono);
+    font-size:0.86rem;
+    line-height:1.65;
+    border-left:3px solid var(--amber);
+  }
+  pre code{background:none;border:none;padding:0;color:inherit;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:5.5rem 1.5rem 4rem;
+    text-align:left;
+    max-width:var(--maxw);
+    margin:0 auto;
+  }
+  .hero .kicker{
+    font-family:var(--mono);
+    font-size:0.82rem;
+    color:var(--muted);
+    letter-spacing:0.02em;
+    margin-bottom:1rem;
+  }
+  .hero h1{
+    font-family:var(--serif);
+    font-optical-sizing:auto;
+    font-weight:600;
+    font-size:clamp(2.3rem, 5vw, 3.4rem);
+    line-height:1.08;
+    margin:0 0 1.2rem;
+    letter-spacing:-0.01em;
+  }
+  .hero p.lede{
+    font-size:1.15rem;
+    color:#3a352c;
+    max-width:56ch;
+  }
+  .hero .prompt-line{
+    margin-top:2.2rem;
+    display:inline-block;
+  }
+
+  /* ---------- Layout with side nav ---------- */
+  .layout{
+    display:grid;
+    grid-template-columns:220px minmax(0,1fr);
+    gap:3rem;
+    max-width:1100px;
+    margin:0 auto;
+    padding:0 1.5rem 6rem;
+  }
+  nav.toc{
+    position:sticky;
+    top:2.5rem;
+    align-self:start;
+    font-family:var(--mono);
+    font-size:0.82rem;
+  }
+  nav.toc .toc-title{
+    color:var(--muted);
+    margin-bottom:0.9rem;
+    font-size:0.75rem;
+  }
+  nav.toc ol{
+    list-style:none;
+    margin:0;
+    padding:0;
+    counter-reset:toc;
+  }
+  nav.toc li{
+    counter-increment:toc;
+    margin-bottom:0.65rem;
+  }
+  nav.toc a{
+    color:var(--ink);
+    text-decoration:none;
+    display:flex;
+    gap:0.5rem;
+  }
+  nav.toc a:before{
+    content:counter(toc, decimal-leading-zero);
+    color:var(--amber-deep);
+  }
+  nav.toc a:hover{color:var(--amber-deep);}
+
+  main{max-width:var(--maxw);}
+
+  section{
+    padding:3.2rem 0;
+    border-top:1px solid var(--panel-line);
+  }
+  section:first-child{border-top:none;}
+
+  section > .sec-label{
+    font-family:var(--mono);
+    font-size:0.78rem;
+    color:var(--amber-deep);
+    margin-bottom:0.6rem;
+  }
+  h2{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:1.9rem;
+    margin:0 0 1.1rem;
+    letter-spacing:-0.01em;
+  }
+  h3{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:1.28rem;
+    margin:2.1rem 0 0.7rem;
+  }
+  p{margin:0 0 1rem; max-width:68ch;}
+  ul, ol{padding-left:1.3rem; margin:0 0 1.2rem;}
+  li{margin-bottom:0.5rem; max-width:64ch;}
+
+  .callout{
+    background:var(--panel);
+    border:1px solid var(--panel-line);
+    border-left:3px solid var(--teal);
+    padding:1rem 1.2rem;
+    border-radius:4px;
+    margin:1.4rem 0;
+    font-size:0.95rem;
+  }
+  .callout .callout-label{
+    font-family:var(--mono);
+    font-size:0.75rem;
+    color:var(--teal);
+    margin-bottom:0.35rem;
+  }
+
+  /* ---------- Step cards (OS-specific instructions) ---------- */
+  .path-card{
+    background:var(--panel);
+    border:1px solid var(--panel-line);
+    border-radius:6px;
+    padding:1.5rem 1.6rem;
+    margin:1.6rem 0;
+  }
+  .path-card h4{
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:1rem;
+    margin:0 0 0.9rem;
+    display:flex;
+    align-items:center;
+    gap:0.5rem;
+  }
+  .path-card h4 .tag{
+    font-family:var(--mono);
+    font-size:0.7rem;
+    background:var(--ink);
+    color:var(--paper);
+    padding:0.15rem 0.5rem;
+    border-radius:3px;
+  }
+  .path-card ol{margin-bottom:0;}
+  .path-card li{margin-bottom:0.75rem;}
+
+  /* ---------- Comparison tables ---------- */
+  .table-wrap{overflow-x:auto; margin:1.4rem 0;}
+  table{
+    border-collapse:collapse;
+    width:100%;
+    font-size:0.92rem;
+  }
+  th, td{
+    text-align:left;
+    padding:0.7rem 0.9rem;
+    border-bottom:1px solid var(--panel-line);
+    vertical-align:top;
+  }
+  thead th{
+    font-family:var(--mono);
+    font-size:0.76rem;
+    color:var(--muted);
+    font-weight:500;
+    border-bottom:2px solid var(--ink);
+  }
+  tbody tr:hover{background:var(--panel);}
+
+  /* ---------- Distro index ---------- */
+  .distro-index{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(210px,1fr));
+    gap:1px;
+    background:var(--panel-line);
+    border:1px solid var(--panel-line);
+    margin:1.6rem 0;
+  }
+  .distro{
+    background:var(--paper);
+    padding:1.1rem 1.2rem;
+  }
+  .distro .rank{
+    font-family:var(--mono);
+    font-size:0.72rem;
+    color:var(--amber-deep);
+  }
+  .distro h5{
+    font-family:var(--serif);
+    font-size:1.05rem;
+    margin:0.25rem 0 0.35rem;
+    font-weight:600;
+  }
+  .distro p{font-size:0.85rem; color:var(--muted); margin:0;}
+
+  /* ---------- Use-case grid (server) ---------- */
+  .use-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1.4rem;
+    margin:1.6rem 0;
+  }
+  .use-card{
+    border:1px solid var(--panel-line);
+    border-radius:6px;
+    padding:1.2rem 1.3rem;
+    background:var(--paper);
+  }
+  .use-card h5{
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:0.98rem;
+    margin:0 0 0.4rem;
+  }
+  .use-card p{font-size:0.9rem; margin:0; color:#3a352c;}
+
+  /* ---------- Benefits list ---------- */
+  .benefit-row{
+    display:flex;
+    gap:1.4rem;
+    padding:1.1rem 0;
+    border-bottom:1px solid var(--panel-line);
+  }
+  .benefit-row:last-child{border-bottom:none;}
+  .benefit-row .num{
+    font-family:var(--serif);
+    font-size:1.6rem;
+    color:var(--amber-deep);
+    flex-shrink:0;
+    width:2.4rem;
+  }
+  .benefit-row h5{margin:0 0 0.3rem; font-family:var(--sans); font-weight:600; font-size:1rem;}
+  .benefit-row p{margin:0; font-size:0.92rem;}
+
+  /* ---------- Virtualization compare ---------- */
+  .vtype{
+    border:1px solid var(--panel-line);
+    border-radius:6px;
+    padding:1.3rem 1.4rem;
+    margin-bottom:1.2rem;
+  }
+  .vtype .vtype-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom:0.5rem;
+  }
+  .vtype .vtype-head h5{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:1.15rem;
+    margin:0;
+  }
+  .vtype .vtype-head span{
+    font-family:var(--mono);
+    font-size:0.72rem;
+    color:var(--muted);
+  }
+
+  footer{
+    max-width:var(--maxw);
+    margin:0 auto;
+    padding:2rem 1.5rem 4rem;
+    font-family:var(--mono);
+    font-size:0.78rem;
+    color:var(--muted);
+    border-top:1px solid var(--panel-line);
+  }
+
+  @media (max-width: 860px){
+    .layout{grid-template-columns:1fr;}
+    nav.toc{
+      position:static;
+      border:1px solid var(--panel-line);
+      background:var(--panel);
+      padding:1.2rem 1.4rem;
+      border-radius:6px;
+      margin-bottom:1rem;
+    }
+    .use-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="kicker">a working guide — updated for 2026</div>
+  <h1>Running your own Linux, from first boot to first server</h1>
+  <p class="lede">What Linux actually is, how to run it from inside Windows or macOS without wiping anything, which distribution to pick, and how to turn a spare machine into a server that does something useful for you.</p>
+  <div class="prompt-line"><code>$ whoami</code> <code>curious</code></div>
+</div>
+
+<div class="layout">
+  <nav class="toc">
+    <div class="toc-title">contents</div>
+    <ol>
+      <li><a href="#basics">Linux, briefly</a></li>
+      <li><a href="#on-windows">Linux on Windows</a></li>
+      <li><a href="#on-mac">Linux on macOS</a></li>
+      <li><a href="#compare">What each OS won't do</a></li>
+      <li><a href="#distros">Distribution index</a></li>
+      <li><a href="#server">Build a personal server</a></li>
+      <li><a href="#benefits">Why bother</a></li>
+      <li><a href="#virtual">Virtual systems</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <section id="basics">
+      <div class="sec-label">01 — orientation</div>
+      <h2>What Linux is, in practice</h2>
+      <p>Linux is the kernel — the core piece of software that talks to your hardware — at the center of a whole family of free operating systems. Unlike Windows or macOS, no single company owns it. Instead, different groups package the kernel together with their own set of tools, defaults, and design philosophy, and each finished package is called a <strong>distribution</strong>, or "distro" for short. That's why "Ubuntu," "Fedora," and "Arch" all mean "Linux" but feel like different operating systems.</p>
+
+      <p>Three ideas make everything else click:</p>
+      <ul>
+        <li><strong>The terminal is a first-class citizen.</strong> Almost anything you can do with a mouse, you can do faster with a typed command. This isn't a power-user afterthought — it's the native interface.</li>
+        <li><strong>The filesystem has one root.</strong> There's no C: drive. Everything — your files, connected drives, your programs — lives somewhere under a single <code>/</code>, with folders like <code>/home</code> (your personal files), <code>/etc</code> (configuration), and <code>/var</code> (logs, changing data).</li>
+        <li><strong>Software comes from repositories, not websites.</strong> Instead of downloading installers, you ask a package manager — <code>apt</code>, <code>dnf</code>, <code>pacman</code>, depending on the distro — to fetch and install (and later update) software for you.</li>
+      </ul>
+
+      <div class="callout">
+        <div class="callout-label">first commands worth knowing</div>
+        <pre><code>pwd                 # where am I?
+ls -la               # what's here?
+cd Documents         # go somewhere
+sudo apt update      # refresh the list of available software
+sudo apt install htop  # install something (Debian/Ubuntu family)
+man ls               # read the manual for any command</code></pre>
+      </div>
+
+      <p><code>sudo</code> is worth calling out on its own: it temporarily runs a single command with administrator privileges. You'll type it constantly for anything that touches system files — it's Linux's equivalent of the "Run as Administrator" prompt, except scoped to one command instead of a whole session.</p>
+    </section>
+
+    <section id="on-windows">
+      <div class="sec-label">02 — running it alongside Windows</div>
+      <h2>Getting Linux running on Windows</h2>
+      <p>You have four realistic paths, in order of how much they disturb your existing setup.</p>
+
+      <div class="path-card">
+        <h4>WSL2 <span class="tag">recommended for most people</span></h4>
+        <p>Windows Subsystem for Linux runs a real Linux kernel directly alongside Windows — no separate boot, no dedicated disk partition, and file access works in both directions.</p>
+        <ol>
+          <li>Open PowerShell as Administrator and run <code>wsl --install</code>.</li>
+          <li>Restart when prompted.</li>
+          <li>On relaunch, choose a distro (Ubuntu is the default) and set a username and password.</li>
+          <li>Launch it anytime from the Start menu, or type <code>wsl</code> in any terminal.</li>
+        </ol>
+      </div>
+
+      <div class="path-card">
+        <h4>Virtual machine <span class="tag">safest to experiment in</span></h4>
+        <p>Install VirtualBox or VMware Workstation, download a distro's <code>.iso</code> installer image, create a new virtual machine, and install Linux inside it exactly as if it were a physical computer. Windows never sees a single file change.</p>
+        <ol>
+          <li>Install VirtualBox (free) from its official site.</li>
+          <li>Download an ISO — Ubuntu Desktop is a solid first choice.</li>
+          <li>In VirtualBox: New → allocate RAM (4GB+) and disk (25GB+) → attach the ISO → start.</li>
+          <li>Walk through the on-screen installer as you would for any OS.</li>
+        </ol>
+      </div>
+
+      <div class="path-card">
+        <h4>Dual boot <span class="tag">best real-hardware performance</span></h4>
+        <p>Linux installs onto its own disk partition alongside Windows, and a boot menu lets you choose which OS to start each time. Full hardware speed, but back up your data first — partitioning carries real risk if interrupted.</p>
+        <ol>
+          <li>Shrink your Windows partition in Disk Management to free up unallocated space.</li>
+          <li>Write a distro's ISO to a USB drive with Rufus or balenaEtcher.</li>
+          <li>Boot from the USB (via your BIOS/UEFI boot menu) and choose "install alongside Windows."</li>
+          <li>Reboot — GRUB, the boot menu, now lets you pick an OS at startup.</li>
+        </ol>
+      </div>
+
+      <div class="path-card">
+        <h4>Live USB <span class="tag">zero commitment</span></h4>
+        <p>Boot Linux entirely from a USB stick with nothing installed to your hard drive at all. Perfect for a test drive.</p>
+        <ol>
+          <li>Write an ISO to USB with balenaEtcher.</li>
+          <li>Restart your PC and enter the boot menu (commonly <code>F12</code>, <code>Esc</code>, or <code>F2</code>).</li>
+          <li>Select the USB drive and choose "Try [distro]" rather than "Install."</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="on-mac">
+      <div class="sec-label">03 — running it alongside macOS</div>
+      <h2>Getting Linux running on a Mac</h2>
+      <p>Macs don't have a WSL equivalent, and Apple Silicon (M-series) Macs can't dual-boot Linux the way Intel Macs once could — but virtualization is fast and well-supported on both chip types.</p>
+
+      <div class="path-card">
+        <h4>UTM <span class="tag">free, native on Apple Silicon</span></h4>
+        <p>UTM wraps Apple's own virtualization framework in a friendly interface, and runs ARM Linux distros at near-native speed on M-series Macs.</p>
+        <ol>
+          <li>Install UTM from utm.app or the Mac App Store.</li>
+          <li>Download the ARM64 build of a distro (Ubuntu Server or Debian are easy first picks).</li>
+          <li>In UTM: Create a New VM → Virtualize → attach the ISO → allocate RAM/disk → start.</li>
+          <li>Install as normal from the guided installer.</li>
+        </ol>
+      </div>
+
+      <div class="path-card">
+        <h4>Parallels Desktop <span class="tag">paid, most polished</span></h4>
+        <p>Parallels is commercial software, but it offers one-click Linux distro downloads, shared folders with macOS, and clipboard sharing out of the box.</p>
+        <ol>
+          <li>Install Parallels Desktop and open it.</li>
+          <li>Choose "Download Linux" or "Install from image" in the new-VM wizard.</li>
+          <li>Follow the prompts — Parallels handles most configuration automatically.</li>
+        </ol>
+      </div>
+
+      <div class="path-card">
+        <h4>Docker Desktop <span class="tag">for running Linux software, not a desktop</span></h4>
+        <p>If your goal is really "I want to run Linux-based tools and servers," not "I want a Linux desktop," Docker gives you isolated Linux environments without managing a full VM yourself.</p>
+        <ol>
+          <li>Install Docker Desktop for Mac.</li>
+          <li>Run <code>docker run -it ubuntu bash</code> to drop into a live Ubuntu shell.</li>
+        </ol>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">a note on Intel vs Apple Silicon</div>
+        Intel Macs can also dual-boot older Linux distros using rEFInd as a boot manager, though this path is less common now than it used to be. On M-series Macs, virtualization is the practical route — the hardware simply doesn't support the older dual-boot method.
+      </div>
+    </section>
+
+    <section id="compare">
+      <div class="sec-label">04 — the honest comparison</div>
+      <h2>What each operating system won't do for you</h2>
+      <p>No OS wins every category. Here's where each one genuinely falls short, and the most-adopted distros to know regardless of which route you take.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Area</th><th>Linux can't (easily)</th><th>Windows can't (easily)</th><th>macOS can't (easily)</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Software</td>
+              <td>Run most commercial creative/office suites natively (Photoshop, full Office)</td>
+              <td>Use most package managers without third-party tools like winget or Chocolatey filling gaps</td>
+              <td>Run most PC games or software requiring DirectX</td>
+            </tr>
+            <tr>
+              <td>Hardware</td>
+              <td>Guarantee day-one driver support for brand-new GPUs and laptops</td>
+              <td>Run on non-x86/ARM-licensed hardware outside Microsoft's ecosystem</td>
+              <td>Run on non-Apple hardware at all (without hacks)</td>
+            </tr>
+            <tr>
+              <td>Customization</td>
+              <td>—</td>
+              <td>Swap the entire desktop environment or window manager</td>
+              <td>Swap the entire desktop environment, or run without Apple's UI conventions</td>
+            </tr>
+            <tr>
+              <td>Cost & licensing</td>
+              <td>—</td>
+              <td>Run free of a product key or license terms</td>
+              <td>Run legally on non-Apple hardware</td>
+            </tr>
+            <tr>
+              <td>Gaming</td>
+              <td>Match Windows' anti-cheat and DRM game compatibility (improving via Proton, not universal)</td>
+              <td>—</td>
+              <td>Access most current AAA game releases</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="distros">
+      <div class="sec-label">05 — index</div>
+      <h2>The most-adopted distributions</h2>
+      <p>Hundreds of distros exist; these are the ones you'll encounter constantly, ordered by how commonly they come up for a newcomer.</p>
+
+      <div class="distro-index">
+        <div class="distro"><div class="rank">01</div><h5>Ubuntu</h5><p>The default recommendation. Huge community, long-term-support releases, most tutorials assume it.</p></div>
+        <div class="distro"><div class="rank">02</div><h5>Linux Mint</h5><p>Ubuntu-based, tuned for a Windows-like desktop feel out of the box.</p></div>
+        <div class="distro"><div class="rank">03</div><h5>Debian</h5><p>The stable, conservative base that Ubuntu and Mint are built on top of.</p></div>
+        <div class="distro"><div class="rank">04</div><h5>Fedora</h5><p>Cutting-edge but polished; backed by Red Hat, popular with developers.</p></div>
+        <div class="distro"><div class="rank">05</div><h5>Arch Linux</h5><p>Minimal and fully manual install — you build the system piece by piece. Steep learning curve, total control.</p></div>
+        <div class="distro"><div class="rank">06</div><h5>Pop!_OS</h5><p>Ubuntu-based, from System76, tuned for developers and Nvidia hardware.</p></div>
+        <div class="distro"><div class="rank">07</div><h5>openSUSE</h5><p>Enterprise-grade tooling (YaST) with both stable and rolling-release editions.</p></div>
+        <div class="distro"><div class="rank">08</div><h5>Manjaro</h5><p>Arch's power under a friendlier, pre-configured installer.</p></div>
+      </div>
+    </section>
+
+    <section id="server">
+      <div class="sec-label">06 — build something</div>
+      <h2>Turning Linux into a personal server</h2>
+      <p>"Server" just means a machine that stays on and answers requests — from your other devices, or from the internet. It can be a repurposed old laptop, a Raspberry Pi, a mini PC, or a virtual machine. The distro of choice here is usually a lightweight, no-desktop build like <strong>Ubuntu Server</strong> or <strong>Debian</strong>, since a server rarely needs a graphical interface at all.</p>
+
+      <h3>What you can actually build with it</h3>
+      <div class="use-grid">
+        <div class="use-card">
+          <h5>File server / home NAS</h5>
+          <p>Share and back up files across every device on your network using Samba or NFS — your own private Dropbox, with no storage limit but your own drive.</p>
+        </div>
+        <div class="use-card">
+          <h5>Media server</h5>
+          <p>Run Jellyfin or Plex to stream your own movies, shows, and music to any TV or phone in the house, organized and searchable.</p>
+        </div>
+        <div class="use-card">
+          <h5>Personal website or web app</h5>
+          <p>Host a blog, portfolio, or side project with Nginx or Apache, fully under your control instead of a third-party platform.</p>
+        </div>
+        <div class="use-card">
+          <h5>Home automation hub</h5>
+          <p>Run Home Assistant to tie together smart bulbs, sensors, and switches from different brands into one local dashboard.</p>
+        </div>
+        <div class="use-card">
+          <h5>Private VPN</h5>
+          <p>Set up WireGuard so you can securely reach your home network — and route your traffic through it — from anywhere.</p>
+        </div>
+        <div class="use-card">
+          <h5>Game server</h5>
+          <p>Host a Minecraft, Valheim, or CS2 server for friends, with full control over mods, uptime, and who's invited.</p>
+        </div>
+        <div class="use-card">
+          <h5>Ad and tracker blocking</h5>
+          <p>Run Pi-hole to filter ads and trackers network-wide, for every device that connects — no per-device app needed.</p>
+        </div>
+        <div class="use-card">
+          <h5>Development sandbox</h5>
+          <p>A always-on Linux box to test code, run CI jobs, or host databases without touching your main computer.</p>
+        </div>
+      </div>
+
+      <h3>A minimal first setup</h3>
+      <pre><code># after installing Ubuntu Server, from another machine:
+ssh youruser@server-ip-address
+
+# keep it updated
+sudo apt update && sudo apt upgrade -y
+
+# install something useful — e.g. a file share
+sudo apt install samba
+
+# check what's listening on the network
+sudo ss -tulpn</code></pre>
+      <div class="callout">
+        <div class="callout-label">before you expose anything to the internet</div>
+        Give the server a static local IP, enable a firewall (<code>ufw</code> is the simplest option on Debian-based systems), and only open the specific ports each service actually needs. A server reachable from outside your home network is worth locking down deliberately, not by default settings.
+      </div>
+    </section>
+
+    <section id="benefits">
+      <div class="sec-label">07 — the case for it</div>
+      <h2>What running your own server actually gets you</h2>
+
+      <div class="benefit-row">
+        <div class="num">1</div>
+        <div>
+          <h5>Ownership of your own data</h5>
+          <p>Photos, files, and media live on hardware you control, not on a company's servers subject to their pricing changes, outages, or policy shifts.</p>
+        </div>
+      </div>
+      <div class="benefit-row">
+        <div class="num">2</div>
+        <div>
+          <h5>No recurring subscription creep</h5>
+          <p>One machine can replace several monthly subscriptions — cloud storage, streaming-media apps, VPN services, smart-home clouds — with a single upfront cost.</p>
+        </div>
+      </div>
+      <div class="benefit-row">
+        <div class="num">3</div>
+        <div>
+          <h5>A real place to learn</h5>
+          <p>Networking, security, backups, and troubleshooting stop being abstract concepts once a service you actually use depends on you keeping it running.</p>
+        </div>
+      </div>
+      <div class="benefit-row">
+        <div class="num">4</div>
+        <div>
+          <h5>Flexibility to grow</h5>
+          <p>Start with one small service, and the same box can quietly pick up more roles over time — file sharing today, a game server or home automation hub next month.</p>
+        </div>
+      </div>
+      <div class="benefit-row">
+        <div class="num">5</div>
+        <div>
+          <h5>Works even when the internet doesn't</h5>
+          <p>Local-network services keep running during an outage, since nothing has to leave your house to reach another device on the same network.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="virtual">
+      <div class="sec-label">08 — virtualization</div>
+      <h2>Operating a virtual system</h2>
+      <p>Virtualization lets one physical machine pretend to be several. Instead of buying separate hardware for every server or experiment, you carve one computer's CPU, memory, and storage into isolated slices — each one behaving like its own independent machine.</p>
+
+      <div class="vtype">
+        <div class="vtype-head"><h5>Type-2 hypervisors</h5><span>run inside a host OS</span></div>
+        <p>VirtualBox, VMware Workstation, and UTM run as ordinary applications on top of Windows, macOS, or Linux. Easiest to start with — good for testing a distro, running an isolated environment, or the "on Windows/Mac" paths described above.</p>
+      </div>
+
+      <div class="vtype">
+        <div class="vtype-head"><h5>Type-1 hypervisors</h5><span>run directly on hardware</span></div>
+        <p>Proxmox VE and bare-metal ESXi install directly onto a machine with no host OS underneath them at all — the hypervisor <em>is</em> the operating system. This is how you turn a dedicated box into a small private cloud, running several virtual machines and containers side by side, each with guaranteed resources and its own network identity.</p>
+      </div>
+
+      <div class="vtype">
+        <div class="vtype-head"><h5>Containers</h5><span>lighter than a full VM</span></div>
+        <p>Docker and LXC don't emulate a whole computer — they isolate a process using the host kernel's own features. Faster to start, lighter on resources, but less isolated than a true VM. Ideal for running many small services (a web app, a database, a bot) on one server without each one needing its own full OS copy.</p>
+      </div>
+
+      <h3>Operating one day-to-day</h3>
+      <ul>
+        <li><strong>Snapshots</strong> — save a VM's exact state before making a risky change, and roll back instantly if it breaks.</li>
+        <li><strong>Resource allocation</strong> — assign each VM a fixed share of CPU cores, RAM, and disk so one guest can't starve the others.</li>
+        <li><strong>Networking modes</strong> — bridged (the VM gets its own address on your network) versus NAT (the VM shares the host's address) changes whether other devices can reach it directly.</li>
+        <li><strong>Headless operation</strong> — most server VMs run without a display at all; you manage them entirely over SSH or a web console like Proxmox's.</li>
+      </ul>
+
+      <pre><code># quick example: spin up an Ubuntu VM from the command line with QEMU
+qemu-img create -f qcow2 myserver.qcow2 20G
+qemu-system-x86_64 -m 2048 -hda myserver.qcow2 -cdrom ubuntu-server.iso -boot d</code></pre>
+
+      <div class="callout">
+        <div class="callout-label">why this matters for a personal server</div>
+        Virtualization means one physical box can safely host your file server, media server, and a test environment for new projects at the same time — each isolated, so a crash or misconfiguration in one never touches the others.
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  built as a self-contained reference — no tracking, no external calls beyond the two fonts loaded above.
+</footer>
+
+</body>
+</html>
