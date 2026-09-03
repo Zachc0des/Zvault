@@ -1,1 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>From Bits to Networks — Binary in Networking</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A2540;
+    --bg-deep:#071B33;
+    --panel:#0F3159;
+    --panel-2:#123A6B;
+    --grid:rgba(255,255,255,0.055);
+    --paper:#EAF1F8;
+    --muted:#7FA0C4;
+    --muted-2:#4E7398;
+    --orange:#FF8C42;
+    --teal:#4ECDC4;
+    --border:#2C5D8F;
+    --red:#FF6B6B;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg);
+    color:var(--paper);
+    font-family:'Space Grotesk', sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .mono{font-family:'IBM Plex Mono', monospace;}
+
+  a{color:var(--orange);}
+
+  /* ---------- Layout shell ---------- */
+  .sheet{
+    max-width:960px;
+    margin:0 auto;
+    padding:0 24px 120px;
+    position:relative;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:72px 0 56px;
+    border-bottom:1px solid var(--border);
+    position:relative;
+  }
+  .hero .tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--orange);
+    letter-spacing:0.02em;
+    margin-bottom:18px;
+  }
+  .hero h1{
+    font-size:clamp(34px, 6vw, 58px);
+    font-weight:700;
+    margin:0 0 18px;
+    letter-spacing:-0.01em;
+    max-width:11ch;
+  }
+  .hero p.lede{
+    font-size:18px;
+    color:var(--muted);
+    max-width:56ch;
+    margin:0 0 28px;
+  }
+  .hero .ip-strip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:15px;
+    color:var(--teal);
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .hero .ip-strip span{
+    padding:4px 10px;
+    border:1px solid var(--border);
+    background:var(--panel);
+  }
+
+  /* ---------- Section shell with ruler numbering ---------- */
+  .section{
+    display:grid;
+    grid-template-columns:64px 1fr;
+    gap:28px;
+    padding:56px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .section:last-of-type{border-bottom:none;}
+  .rail{
+    position:relative;
+  }
+  .rail .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+    color:var(--muted-2);
+    writing-mode:horizontal-tb;
+  }
+  .rail .num strong{
+    display:block;
+    font-size:28px;
+    color:var(--orange);
+    font-weight:600;
+  }
+  .rail .line{
+    position:absolute;
+    top:44px;
+    bottom:-56px;
+    left:14px;
+    width:1px;
+    background:var(--border);
+  }
+  .section:last-of-type .rail .line{display:none;}
+
+  .content h2{
+    font-size:26px;
+    margin:0 0 14px;
+    font-weight:600;
+  }
+  .content > p{
+    color:var(--muted);
+    max-width:64ch;
+    margin:0 0 20px;
+    font-size:15.5px;
+  }
+  .content > p strong{color:var(--paper);}
+
+  /* ---------- Panels (blueprint callout boxes, not rounded cards) ---------- */
+  .panel{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--border);
+    padding:24px;
+    margin:20px 0;
+  }
+  .panel::before, .panel::after,
+  .panel .c2::before, .panel .c2::after{
+    content:'';
+    position:absolute;
+    width:12px;
+    height:12px;
+    border:2px solid var(--orange);
+  }
+  .panel::before{top:-1px;left:-1px;border-right:none;border-bottom:none;}
+  .panel::after{top:-1px;right:-1px;border-left:none;border-bottom:none;}
+  .panel .c2::before{bottom:-1px;left:-1px;border-right:none;border-top:none;position:absolute;}
+  .panel .c2::after{bottom:-1px;right:-1px;border-left:none;border-top:none;position:absolute;}
+  .panel .label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--muted-2);
+    margin-bottom:14px;
+  }
+
+  /* ---------- Place value table ---------- */
+  .place-table{
+    display:grid;
+    grid-template-columns:repeat(8, 1fr);
+    gap:1px;
+    background:var(--border);
+    border:1px solid var(--border);
+    font-family:'IBM Plex Mono', monospace;
+    text-align:center;
+    font-size:14px;
+  }
+  .place-table > div{background:var(--panel);padding:12px 4px;}
+  .place-table .hd{color:var(--muted-2);font-size:12px;}
+  .place-table .val{color:var(--orange);font-weight:600;font-size:16px;}
+
+  /* ---------- Bit toggle widget ---------- */
+  .bit-widget{margin:22px 0;}
+  .bit-row{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .bit{
+    font-family:'IBM Plex Mono', monospace;
+    width:52px;
+    height:64px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    border:1px solid var(--border);
+    background:var(--bg-deep);
+    color:var(--muted);
+    cursor:pointer;
+    user-select:none;
+    transition:background .12s, color .12s, border-color .12s;
+    gap:4px;
+  }
+  .bit .pv{font-size:10px;color:var(--muted-2);}
+  .bit .bv{font-size:20px;font-weight:600;}
+  .bit.on{background:var(--orange);color:var(--bg-deep);border-color:var(--orange);}
+  .bit.on .pv{color:var(--bg-deep);opacity:.7;}
+  .readout{
+    margin-top:16px;
+    display:flex;
+    gap:24px;
+    flex-wrap:wrap;
+    align-items:baseline;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .readout .big{font-size:34px;color:var(--teal);font-weight:600;}
+  .readout .lbl{font-size:12px;color:var(--muted-2);display:block;margin-bottom:2px;}
+
+  /* ---------- IP breakdown ---------- */
+  .octet-line{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+    font-family:'IBM Plex Mono', monospace;
+    margin:10px 0;
+  }
+  .octet-line .oct{
+    background:var(--bg-deep);
+    border:1px solid var(--border);
+    padding:8px 12px;
+    text-align:center;
+    min-width:96px;
+  }
+  .octet-line .oct .d{color:var(--teal);font-size:18px;font-weight:600;}
+  .octet-line .oct .b{color:var(--muted);font-size:13px;margin-top:2px;}
+  .dot{color:var(--muted-2);font-size:20px;}
+
+  /* ---------- CIDR playground ---------- */
+  .playground{margin:22px 0;}
+  .pg-controls{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    align-items:flex-end;
+    margin-bottom:22px;
+  }
+  .field label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--muted-2);
+    margin-bottom:6px;
+  }
+  .field input[type="text"]{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:16px;
+    background:var(--bg-deep);
+    border:1px solid var(--border);
+    color:var(--paper);
+    padding:8px 10px;
+    width:160px;
+  }
+  .field input[type="range"]{width:220px;accent-color:var(--orange);}
+  .cidr-val{font-family:'IBM Plex Mono', monospace;color:var(--orange);font-size:16px;font-weight:600;}
+
+  .bit32{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    margin:16px 0;
+  }
+  .bit32 .g{display:flex;gap:2px;padding:4px;border:1px solid var(--border);background:var(--bg-deep);}
+  .bit32 .b{width:16px;text-align:center;}
+  .bit32 .net{color:var(--orange);font-weight:600;}
+  .bit32 .host{color:var(--teal);font-weight:600;}
+
+  .result-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
+    gap:1px;
+    background:var(--border);
+    border:1px solid var(--border);
+    margin-top:18px;
+  }
+  .result-grid > div{background:var(--panel-2);padding:14px 16px;}
+  .result-grid .rl{font-family:'IBM Plex Mono', monospace;font-size:11px;color:var(--muted-2);margin-bottom:4px;}
+  .result-grid .rv{font-family:'IBM Plex Mono', monospace;font-size:17px;color:var(--paper);font-weight:600;}
+  .warn{color:var(--red);font-size:13px;font-family:'IBM Plex Mono', monospace;margin-top:8px;}
+
+  /* ---------- Subnet plan table ---------- */
+  table.plan{
+    width:100%;
+    border-collapse:collapse;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13.5px;
+    margin:18px 0;
+  }
+  table.plan th, table.plan td{
+    border:1px solid var(--border);
+    padding:10px 12px;
+    text-align:left;
+  }
+  table.plan th{
+    background:var(--panel-2);
+    color:var(--muted);
+    font-weight:500;
+    font-size:12px;
+  }
+  table.plan td{color:var(--paper);}
+  table.plan td.small{color:var(--muted);font-size:12px;}
+
+  /* ---------- Checklist ---------- */
+  .checklist{list-style:none;margin:18px 0;padding:0;}
+  .checklist li{
+    display:flex;
+    gap:14px;
+    padding:14px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .idx{
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--orange);
+    font-weight:600;
+    flex-shrink:0;
+  }
+  .checklist .body strong{display:block;margin-bottom:3px;}
+  .checklist .body span{color:var(--muted);font-size:14px;}
+  .checklist code{
+    font-family:'IBM Plex Mono', monospace;
+    background:var(--bg-deep);
+    padding:1px 6px;
+    border:1px solid var(--border);
+    color:var(--teal);
+    font-size:13px;
+  }
+
+  footer{
+    padding:48px 0 0;
+    color:var(--muted-2);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+  }
+
+  @media (max-width:640px){
+    .section{grid-template-columns:1fr;}
+    .rail{display:flex;align-items:center;gap:10px;}
+    .rail .line{display:none;}
+    .rail .num strong{display:inline;font-size:20px;margin-right:6px;}
+    .place-table{grid-template-columns:repeat(4, 1fr);}
+    .bit{width:40px;height:56px;}
+    .bit .bv{font-size:16px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+  <div class="hero">
+    <div class="tag mono">schematic — binary &amp; ip addressing</div>
+    <h1>From bits to networks</h1>
+    <p class="lede">Every IP address, subnet mask, and routing decision on a network is a string of 32 binary digits underneath. This walks through the conversion, step by step, with a live playground you can wire up with real numbers.</p>
+    <div class="ip-strip">
+      <span>192.168.1.10</span>
+      <span>11000000.10101000.00000001.00001010</span>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="section">
+    <div class="rail">
+      <div class="num mono"><strong>01</strong>basics</div>
+      <div class="line"></div>
+    </div>
+    <div class="content">
+      <h2>Why networking runs on binary</h2>
+      <p>Computers address, route, and filter traffic using pure binary — every IP address is really a <strong>32-bit number</strong>. We write it as four decimal numbers (octets) separated by dots only because that's easier for humans to read. Each octet is 8 bits, and each bit position is worth a fixed value.</p>
+
+      <div class="panel">
+        <div class="c2"></div>
+        <div class="label mono">place values in one octet (8 bits)</div>
+        <div class="place-table">
+          <div class="hd">bit 7</div><div class="hd">bit 6</div><div class="hd">bit 5</div><div class="hd">bit 4</div>
+          <div class="hd">bit 3</div><div class="hd">bit 2</div><div class="hd">bit 1</div><div class="hd">bit 0</div>
+          <div class="val">128</div><div class="val">64</div><div class="val">32</div><div class="val">16</div>
+          <div class="val">8</div><div class="val">4</div><div class="val">2</div><div class="val">1</div>
+        </div>
+      </div>
+      <p>To convert binary → decimal, add up the place values wherever there's a <span class="mono" style="color:var(--orange)">1</span>. To convert decimal → binary, work from 128 down: if the number is ≥ the place value, put a 1 and subtract it; otherwise put a 0 and move on.</p>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="section">
+    <div class="rail">
+      <div class="num mono"><strong>02</strong>try it</div>
+      <div class="line"></div>
+    </div>
+    <div class="content">
+      <h2>Toggle the bits yourself</h2>
+      <p>Click bits on and off. Watch the decimal value on the right update live — this is exactly what a router does in reverse, millions of times a second.</p>
+
+      <div class="panel">
+        <div class="c2"></div>
+        <div class="label mono">interactive octet</div>
+        <div class="bit-widget">
+          <div class="bit-row" id="bitRow"></div>
+          <div class="readout">
+            <div><span class="lbl">binary</span><span class="mono" id="binOut" style="font-size:20px;color:var(--paper)">00000000</span></div>
+            <div><span class="lbl">decimal</span><span class="big" id="decOut">0</span></div>
+          </div>
+        </div>
+      </div>
+      <p>Try building <span class="mono" style="color:var(--teal)">255</span> (all bits on), <span class="mono" style="color:var(--teal)">128</span> (just the first bit), and <span class="mono" style="color:var(--teal)">1</span> (just the last bit) to get a feel for it.</p>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="section">
+    <div class="rail">
+      <div class="num mono"><strong>03</strong>real example</div>
+      <div class="line"></div>
+    </div>
+    <div class="content">
+      <h2>A real IP address, broken into octets</h2>
+      <p>A home router's address, <strong>192.168.1.10</strong>, is really four separate binary-to-decimal conversions glued together with dots:</p>
+
+      <div class="panel">
+        <div class="c2"></div>
+        <div class="label mono">192.168.1.10</div>
+        <div class="octet-line">
+          <div class="oct"><div class="d">192</div><div class="b">11000000</div></div>
+          <span class="dot">.</span>
+          <div class="oct"><div class="d">168</div><div class="b">10101000</div></div>
+          <span class="dot">.</span>
+          <div class="oct"><div class="d">1</div><div class="b">00000001</div></div>
+          <span class="dot">.</span>
+          <div class="oct"><div class="d">10</div><div class="b">00001010</div></div>
+        </div>
+      </div>
+      <p>Full 32-bit form: <span class="mono" style="color:var(--paper)">11000000.10101000.00000001.00001010</span> — one continuous binary number a router reads to decide where a packet goes next.</p>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="section">
+    <div class="rail">
+      <div class="num mono"><strong>04</strong>subnetting</div>
+      <div class="line"></div>
+    </div>
+    <div class="content">
+      <h2>Subnet masks &amp; CIDR playground</h2>
+      <p>A subnet mask splits those 32 bits into two zones: <strong style="color:var(--orange)">network bits</strong> (which network this address belongs to) and <strong style="color:var(--teal)">host bits</strong> (which specific device on that network). The CIDR number — the <span class="mono">/24</span> in <span class="mono">192.168.1.10/24</span> — is just a count of how many leading bits are network bits.</p>
+
+      <div class="panel">
+        <div class="c2"></div>
+        <div class="label mono">enter an ip and slide the cidr</div>
+
+        <div class="playground">
+          <div class="pg-controls">
+            <div class="field">
+              <label for="ipInput">ip address</label>
+              <input type="text" id="ipInput" value="192.168.1.10">
+            </div>
+            <div class="field">
+              <label for="cidrInput">cidr prefix — <span class="cidr-val" id="cidrLabel">/24</span></label>
+              <input type="range" id="cidrInput" min="0" max="32" value="24">
+            </div>
+          </div>
+
+          <div id="bit32Wrap" class="bit32"></div>
+          <div id="warnMsg" class="warn"></div>
+
+          <div class="result-grid" id="resultGrid"></div>
+        </div>
+      </div>
+      <p>Orange bits are locked to the network — every device sharing this subnet has the same orange pattern. Teal bits are free for host addresses. Fewer teal bits means a smaller subnet with fewer usable devices, but more subnets overall.</p>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="section">
+    <div class="rail">
+      <div class="num mono"><strong>05</strong>applied</div>
+      <div class="line"></div>
+    </div>
+    <div class="content">
+      <h2>Real-life example: splitting an office network</h2>
+      <p>Say an office is handed the block <strong>192.168.1.0/24</strong> (256 addresses) and needs to separate four departments so their traffic doesn't mix. Borrowing 2 extra bits from the host portion (moving from /24 to /26) creates four equal subnets of 64 addresses each:</p>
+
+      <table class="plan">
+        <thead>
+          <tr><th>department</th><th>subnet</th><th>network addr</th><th>usable range</th><th>broadcast</th><th>hosts</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Sales</td><td>192.168.1.0/26</td><td class="small">192.168.1.0</td><td>.1 – .62</td><td class="small">192.168.1.63</td><td>62</td></tr>
+          <tr><td>Engineering</td><td>192.168.1.64/26</td><td class="small">192.168.1.64</td><td>.65 – .126</td><td class="small">192.168.1.127</td><td>62</td></tr>
+          <tr><td>HR &amp; Finance</td><td>192.168.1.128/26</td><td class="small">192.168.1.128</td><td>.129 – .190</td><td class="small">192.168.1.191</td><td>62</td></tr>
+          <tr><td>Guest Wi-Fi</td><td>192.168.1.192/26</td><td class="small">192.168.1.192</td><td>.193 – .254</td><td class="small">192.168.1.255</td><td>62</td></tr>
+        </tbody>
+      </table>
+      <p>Each row is generated the same way you just saw in the playground above — set the CIDR to <span class="mono" style="color:var(--orange)">/26</span> and try each starting address to confirm the ranges yourself.</p>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="section">
+    <div class="rail">
+      <div class="num mono"><strong>06</strong>implementation</div>
+      <div class="line"></div>
+    </div>
+    <div class="content">
+      <h2>Putting it into a router</h2>
+      <p>Once the binary math is planned, configuring it on real equipment (a home router, a Cisco switch, or a Linux box) follows the same handful of steps:</p>
+
+      <ul class="checklist">
+        <li>
+          <div class="idx mono">1</div>
+          <div class="body">
+            <strong>Pick the block and CIDR</strong>
+            <span>Decide the address range and prefix length, e.g. <code>192.168.1.64/26</code>, based on how many hosts that segment actually needs.</span>
+          </div>
+        </li>
+        <li>
+          <div class="idx mono">2</div>
+          <div class="body">
+            <strong>Convert /26 to a dotted mask</strong>
+            <span>26 network bits → <code>11111111.11111111.11111111.11000000</code> → <code>255.255.255.192</code>. This is the exact value you type into the "subnet mask" field.</span>
+          </div>
+        </li>
+        <li>
+          <div class="idx mono">3</div>
+          <div class="body">
+            <strong>Assign the gateway</strong>
+            <span>Give the router's interface for that segment the first usable address, e.g. <code>192.168.1.65</code>, and set it as the default gateway for devices on that subnet.</span>
+          </div>
+        </li>
+        <li>
+          <div class="idx mono">4</div>
+          <div class="body">
+            <strong>Configure DHCP or static addressing</strong>
+            <span>Restrict the DHCP pool to the usable range (<code>.66 – .126</code>) so it never hands out the network or broadcast address.</span>
+          </div>
+        </li>
+        <li>
+          <div class="idx mono">5</div>
+          <div class="body">
+            <strong>Add the route</strong>
+            <span>Make sure the routing table has an entry for <code>192.168.1.64/26</code> pointing at the right interface so other subnets can reach it.</span>
+          </div>
+        </li>
+        <li>
+          <div class="idx mono">6</div>
+          <div class="body">
+            <strong>Verify</strong>
+            <span>From a host on the segment, confirm its IP and mask with <code>ipconfig</code> / <code>ip addr</code>, then <code>ping</code> the gateway and a device on another subnet to confirm routing works as planned.</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    binary-to-network reference · built as a static, self-contained page
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  // ---------- Octet bit toggle widget ----------
+  const placeValues = [128,64,32,16,8,4,2,1];
+  const bitRow = document.getElementById('bitRow');
+  const state = [0,0,0,0,0,0,0,0];
+
+  function renderBits(){
+    bitRow.innerHTML = '';
+    placeValues.forEach((pv, i) => {
+      const el = document.createElement('div');
+      el.className = 'bit' + (state[i] ? ' on' : '');
+      el.innerHTML = '<span class="pv">'+pv+'</span><span class="bv">'+state[i]+'</span>';
+      el.addEventListener('click', () => {
+        state[i] = state[i] ? 0 : 1;
+        renderBits();
+        updateReadout();
+      });
+      bitRow.appendChild(el);
+    });
+  }
+
+  function updateReadout(){
+    const bin = state.join('');
+    const dec = state.reduce((sum, bit, i) => sum + bit * placeValues[i], 0);
+    document.getElementById('binOut').textContent = bin;
+    document.getElementById('decOut').textContent = dec;
+  }
+
+  renderBits();
+  updateReadout();
+
+  // ---------- CIDR playground ----------
+  const ipInput = document.getElementById('ipInput');
+  const cidrInput = document.getElementById('cidrInput');
+  const cidrLabel = document.getElementById('cidrLabel');
+  const bit32Wrap = document.getElementById('bit32Wrap');
+  const resultGrid = document.getElementById('resultGrid');
+  const warnMsg = document.getElementById('warnMsg');
+
+  function octetToBin(n){
+    return n.toString(2).padStart(8,'0');
+  }
+  function binToOctet(b){
+    return parseInt(b,2);
+  }
+  function parseIP(str){
+    const parts = str.trim().split('.');
+    if(parts.length !== 4) return null;
+    const nums = parts.map(p => parseInt(p,10));
+    if(nums.some(n => isNaN(n) || n < 0 || n > 255)) return null;
+    return nums;
+  }
+
+  function render(){
+    const cidr = parseInt(cidrInput.value, 10);
+    cidrLabel.textContent = '/' + cidr;
+    const ipParts = parseIP(ipInput.value);
+
+    if(!ipParts){
+      warnMsg.textContent = 'Enter a valid IPv4 address, e.g. 192.168.1.10';
+      bit32Wrap.innerHTML = '';
+      resultGrid.innerHTML = '';
+      return;
+    }
+    warnMsg.textContent = '';
+
+    const ipBinary = ipParts.map(octetToBin).join('');
+    const maskBinary = '1'.repeat(cidr) + '0'.repeat(32 - cidr);
+
+    let networkBinary = '';
+    let broadcastBinary = '';
+    for(let i = 0; i < 32; i++){
+      networkBinary += (ipBinary[i] === '1' && maskBinary[i] === '1') ? '1' : '0';
+      broadcastBinary += (maskBinary[i] === '1') ? ipBinary[i] : '1';
+    }
+
+    // render 32 bits grouped into 4 octets, colored network vs host
+    bit32Wrap.innerHTML = '';
+    for(let o = 0; o < 4; o++){
+      const g = document.createElement('div');
+      g.className = 'g';
+      for(let b = 0; b < 8; b++){
+        const idx = o*8 + b;
+        const span = document.createElement('span');
+        span.className = 'b ' + (idx < cidr ? 'net' : 'host');
+        span.textContent = ipBinary[idx];
+        g.appendChild(span);
+      }
+      bit32Wrap.appendChild(g);
+    }
+
+    function binToDotted(bin){
+      const octs = [];
+      for(let i=0;i<4;i++) octs.push(binToOctet(bin.substr(i*8,8)));
+      return octs.join('.');
+    }
+
+    const maskDotted = binToDotted(maskBinary);
+    const networkDotted = binToDotted(networkBinary);
+    const broadcastDotted = binToDotted(broadcastBinary);
+    const hostBits = 32 - cidr;
+    let totalAddresses = Math.pow(2, hostBits);
+    let usableHosts, usableRange;
+
+    if(hostBits >= 2){
+      usableHosts = totalAddresses - 2;
+      const netInt = parseInt(networkBinary,2);
+      const firstUsable = binToDotted((netInt+1).toString(2).padStart(32,'0'));
+      const lastUsable = binToDotted((netInt+totalAddresses-2).toString(2).padStart(32,'0'));
+      usableRange = firstUsable + ' – ' + lastUsable;
+    } else if(hostBits === 1){
+      usableHosts = 2;
+      usableRange = '(point-to-point link, both addresses usable)';
+    } else {
+      usableHosts = 1;
+      usableRange = '(single host route)';
+    }
+
+    resultGrid.innerHTML = `
+      <div><div class="rl mono">subnet mask</div><div class="rv mono">${maskDotted}</div></div>
+      <div><div class="rl mono">network address</div><div class="rv mono">${networkDotted}</div></div>
+      <div><div class="rl mono">broadcast address</div><div class="rv mono">${broadcastDotted}</div></div>
+      <div><div class="rl mono">usable hosts</div><div class="rv mono">${usableHosts}</div></div>
+      <div style="grid-column:1/-1;"><div class="rl mono">usable range</div><div class="rv mono">${usableRange}</div></div>
+    `;
+  }
+
+  ipInput.addEventListener('input', render);
+  cidrInput.addEventListener('input', render);
+  render();
+})();
+</script>
+
+</body>
+</html>
 
