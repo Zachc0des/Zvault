@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Networking Devices — A Field Reference</title>
+<style>
+  :root{
+    --ink:#0e1a24;
+    --paper:#f3efe6;
+    --panel:#ffffff;
+    --line:#d8cfb9;
+    --copper:#b5651d;
+    --copper-dim:#e3b58a;
+    --signal:#2f6f5e;
+    --mono: "IBM Plex Mono", "Courier New", monospace;
+    --sans: "IBM Plex Sans", Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.55;
+  }
+  @font-face{
+    font-family:"IBM Plex Sans";
+    src:local("Arial");
+  }
+
+  header{
+    padding:64px 24px 40px;
+    max-width:900px;
+    margin:0 auto;
+    border-bottom:2px solid var(--ink);
+  }
+  .kicker{
+    font-family:var(--mono);
+    font-size:13px;
+    letter-spacing:0.02em;
+    color:var(--copper);
+    margin:0 0 14px;
+  }
+  h1{
+    font-size:clamp(32px,5vw,52px);
+    margin:0 0 16px;
+    font-weight:700;
+    letter-spacing:-0.01em;
+    max-width:14ch;
+  }
+  header p{
+    max-width:60ch;
+    font-size:17px;
+    color:#3a3229;
+    margin:0;
+  }
+
+  .mode-bar{
+    position:sticky;
+    top:0;
+    z-index:10;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    padding:14px 24px;
+  }
+  .mode-inner{
+    max-width:900px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .mode-label{
+    font-size:14px;
+    color:#3a3229;
+  }
+  .toggle{
+    display:flex;
+    border:1.5px solid var(--ink);
+    border-radius:999px;
+    overflow:hidden;
+    font-family:var(--mono);
+    font-size:13px;
+  }
+  .toggle button{
+    border:none;
+    background:transparent;
+    padding:9px 18px;
+    cursor:pointer;
+    color:var(--ink);
+    font-family:inherit;
+  }
+  .toggle button.active{
+    background:var(--ink);
+    color:var(--paper);
+  }
+
+  main{
+    max-width:900px;
+    margin:0 auto;
+    padding:32px 24px 100px;
+  }
+
+  .device{
+    border-bottom:1px solid var(--line);
+    padding:40px 0;
+  }
+  .device:first-child{padding-top:12px;}
+
+  .device-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    margin-bottom:6px;
+  }
+  .device-num{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--copper);
+  }
+  .device h2{
+    font-size:23px;
+    margin:0;
+  }
+  .device-tag{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--signal);
+    margin:0 0 18px;
+  }
+
+  .desc{max-width:68ch;}
+  .desc p{margin:0 0 12px; color:#241c14;}
+  .desc[data-view="beginner"]{display:block;}
+  .desc[data-view="expert"]{display:none;}
+  body.expert .desc[data-view="beginner"]{display:none;}
+  body.expert .desc[data-view="expert"]{display:block;}
+
+  .example{
+    margin-top:18px;
+    padding:16px 18px;
+    background:var(--panel);
+    border-left:3px solid var(--copper);
+  }
+  .example-label{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--copper);
+    margin:0 0 6px;
+  }
+  .example p{margin:0; font-size:15px; color:#241c14;}
+
+  .specs{
+    margin-top:14px;
+    display:none;
+    font-family:var(--mono);
+    font-size:13px;
+    color:#4a4033;
+    gap:6px;
+  }
+  body.expert .specs{display:flex; flex-direction:column;}
+  .specs span b{color:var(--ink);}
+
+  footer{
+    max-width:900px;
+    margin:0 auto;
+    padding:0 24px 60px;
+    font-size:13px;
+    color:#6b6152;
+  }
+
+  @media (max-width:600px){
+    header{padding:44px 18px 28px;}
+    main{padding:24px 18px 80px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="kicker">FIELD REFERENCE · NETWORK HARDWARE</p>
+  <h1>The devices that move your data</h1>
+  <p>Every network — a home Wi-Fi setup or a data center — is built from a small set of physical building blocks. This reference covers the ones you'll actually run into, explained twice: once in plain language, once at the level a network engineer would expect.</p>
+</header>
+
+<div class="mode-bar">
+  <div class="mode-inner">
+    <span class="mode-label">Reading level</span>
+    <div class="toggle">
+      <button id="btn-beginner" class="active" onclick="setMode('beginner')">New to networking</button>
+      <button id="btn-expert" onclick="setMode('expert')">Experienced / technical</button>
+    </div>
+  </div>
+</div>
+
+<main id="devices"></main>
+
+<footer>Toggle the switch above at any time — it changes how every entry below is explained, not just the one you're reading.</footer>
+
+<script>
+const DEVICES = [
+  {
+    name: "Router",
+    tag: "layer 3 · connects networks",
+    beginner: "A router is the device that connects your home network to the internet, and decides where each piece of data should go. Think of it as a traffic director standing at an intersection: every device in your house sends its internet requests to the router, and the router forwards them out to the internet — then brings the replies back to the right device.",
+    expert: "A router operates at Layer 3, forwarding packets between distinct IP networks based on routing tables built from static routes, RIP, OSPF, BGP, or similar protocols. It performs NAT for private-to-public address translation at the WAN edge, handles DHCP for the LAN it serves, and makes forwarding decisions per-packet using the longest-prefix match against its routing table.",
+    example: "The box your ISP installed (or the one behind it) that every device in your house or office connects through to reach the internet — an ISP-supplied gateway, a pfSense box, or a Cisco ISR in a branch office.",
+    specs: ["Layer: 3 (Network)", "Key job: inter-network forwarding, NAT", "Common protocols: BGP, OSPF, DHCP"]
+  },
+  {
+    name: "Switch",
+    tag: "layer 2 · connects devices within one network",
+    beginner: "A switch connects multiple devices — computers, printers, cameras — within the same local network, using cables. Unlike a router, it doesn't connect you to the internet; it just lets devices on the same network talk to each other quickly and directly, without unnecessary interruptions.",
+    expert: "A Layer 2 switch forwards frames based on MAC addresses learned via source-address inspection, storing them in a CAM table. Managed switches add VLAN segmentation (802.1Q), spanning tree (STP/RSTP) for loop prevention, port mirroring, and QoS tagging. Layer 3 switches add inter-VLAN routing directly in hardware via ASICs.",
+    example: "The 24-port box in an office server closet that every desk's Ethernet cable plugs into, or a Cisco Catalyst / Ubiquiti switch handling VLANs for voice and data traffic separately.",
+    specs: ["Layer: 2 (Data Link), or 2/3 for L3 switches", "Key job: intra-network frame forwarding", "Common features: VLANs, STP, PoE"]
+  },
+  {
+    name: "Hub",
+    tag: "layer 1 · legacy, largely obsolete",
+    beginner: "A hub is an older, simpler cousin of the switch. It also connects devices together, but it's much less intelligent — when one device sends data, the hub repeats it to every other device, whether they need it or not. This makes networks slower and less private, which is why hubs have been almost entirely replaced by switches.",
+    expert: "A hub is a Layer 1 multiport repeater with no address awareness; it regenerates the electrical signal and broadcasts every incoming frame out all other ports, creating a single shared collision domain. Half-duplex only, no filtering, no isolation — largely obsolete outside of legacy lab equipment and protocol-analysis taps.",
+    example: "Rarely seen in production today; you might still find one in a decades-old industrial control cabinet, or used deliberately as a passive network tap for packet capture.",
+    specs: ["Layer: 1 (Physical)", "Key job: signal repetition, no filtering", "Status: obsolete for general use"]
+  },
+  {
+    name: "Modem",
+    tag: "translates ISP signal to network data",
+    beginner: "A modem is the device that translates the signal coming from your internet provider (over cable, fiber, or phone lines) into a format your router and devices can use. It's the bridge between your home network and the wider internet infrastructure outside your walls.",
+    expert: "A modem performs modulation/demodulation between the physical transport medium (DOCSIS over coax, VDSL/ADSL over copper, or GPON/EPON over fiber) and Ethernet. Many ISP-supplied units are gateways that combine modem, router, switch, and Wi-Fi AP in a single device, which limits configurability for advanced users.",
+    example: "The device labeled 'cable modem' or 'ONT' mounted where fiber or coax enters the building, feeding an Ethernet cable into a separate router — common in setups where users buy their own router for better performance or security.",
+    specs: ["Layer: 1 (Physical)", "Key job: signal translation ISP ↔ Ethernet", "Common types: DOCSIS, DSL, ONT (fiber)"]
+  },
+  {
+    name: "Wireless Access Point",
+    tag: "layer 2 · extends the network over Wi-Fi",
+    beginner: "A wireless access point (WAP) lets devices connect to a network using Wi-Fi instead of a cable. Many home routers have one built in, but larger buildings often use several separate access points placed around the space so Wi-Fi reaches every room reliably.",
+    expert: "An AP bridges 802.11 wireless frames to the wired 802.3 network, handling association, authentication (WPA2/WPA3-Enterprise via 802.1X/RADIUS), and channel/band management. Enterprise deployments use a wireless controller for centralized RF management, roaming (802.11r), and unified SSID policy across dozens or hundreds of APs.",
+    example: "The small white discs mounted on ceilings throughout an office, university building, or hotel — often Cisco Meraki, Aruba, or Ubiquiti UniFi units — all broadcasting the same network name so people move between rooms without dropping connection.",
+    specs: ["Layer: 2 (bridges wireless ↔ wired)", "Key job: 802.11 wireless connectivity", "Common protocols: WPA2/3, 802.1X, 802.11r"]
+  },
+  {
+    name: "Firewall",
+    tag: "layer 3–7 · filters and inspects traffic",
+    beginner: "A firewall is a security checkpoint for network traffic. It inspects data trying to enter or leave a network and blocks anything that looks unauthorized or dangerous, based on rules you or an administrator set — similar to a security guard checking IDs at a building entrance.",
+    expert: "Firewalls range from stateless ACL filtering at Layer 3/4 to stateful inspection tracking connection state, up to next-generation firewalls (NGFW) doing deep packet inspection, application-layer awareness, and integrated IDS/IPS. Rules are typically applied as ordered ACLs matching on source/destination IP, port, protocol, and increasingly on application signatures or TLS-inspected content.",
+    example: "A Palo Alto or Fortinet appliance sitting at the edge of a corporate network inspecting all inbound and outbound traffic, or the software firewall (Windows Defender Firewall, iptables) running on an individual laptop.",
+    specs: ["Layer: 3–7 depending on type", "Key job: traffic filtering, threat inspection", "Types: stateless, stateful, NGFW"]
+  },
+  {
+    name: "Network Bridge",
+    tag: "layer 2 · joins two network segments",
+    beginner: "A bridge connects two separate network segments so they behave as one, letting devices on either side communicate as if they were on the same local network. It's less common today since switches (which are essentially multi-port bridges) do the same job for more devices at once.",
+    expert: "A bridge forwards frames between two Layer 2 segments based on MAC address tables, effectively merging collision/broadcast domains while filtering unnecessary traffic between them. Software bridges are common in virtualization (e.g., a Linux bridge joining a VM's virtual NIC to a physical interface) and wireless bridging links two buildings over a point-to-point radio link.",
+    example: "A wireless bridge kit linking a detached garage or warehouse building's network back to the main building without trenching cable, or a virtual bridge inside a hypervisor connecting VMs to the physical LAN.",
+    specs: ["Layer: 2 (Data Link)", "Key job: joining two segments into one", "Common use: wireless building-to-building links, virtualization"]
+  },
+  {
+    name: "Repeater / Range Extender",
+    tag: "layer 1 · boosts signal reach",
+    beginner: "A repeater takes a weak signal — usually Wi-Fi — and rebroadcasts it to reach further into a home or building. It's a quick fix for dead zones, though it typically works better to add a proper access point if you can run a cable to it.",
+    expert: "A repeater regenerates and retransmits the physical-layer signal without any address-aware filtering. Wireless range extenders specifically re-broadcast the SSID on the same or a different channel, but since they receive and retransmit on the same radio, they typically halve available throughput for connected clients versus a wired AP.",
+    example: "A plug-in Wi-Fi extender used to reach a basement or far bedroom where the main router's signal is weak, common in older houses with thick walls.",
+    specs: ["Layer: 1 (Physical)", "Key job: signal amplification/retransmission", "Trade-off: throughput loss vs. wired AP"]
+  },
+  {
+    name: "Gateway",
+    tag: "connects dissimilar networks/protocols",
+    beginner: "A gateway is any device that acts as an entry and exit point between two different types of networks — most commonly, between your home network and the internet. In casual use, 'gateway' and 'router' are often used interchangeably, since most home routers do serve as the gateway.",
+    expert: "Technically, a gateway operates at whatever layer is needed to translate between dissimilar network architectures or protocol stacks — not just IP-to-IP routing but potentially protocol translation (e.g., a VoIP gateway converting between SIP/RTP and a PSTN trunk, or an IoT gateway translating Zigbee to IP). The default gateway address on a host is simply the router it sends off-subnet traffic to.",
+    example: "A VoIP gateway that connects an office's traditional phone lines to an internet-based phone system, or the 'default gateway' IP address configured on every device on your home network (usually your router).",
+    specs: ["Layer: varies by function", "Key job: bridging dissimilar network types", "Examples: VoIP gateway, IoT gateway, API gateway"]
+  },
+  {
+    name: "Load Balancer",
+    tag: "layer 4–7 · distributes traffic across servers",
+    beginner: "A load balancer spreads incoming requests across multiple servers instead of sending them all to one, so no single server gets overwhelmed and the service stays fast and available even if one server fails.",
+    expert: "Load balancers operate at L4 (distributing TCP/UDP connections based on IP/port, e.g., via round-robin, least-connections, or IP hash) or L7 (making routing decisions based on HTTP headers, cookies, or URL paths). They perform health checks to pull unhealthy backends out of rotation and are often paired with SSL termination to offload encryption from application servers.",
+    example: "An AWS Application Load Balancer or F5 BIG-IP sitting in front of a fleet of web servers for a high-traffic site like an e-commerce checkout, distributing thousands of simultaneous shoppers across servers.",
+    specs: ["Layer: 4 (transport) or 7 (application)", "Key job: distributing load, health checking", "Common tools: F5, HAProxy, AWS ALB/NLB"]
+  },
+  {
+    name: "Network Interface Card (NIC)",
+    tag: "layer 1–2 · connects a device to the network",
+    beginner: "A network interface card is the component inside your computer, phone, or printer that lets it physically connect to a network — either through a cable port or Wi-Fi radio. Every device needs one to get online at all.",
+    expert: "The NIC provides the physical (PHY) and MAC-layer interface between a host and the network medium, with a burned-in MAC address for Layer 2 addressing. Server-grade NICs often support offload features like TCP checksum/segmentation offload, RSS (receive-side scaling) across CPU cores, and SR-IOV for virtualized environments.",
+    example: "The built-in Wi-Fi/Bluetooth chip in a laptop, or a dedicated 10GbE PCIe network card added to a server for high-throughput storage or backup traffic.",
+    specs: ["Layer: 1–2 (Physical/Data Link)", "Key job: physical network connectivity", "Types: wired (Ethernet), wireless (Wi-Fi/BT)"]
+  },
+  {
+    name: "Patch Panel",
+    tag: "layer 1 · cable management, not active",
+    beginner: "A patch panel isn't an electronic device at all — it's a panel of ports that organizes all the network cables running through the walls of a building, making it easy to connect (and reconnect) them to a switch without crawling through walls each time.",
+    expert: "A patch panel is a purely passive Layer 1 termination point for structured cabling (typically Cat5e/6/6a), providing a fixed, labeled cross-connect between horizontal cabling runs and active equipment via short patch cables. It carries no electronics and performs no signal processing — its value is entirely in cable management and moves/adds/changes efficiency.",
+    example: "The rack of labeled RJ45 ports at the top of a server cabinet in an office IT closet, where each port corresponds to a specific wall jack elsewhere in the building.",
+    specs: ["Layer: 1 (Physical, passive)", "Key job: structured cable termination/organization", "Contains: no active electronics"]
+  },
+  {
+    name: "Proxy Server",
+    tag: "layer 7 · intermediary for requests",
+    beginner: "A proxy server sits between your device and the internet, forwarding your requests on your behalf. It can be used to hide your identity, filter content, cache frequently requested data to speed things up, or control what a group of users can access.",
+    expert: "A forward proxy intermediates outbound client requests (used for content filtering, caching, and anonymization), while a reverse proxy sits in front of servers to handle inbound requests (used for SSL termination, caching, load distribution, and hiding backend topology). Both operate primarily at Layer 7, inspecting and sometimes rewriting HTTP(S) traffic.",
+    example: "A school or corporate network using a forward proxy (like Squid) to block certain websites, or Nginx/Cloudflare acting as a reverse proxy in front of a web app to cache content and absorb DDoS traffic.",
+    specs: ["Layer: 7 (Application)", "Key job: intermediary request handling", "Types: forward proxy, reverse proxy"]
+  }
+];
+
+const container = document.getElementById('devices');
+DEVICES.forEach((d, i) => {
+  const num = String(i+1).padStart(2,'0');
+  const el = document.createElement('div');
+  el.className = 'device';
+  el.innerHTML = `
+    <div class="device-head">
+      <span class="device-num">${num}</span>
+      <h2>${d.name}</h2>
+    </div>
+    <p class="device-tag">${d.tag}</p>
+    <div class="desc" data-view="beginner"><p>${d.beginner}</p></div>
+    <div class="desc" data-view="expert"><p>${d.expert}</p></div>
+    <div class="specs">${d.specs.map(s => {
+      const [k,v] = s.split(': ');
+      return `<span><b>${k}:</b> ${v}</span>`;
+    }).join('')}</div>
+    <div class="example">
+      <p class="example-label">REAL-WORLD EXAMPLE</p>
+      <p>${d.example}</p>
+    </div>
+  `;
+  container.appendChild(el);
+});
+
+function setMode(mode){
+  document.body.classList.toggle('expert', mode === 'expert');
+  document.getElementById('btn-beginner').classList.toggle('active', mode === 'beginner');
+  document.getElementById('btn-expert').classList.toggle('active', mode === 'expert');
+}
+</script>
+
+</body>
+</html>
