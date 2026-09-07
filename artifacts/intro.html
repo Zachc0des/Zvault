@@ -1,1 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Inward Path — A Guide for Introverts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#242821;
+    --ink-soft:#4b5045;
+    --paper:#ece7db;
+    --paper-deep:#e2dcca;
+    --moss:#4c5f45;
+    --moss-deep:#333f2c;
+    --clay:#a9633c;
+    --clay-soft:#c98a5e;
+    --line:#c9c1a9;
+    --cream:#f5f2e8;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Karla',sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    margin:0;
+    color:var(--moss-deep);
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:0 32px;}
+  a{color:var(--clay);}
 
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:120px 32px 100px;
+    background:var(--moss-deep);
+    color:var(--cream);
+    overflow:hidden;
+  }
+  .hero .wrap{position:relative;z-index:2;}
+  .hero-eyebrow{
+    font-size:15px;
+    color:var(--clay-soft);
+    margin-bottom:18px;
+    font-style:italic;
+    font-family:'Fraunces',serif;
+  }
+  .hero h1{
+    color:var(--cream);
+    font-size:clamp(38px,6vw,64px);
+    line-height:1.08;
+    max-width:11ch;
+    font-weight:500;
+  }
+  .hero p{
+    max-width:46ch;
+    margin-top:26px;
+    font-size:18px;
+    color:#d8d3c1;
+  }
+  .hero-figure{
+    position:absolute;
+    right:-40px;
+    top:0;
+    bottom:0;
+    width:420px;
+    opacity:0.9;
+  }
+  @media(max-width:760px){ .hero-figure{display:none;} }
+
+  /* ---------- NAV DOTS ---------- */
+  .toc{
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
+    padding:26px 32px;
+    background:var(--paper-deep);
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .toc a{
+    color:var(--ink-soft);
+    text-decoration:none;
+    border-bottom:1px solid transparent;
+    padding-bottom:2px;
+  }
+  .toc a:hover{border-bottom-color:var(--clay);color:var(--ink);}
+
+  section{padding:88px 0;}
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:18px;
+    margin-bottom:48px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:22px;
+  }
+  .section-num{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:20px;
+    color:var(--clay);
+    white-space:nowrap;
+  }
+  .section-head h2{font-size:clamp(26px,3.6vw,36px);}
+  .section-intro{
+    max-width:62ch;
+    color:var(--ink-soft);
+    font-size:17px;
+    margin-bottom:44px;
+  }
+
+  /* ---------- BENEFITS ---------- */
+  .benefits{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:0;
+  }
+  .benefit{
+    padding:30px 30px 30px 0;
+    border-top:1px solid var(--line);
+  }
+  .benefit:nth-child(odd){border-right:1px solid var(--line);padding-right:36px;}
+  .benefit:nth-child(even){padding-left:36px;}
+  .benefit:nth-child(-n+2){border-top:none;}
+  .benefit h3{
+    font-size:19px;
+    margin-bottom:10px;
+    color:var(--moss-deep);
+  }
+  .benefit p{margin:0;color:var(--ink-soft);font-size:15.5px;}
+  @media(max-width:660px){
+    .benefits{grid-template-columns:1fr;}
+    .benefit:nth-child(odd){border-right:none;padding-right:0;}
+    .benefit:nth-child(even){padding-left:0;}
+    .benefit:nth-child(2){border-top:1px solid var(--line);}
+  }
+
+  /* ---------- MANAGING ---------- */
+  .manage-band{background:var(--cream);}
+  .distinction{
+    display:flex;
+    gap:0;
+    border:1px solid var(--line);
+    margin-bottom:52px;
+    background:var(--paper);
+  }
+  .distinction > div{flex:1;padding:28px 30px;}
+  .distinction > div:first-child{border-right:1px solid var(--line);}
+  .distinction .tag{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    color:var(--moss);
+    font-size:15px;
+    margin-bottom:8px;
+    display:block;
+  }
+  .distinction .tag.clay{color:var(--clay);}
+  .distinction p{margin:0;color:var(--ink-soft);font-size:15px;}
+  @media(max-width:600px){
+    .distinction{flex-direction:column;}
+    .distinction > div:first-child{border-right:none;border-bottom:1px solid var(--line);}
+  }
+
+  .practice-list{list-style:none;margin:0;padding:0;}
+  .practice-list li{
+    display:flex;
+    gap:22px;
+    padding:22px 0;
+    border-top:1px solid var(--line);
+  }
+  .practice-list li:last-child{border-bottom:1px solid var(--line);}
+  .practice-list .mark{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    color:var(--clay);
+    font-size:15px;
+    padding-top:2px;
+    min-width:120px;
+  }
+  .practice-list h3{font-size:17px;margin-bottom:6px;color:var(--moss-deep);}
+  .practice-list p{margin:0;color:var(--ink-soft);font-size:15.5px;max-width:56ch;}
+  @media(max-width:600px){
+    .practice-list li{flex-direction:column;gap:6px;}
+    .practice-list .mark{min-width:auto;}
+  }
+
+  /* ---------- OUTDOOR STEPS ---------- */
+  .steps{
+    position:relative;
+    padding-left:0;
+  }
+  .step{
+    position:relative;
+    display:grid;
+    grid-template-columns:64px 1fr;
+    gap:24px;
+    padding-bottom:44px;
+  }
+  .step:last-child{padding-bottom:0;}
+  .step-line{
+    position:absolute;
+    left:31px;
+    top:44px;
+    bottom:-2px;
+    width:1px;
+    background:var(--line);
+  }
+  .step:last-child .step-line{display:none;}
+  .step-num{
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    border:1px solid var(--moss);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:20px;
+    color:var(--moss);
+    background:var(--paper);
+    flex-shrink:0;
+    z-index:1;
+  }
+  .step h3{font-size:19px;margin-bottom:8px;padding-top:12px;}
+  .step p{margin:0;color:var(--ink-soft);font-size:15.5px;max-width:58ch;}
+  .step .dose{
+    display:inline-block;
+    margin-top:10px;
+    font-size:13px;
+    color:var(--clay);
+    font-style:italic;
+    font-family:'Fraunces',serif;
+  }
+
+  /* ---------- CLOSING ---------- */
+  .closing{
+    background:var(--moss-deep);
+    color:var(--cream);
+    text-align:left;
+    padding:90px 0;
+  }
+  .closing h2{
+    color:var(--cream);
+    font-size:clamp(26px,4vw,38px);
+    max-width:20ch;
+    margin-bottom:22px;
+  }
+  .closing p{color:#d8d3c1;max-width:56ch;font-size:16.5px;}
+  .closing .signoff{
+    margin-top:36px;
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    color:var(--clay-soft);
+  }
+
+  footer{
+    padding:28px 32px;
+    text-align:center;
+    font-size:13px;
+    color:var(--ink-soft);
+    background:var(--paper-deep);
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <svg class="hero-figure" viewBox="0 0 420 600" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="330" cy="120" r="70" fill="#c98a5e" opacity="0.25"/>
+    <path d="M120 600 C120 420 160 340 210 340 C260 340 300 420 300 600 Z" fill="#5b6f4f" opacity="0.5"/>
+    <circle cx="210" cy="260" r="60" fill="#66794f" opacity="0.6"/>
+    <path d="M0 600 C 60 520 120 560 160 600 Z" fill="#333f2c"/>
+    <path d="M420 600 C 360 500 300 560 260 600 Z" fill="#333f2c"/>
+  </svg>
+  <div class="wrap">
+    <span class="hero-eyebrow">a working guide, not a diagnosis</span>
+    <h1>Recharging is not the same as retreating.</h1>
+    <p>Introversion is a preference for depth over volume — fewer conversations, held longer; less noise, more attention. This guide separates that preference from the avoidance that can quietly grow around it, and gives you a slow way back outside.</p>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#benefits">The upside</a>
+  <a href="#managing">Working with the pull inward</a>
+  <a href="#outdoors">Getting outside, in doses</a>
+</nav>
+
+<section id="benefits">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num">i.</span>
+      <h2>What introversion is actually good for</h2>
+    </div>
+    <p class="section-intro">None of this needs fixing. These are the parts of the wiring that tend to work in your favor, especially once you stop apologizing for them.</p>
+    <div class="benefits">
+      <div class="benefit">
+        <h3>Depth over reach</h3>
+        <p>You tend to go further into fewer things — one conversation instead of ten, one project instead of five running shallow in parallel.</p>
+      </div>
+      <div class="benefit">
+        <h3>A quieter nervous system in solitude</h3>
+        <p>Time alone genuinely restores you, rather than just passing the time — which makes rest efficient once you protect it.</p>
+      </div>
+      <div class="benefit">
+        <h3>Careful listening</h3>
+        <p>Less urge to fill silence means more room to actually hear what someone said, and to notice what they didn't say.</p>
+      </div>
+      <div class="benefit">
+        <h3>Considered speech</h3>
+        <p>Thinking before speaking reads as composure. People remember the person who said less but meant more of it.</p>
+      </div>
+      <div class="benefit">
+        <h3>Rich internal processing</h3>
+        <p>Ideas get worked over privately before they're shared, which is why introverts often arrive at unusually well-formed opinions.</p>
+      </div>
+      <div class="benefit">
+        <h3>Selective, durable relationships</h3>
+        <p>Smaller social circles built slowly tend to hold up under pressure better than wide networks built quickly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="managing" class="manage-band">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num">ii.</span>
+      <h2>Working with the pull to withdraw</h2>
+    </div>
+    <p class="section-intro">Preference and avoidance can look identical from the outside — both end in a closed door. The difference is what's driving it, and it's worth checking honestly before building a routine around either.</p>
+
+    <div class="distinction">
+      <div>
+        <span class="tag">Preference</span>
+        <p>You decline the party, spend the evening reading, and feel replenished. The next invitation doesn't cause dread — you simply weigh it and sometimes say yes.</p>
+      </div>
+      <div>
+        <span class="tag clay">Avoidance</span>
+        <p>You decline the party out of a spike of anxiety, feel relief followed by guilt, and notice the circle of things you'll do is quietly shrinking over time.</p>
+      </div>
+    </div>
+
+    <ul class="practice-list">
+      <li>
+        <span class="mark">01 — notice</span>
+        <div>
+          <h3>Track the withdrawal for a week, not the trigger</h3>
+          <p>Before changing anything, just log when you cancel or avoid something. Note what you felt right before — flat and tired, or tight and anxious. The pattern tells you which of the two above you're actually dealing with.</p>
+        </div>
+      </li>
+      <li>
+        <span class="mark">02 — dose</span>
+        <div>
+          <h3>Make contact small enough to not need willpower</h3>
+          <p>A five-minute call, one message to a friend, ten minutes at a gathering with a firm exit time. The goal isn't enjoyment yet — it's proving to yourself the door still opens both ways.</p>
+        </div>
+      </li>
+      <li>
+        <span class="mark">03 — structure</span>
+        <div>
+          <h3>Choose settings with a built-in role</h3>
+          <p>Unstructured mingling is the hardest form of socializing for most introverts. A class, a shared task, a walk with one person — anything with a clear activity removes the burden of generating conversation from nothing.</p>
+        </div>
+      </li>
+      <li>
+        <span class="mark">04 — reach</span>
+        <div>
+          <h3>Initiate before you're asked, once a week</h3>
+          <p>Waiting to be invited quietly hands control of your social life to other people's initiative, which usually thins out over time. Sending one message a week keeps the muscle from atrophying.</p>
+        </div>
+      </li>
+      <li>
+        <span class="mark">05 — protect</span>
+        <div>
+          <h3>Schedule the recovery, not just the event</h3>
+          <p>Block real solitude after anything social, in the calendar, before you agree to it. Knowing the recharge is already booked makes it much easier to say yes to the thing beforehand.</p>
+        </div>
+      </li>
+      <li>
+        <span class="mark">06 — escalate</span>
+        <div>
+          <h3>Bring in a professional if the world is shrinking</h3>
+          <p>If avoidance is costing you a job, a relationship, or your own goals — and the anxiety, not preference, is doing the deciding — a therapist familiar with social anxiety can help far faster than willpower alone.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section id="outdoors">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="section-num">iii.</span>
+      <h2>Getting outside, in doses</h2>
+    </div>
+    <p class="section-intro">Fresh air and daylight help regulate the same nervous system that gets overloaded indoors in crowds — but "just go outside more" is unhelpfully vague. Here's a sequence built for someone starting from very little.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-line"></div>
+        <div>
+          <h3>Walk alone, at a quiet hour</h3>
+          <p>Early morning or just after sunset, when streets and trails are close to empty. The point is exposure to open air and daylight with zero social demand attached.</p>
+          <span class="dose">10–15 minutes, most days</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-line"></div>
+        <div>
+          <h3>Pick low-traffic nature over busy parks</h3>
+          <p>A quiet trail, a river path, a community garden. Nature lowers stimulation faster than a crowded park does, so it's an easier place to practice being outside at all.</p>
+          <span class="dose">1–2 outings a week</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-line"></div>
+        <div>
+          <h3>Bring a buffer, not a shield</h3>
+          <p>A notebook, headphones, or a sketchbook give you something to do with your hands and attention, which makes being seen in public feel much lower-stakes — without shutting the world out entirely.</p>
+          <span class="dose">carry it, use it loosely</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-line"></div>
+        <div>
+          <h3>Add parallel presence around others</h3>
+          <p>Sit in a café with a book, work at a library table, walk a dog where other dog-walkers go. You're near people without needing to engage them — a useful middle step between solitude and conversation.</p>
+          <span class="dose">once you're comfortable with step 2</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-line"></div>
+        <div>
+          <h3>Let one small interaction happen per outing</h3>
+          <p>A nod, a "morning," a comment about someone's dog. Nothing that requires follow-up. This is the smallest possible unit of real social exposure, and it's enough on its own for a while.</p>
+          <span class="dose">one per outing, no more</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-line"></div>
+        <div>
+          <h3>Join something outdoors with a defined structure</h3>
+          <p>A birdwatching group, a beginner hiking club, a community garden shift. Shared focus on a task or a shared view makes conversation optional rather than expected — the easiest kind of group to enter.</p>
+          <span class="dose">try one, no obligation to return</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-line"></div>
+        <div>
+          <h3>Log energy after, not just effort during</h3>
+          <p>Rate how you feel an hour after each outing, not in the moment. If you're consistently drained rather than mildly tired, the dose was too big — shrink it rather than quitting the practice entirely.</p>
+          <span class="dose">ongoing</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="closing">
+  <div class="wrap">
+    <h2>None of this is about becoming an extrovert.</h2>
+    <p>It's about making sure the parts of your life that need contact — a job, a friendship, your own health — don't quietly close off because withdrawal became easier than deciding. Small, honest doses, on your own terms, done consistently, move that needle more than any single big push ever will.</p>
+    <div class="signoff">— take it one quiet step at a time</div>
+  </div>
+</div>
+
+<footer>A working reference, not a clinical assessment. If avoidance is driving your days more than preference is, a therapist can help.</footer>
+
+</body>
+</html>
