@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building an AI Agent — A Builder's Field Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg: #0F1B2B;
+    --bg-grid: #16283F;
+    --surface: #152238;
+    --surface1: #16233A;
+    --surface2: #1B2C45;
+    --line: #2A3F5A;
+    --line-soft: #21344E;
+    --text: #E8EDF4;
+    --text-dim: #93A4BD;
+    --text-faint: #5C7291;
+    --amber: #E8A33D;
+    --amber-dim: #8A6529;
+    --green: #6FCF97;
+    --green-dim: #3E6B52;
+    --red-flag: #E8735A;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:
+      linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection{ background: var(--amber); color: #0F1B2B; }
+
+  a{ color: var(--amber); }
+
+  .wrap{
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  code, .mono{ font-family: 'IBM Plex Mono', monospace; }
+
+  h1,h2,h3,h4{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  /* ---------- NAV ---------- */
+  nav{
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(15,27,43,0.88);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  nav .wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    height: 56px;
+  }
+  .brand{
+    font-family:'Space Grotesk'; font-weight:700; font-size:15px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .brand .dot{ width:8px; height:8px; background:var(--amber); border-radius:1px; transform:rotate(45deg); }
+  .navlinks{ display:flex; gap: 22px; font-size: 13.5px; }
+  .navlinks a{ color: var(--text-dim); text-decoration:none; }
+  .navlinks a:hover{ color: var(--amber); }
+  @media (max-width: 720px){ .navlinks{ display:none; } }
+
+  /* ---------- HERO ---------- */
+  header.hero{
+    padding: 76px 0 56px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .kicker{
+    font-family:'IBM Plex Mono'; font-size: 13px; color: var(--amber);
+    display:flex; align-items:center; gap:10px; margin-bottom: 22px;
+  }
+  .kicker::before{ content:''; width:22px; height:1px; background: var(--amber); display:inline-block; }
+  h1.title{
+    font-size: clamp(34px, 5vw, 54px);
+    line-height: 1.08;
+    max-width: 15ch;
+  }
+  .lede{
+    margin-top: 20px;
+    max-width: 62ch;
+    font-size: 17px;
+    color: var(--text-dim);
+  }
+  .hero-meta{
+    margin-top: 36px;
+    display:flex; flex-wrap:wrap; gap: 0;
+    border-top: 1px solid var(--line-soft);
+  }
+  .hero-meta div{
+    flex: 1 1 160px;
+    padding: 16px 20px 0 0;
+    border-right: 1px solid var(--line-soft);
+  }
+  .hero-meta div:last-child{ border-right: none; }
+  .hero-meta .num{ font-family:'Space Grotesk'; font-size: 22px; color: var(--amber); }
+  .hero-meta .lbl{ font-size: 12.5px; color: var(--text-faint); margin-top: 2px; }
+
+  /* ---------- SECTION SCAFFOLDING ---------- */
+  section{ padding: 64px 0; border-bottom: 1px solid var(--line-soft); }
+  .sec-head{ margin-bottom: 34px; max-width: 68ch; }
+  .sec-index{ font-family:'IBM Plex Mono'; font-size: 12.5px; color: var(--text-faint); margin-bottom: 8px; }
+  h2.sec-title{ font-size: 28px; margin-bottom: 10px; }
+  .sec-sub{ color: var(--text-dim); font-size: 15px; }
+
+  /* ---------- TOOL GRID ---------- */
+  .tool-groups{ display:grid; gap: 28px; }
+  .tool-group{ border-left: 2px solid var(--line); padding-left: 20px; }
+  .tool-group h3{ font-size: 15px; color: var(--amber); margin-bottom: 4px; }
+  .tool-group .desc{ font-size: 13.5px; color: var(--text-faint); margin-bottom: 14px; max-width: 60ch; }
+  .tool-row{
+    display:grid; grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .tool-item{
+    display:grid;
+    grid-template-columns: 160px 1fr auto;
+    gap: 16px;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line-soft);
+    font-size: 14px;
+  }
+  .tool-item:last-child{ border-bottom: none; }
+  .tool-item .name{ font-family:'IBM Plex Mono'; color: var(--text); font-size: 13.5px; }
+  .tool-item .note{ color: var(--text-dim); }
+  .tool-item .tier{
+    font-family:'IBM Plex Mono'; font-size: 11.5px; text-align:right; white-space:nowrap;
+    padding: 3px 8px; border-radius: 3px;
+  }
+  .tier.free{ color: var(--green); border:1px solid var(--green-dim); }
+  .tier.paid{ color: var(--amber); border:1px solid var(--amber-dim); }
+  @media (max-width: 640px){
+    .tool-item{ grid-template-columns: 1fr; gap: 4px; }
+    .tool-item .tier{ text-align:left; width: fit-content; }
+  }
+
+  /* ---------- BUDGET COMPARISON ---------- */
+  .budget-grid{
+    display:grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: var(--line-soft);
+    border: 1px solid var(--line-soft);
+  }
+  @media (max-width: 720px){ .budget-grid{ grid-template-columns: 1fr; } }
+  .budget-col{ background: var(--bg); padding: 26px 26px 30px; }
+  .budget-col .btag{
+    font-family:'IBM Plex Mono'; font-size: 12px; letter-spacing:0.02em;
+    display:inline-block; padding: 4px 9px; border-radius: 3px; margin-bottom: 14px;
+  }
+  .budget-col.low .btag{ color: var(--green); border: 1px solid var(--green-dim); }
+  .budget-col.high .btag{ color: var(--amber); border: 1px solid var(--amber-dim); }
+  .budget-col .price{ font-family:'Space Grotesk'; font-size: 30px; margin-bottom: 4px; }
+  .budget-col .price small{ font-size: 14px; color: var(--text-faint); font-family:'IBM Plex Sans'; }
+  .budget-col .price-note{ font-size: 13px; color: var(--text-faint); margin-bottom: 22px; }
+  .budget-col ul{ list-style:none; }
+  .budget-col li{
+    font-size: 14px; color: var(--text-dim);
+    padding: 9px 0; border-top: 1px solid var(--line-soft);
+    display:flex; gap: 10px;
+  }
+  .budget-col li:first-of-type{ border-top: none; }
+  .budget-col li .k{ color: var(--text); flex: 0 0 108px; font-family:'IBM Plex Mono'; font-size: 12.5px; }
+
+  /* ---------- CATEGORY CARDS ---------- */
+  .cat-grid{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: var(--line-soft); border: 1px solid var(--line-soft);
+  }
+  @media (max-width: 860px){ .cat-grid{ grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 560px){ .cat-grid{ grid-template-columns: 1fr; } }
+  .cat-card{ background: var(--bg); padding: 22px 20px; }
+  .cat-card .cn{ font-family:'IBM Plex Mono'; font-size: 11.5px; color: var(--text-faint); margin-bottom: 10px; }
+  .cat-card h4{ font-size: 15.5px; margin-bottom: 8px; }
+  .cat-card p{ font-size: 13.5px; color: var(--text-dim); margin-bottom: 12px; }
+  .cat-card .ex{ font-size: 12px; color: var(--amber); font-family:'IBM Plex Mono'; line-height:1.5; }
+
+  /* ---------- ROADMAP (true sequence, numbered) ---------- */
+  .roadmap{ position: relative; padding-left: 8px; }
+  .rstep{
+    position: relative; padding: 0 0 34px 44px;
+    border-left: 1px solid var(--line);
+  }
+  .rstep:last-child{ padding-bottom: 0; }
+  .rstep::before{
+    content: attr(data-n);
+    position: absolute; left: -15px; top: 0;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--bg); border: 1px solid var(--amber-dim);
+    color: var(--amber); font-family:'IBM Plex Mono'; font-size: 12px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .rstep h4{ font-size: 16px; margin-bottom: 6px; }
+  .rstep p{ font-size: 14px; color: var(--text-dim); max-width: 62ch; }
+
+  /* ---------- CALLOUT ---------- */
+  .callout{
+    border: 1px solid var(--amber-dim);
+    background: linear-gradient(180deg, rgba(232,163,61,0.06), transparent);
+    padding: 20px 22px; border-radius: 4px; margin-top: 28px;
+    font-size: 14px; color: var(--text-dim);
+  }
+  .callout strong{ color: var(--amber); font-family:'IBM Plex Mono'; font-size: 12.5px; display:block; margin-bottom: 6px; letter-spacing: 0.02em; }
+
+  /* ---------- FOOTER ---------- */
+  footer{ padding: 40px 0 70px; }
+  footer p{ font-size: 13px; color: var(--text-faint); max-width: 60ch; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>AGENT / FIELD GUIDE</div>
+    <div class="navlinks">
+      <a href="#stack">Stack</a>
+      <a href="#budget">Budget</a>
+      <a href="#new-business">Build a business</a>
+      <a href="#existing-business">Augment a business</a>
+      <a href="#roadmap">Roadmap</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">PRACTICAL GUIDE — NO PLATFORM LOCK-IN</div>
+    <h1 class="title">Building an AI agent, from empty repo to running business</h1>
+    <p class="lede">What an agent actually needs under the hood, what it costs to build one on a shoestring versus a serious budget, and the categories of agents worth pointing at a brand-new business idea or an existing one.</p>
+    <div class="hero-meta">
+      <div><div class="num">$0–30</div><div class="lbl">low-end monthly floor</div></div>
+      <div><div class="num">$2k+</div><div class="lbl">high-end monthly ceiling</div></div>
+      <div><div class="num">6</div><div class="lbl">core stack layers</div></div>
+      <div><div class="num">12</div><div class="lbl">agent categories covered</div></div>
+    </div>
+  </div>
+</header>
+
+<section id="stack">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-index">01 — THE STACK</div>
+      <h2 class="sec-title">What an agent is actually made of</h2>
+      <p class="sec-sub">An "AI agent" is a loop: a model that reasons, a set of tools it can call, memory that persists across steps, and a runtime that keeps the loop honest. Everything below fills one of those roles.</p>
+    </div>
+
+    <div class="tool-groups">
+
+      <div class="tool-group">
+        <h3>Reasoning — the model</h3>
+        <div class="desc">The LLM doing the planning and tool-calling. Pick by cost-per-task, not benchmark bragging rights.</div>
+        <div class="tool-row">
+          <div class="tool-item"><span class="name">Claude API</span><span class="note">Strong tool-use and long-context reasoning; usage-based pricing</span><span class="tier paid">pay-per-token</span></div>
+          <div class="tool-item"><span class="name">GPT / OpenAI API</span><span class="note">Broad ecosystem support, realtime and voice options</span><span class="tier paid">pay-per-token</span></div>
+          <div class="tool-item"><span class="name">Local open models</span><span class="note">Llama / Qwen / Mistral via Ollama — no per-call cost, needs a GPU</span><span class="tier free">self-hosted</span></div>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <h3>Orchestration — the loop</h3>
+        <div class="desc">The framework that wires model, tools, and state together into a controllable agent instead of a one-shot prompt.</div>
+        <div class="tool-row">
+          <div class="tool-item"><span class="name">LangGraph</span><span class="note">Stateful, graph-based orchestration; the current default for production agents</span><span class="tier free">open source</span></div>
+          <div class="tool-item"><span class="name">CrewAI</span><span class="note">Role-based multi-agent crews, fast to prototype</span><span class="tier free">open source</span></div>
+          <div class="tool-item"><span class="name">Provider agent SDKs</span><span class="note">OpenAI Agents SDK / Claude Agent SDK — thin, provider-native primitives</span><span class="tier free">open source</span></div>
+          <div class="tool-item"><span class="name">n8n / Make</span><span class="note">Visual, node-based automation — no code required to wire an agent into workflows</span><span class="tier paid">freemium</span></div>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <h3>Memory — state that persists</h3>
+        <div class="desc">Short-term scratch space plus a long-term store the agent can search back through.</div>
+        <div class="tool-row">
+          <div class="tool-item"><span class="name">SQLite / Postgres</span><span class="note">Structured state — tasks, conversation logs, business records</span><span class="tier free">self-hosted</span></div>
+          <div class="tool-item"><span class="name">Chroma / pgvector</span><span class="note">Vector store for semantic recall (RAG)</span><span class="tier free">open source</span></div>
+          <div class="tool-item"><span class="name">Pinecone / Weaviate Cloud</span><span class="note">Managed vector DB — no ops, scales without you touching infra</span><span class="tier paid">managed</span></div>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <h3>Tools — what the agent can act on</h3>
+        <div class="desc">The hands. An agent without tool access is just a chat window.</div>
+        <div class="tool-row">
+          <div class="tool-item"><span class="name">MCP servers</span><span class="note">Standardized connectors — email, calendar, CRM, file systems, browsers</span><span class="tier free">open protocol</span></div>
+          <div class="tool-item"><span class="name">Zapier / Composio</span><span class="note">Thousands of prebuilt app integrations, callable as agent tools</span><span class="tier paid">freemium</span></div>
+          <div class="tool-item"><span class="name">Browser automation</span><span class="note">Playwright / browser-use — for agents that need to click around the web</span><span class="tier free">open source</span></div>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <h3>Runtime & deployment</h3>
+        <div class="desc">Where the agent actually lives and runs when nobody's watching.</div>
+        <div class="tool-row">
+          <div class="tool-item"><span class="name">Local / cron</span><span class="note">A laptop or a $6/mo VPS running on a schedule — fine for early testing</span><span class="tier free">self-hosted</span></div>
+          <div class="tool-item"><span class="name">Docker + a cloud VM</span><span class="note">Portable, predictable, cheap at small scale</span><span class="tier paid">$5–40/mo</span></div>
+          <div class="tool-item"><span class="name">Serverless (Modal, Fly, Cloud Run)</span><span class="note">Pay only while the agent is actually thinking</span><span class="tier paid">usage-based</span></div>
+        </div>
+      </div>
+
+      <div class="tool-group">
+        <h3>Observability — knowing what it did</h3>
+        <div class="desc">Non-negotiable once an agent is spending your money or talking to customers unsupervised.</div>
+        <div class="tool-row">
+          <div class="tool-item"><span class="name">LangSmith / Langfuse</span><span class="note">Full run traces, token spend, evaluation datasets</span><span class="tier paid">freemium</span></div>
+          <div class="tool-item"><span class="name">Plain logging</span><span class="note">Structured logs to a file or DB — the free floor, better than nothing</span><span class="tier free">DIY</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="budget">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-index">02 — BUDGET</div>
+      <h2 class="sec-title">Low-end vs. high-end builds</h2>
+      <p class="sec-sub">The gap between these two setups is mostly reliability, scale, and how much of the babysitting is automated away — not whether the agent works at all.</p>
+    </div>
+
+    <div class="budget-grid">
+      <div class="budget-col low">
+        <span class="btag">LOW-END</span>
+        <div class="price">$0–30<small>/month</small></div>
+        <div class="price-note">One founder, one laptop, one idea to validate</div>
+        <ul>
+          <li><span class="k">Model</span> Free-tier API calls or a local open model on your own GPU</li>
+          <li><span class="k">Framework</span> LangGraph or CrewAI, self-hosted, default config</li>
+          <li><span class="k">Memory</span> SQLite file + local Chroma index</li>
+          <li><span class="k">Tools</span> A handful of MCP servers or hand-rolled API calls</li>
+          <li><span class="k">Hosting</span> Runs on your machine or a $5–6/mo VPS on a cron job</li>
+          <li><span class="k">Monitoring</span> Print statements and a log file</li>
+          <li><span class="k">Ceiling</span> Fine for one agent, one workflow, low request volume</li>
+        </ul>
+      </div>
+      <div class="budget-col high">
+        <span class="btag">HIGH-END</span>
+        <div class="price">$2,000+<small>/month</small></div>
+        <div class="price-note">Small team, production traffic, real customers depending on it</div>
+        <ul>
+          <li><span class="k">Model</span> Frontier model API at volume, plus a cheaper model for routine steps</li>
+          <li><span class="k">Framework</span> LangGraph Platform or an equivalent managed orchestration layer</li>
+          <li><span class="k">Memory</span> Managed Postgres + managed vector DB (Pinecone / Weaviate)</li>
+          <li><span class="k">Tools</span> Paid integration platform (Zapier/Composio) plus custom MCP servers</li>
+          <li><span class="k">Hosting</span> Autoscaling serverless or a small Kubernetes cluster</li>
+          <li><span class="k">Monitoring</span> LangSmith/Langfuse with alerting, evals, and human-review queues</li>
+          <li><span class="k">Ceiling</span> Multiple agents, high concurrency, SLA-grade uptime</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>WHERE THE MONEY ACTUALLY GOES</strong>
+      Model API calls dominate cost at any scale before infrastructure does. Prototype on a cheap or local model, and only upgrade the model once the workflow itself is proven — not before.
+    </div>
+  </div>
+</section>
+
+<section id="new-business">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-index">03 — NEW VENTURES</div>
+      <h2 class="sec-title">Agent categories that can run as a self-sustained business</h2>
+      <p class="sec-sub">Agents where the product <em>is</em> the automation — the business model is charging for output the agent produces with little ongoing human labor.</p>
+    </div>
+    <div class="cat-grid">
+      <div class="cat-card">
+        <div class="cn">01</div>
+        <h4>Content & SEO agents</h4>
+        <p>Research a niche, draft and publish articles, monitor rankings, and iterate on what performs — sold as a subscription service to small sites.</p>
+        <div class="ex">niche blogs · newsletter mills · programmatic SEO</div>
+      </div>
+      <div class="cat-card">
+        <div class="cn">02</div>
+        <h4>Research & data agents</h4>
+        <p>Continuously scrape, summarize, and structure a category of information (competitors, prices, regulations) and sell access to the feed.</p>
+        <div class="ex">market-intel feeds · price trackers · lead lists</div>
+      </div>
+      <div class="cat-card">
+        <div class="cn">03</div>
+        <h4>Customer support agents</h4>
+        <p>A packaged support bot other businesses install — the business is the packaging, pricing, and reliability layer, not any single deployment.</p>
+        <div class="ex">helpdesk-as-a-service · onboarding bots</div>
+      </div>
+      <div class="cat-card">
+        <div class="cn">04</div>
+        <h4>Personal & niche assistants</h4>
+        <p>A vertical assistant for one narrow job — meal planning for a diet type, scheduling for a specific profession, expense sorting for freelancers.</p>
+        <div class="ex">vertical SaaS copilots</div>
+      </div>
+      <div class="cat-card">
+        <div class="cn">05</div>
+        <h4>Trading & monitoring agents</h4>
+        <p>Watches a market or dataset and acts or alerts on defined rules. High technical and financial risk — treat as a research project first, a business second.</p>
+        <div class="ex">alert bots · rules-based execution</div>
+      </div>
+      <div class="cat-card">
+        <div class="cn">06</div>
+        <h4>Creative production agents</h4>
+        <p>Generates and assembles a specific creative output at volume — short-form video edits, product mockups, ad variants — sold per output or per seat.</p>
+        <div class="ex">social clip factories · ad-variant generators</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="existing-business">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-index">04 — EXISTING OPERATIONS</div>
+      <h2 class="sec-title">Agent categories that augment a business you already run</h2>
+      <p class="sec-sub">Here the agent isn't the product — it's headcount you don't have to hire, embedded into work that's already happening.</p>
+    </div>
+    <div class="cat-grid">
+      <div class="cat-card">
+        <div class="cn">A</div>
+        <h4>Inbox & scheduling agents</h4>
+        <p>Triages email, drafts replies, and finds meeting times, so the first pass of admin work never touches a human.</p>
+        <div class="ex">reduces founder/ops-lead admin load</div>
+      </div>
+      <div class="cat-card">
+        <div class="cn">B</div>
+        <h4>Sales & outreach agents</h4>
+        <p>Qualifies inbound leads, personalizes outreach at scale, and updates the CRM automatically after every call or email.</p>
+        <div class="ex">pipeline never goes stale</div>
+      </div>
+      <div class="cat-card">
+        <div class="cn">C</div>
+        <h4>Support & FAQ agents</h4>
+        <p>Handles the repetitive slice of support tickets and escalates only what genuinely needs a person.</p>
+        <div class="ex">cuts response time, not headcount trust</div>
+      </div>
+      <div class="cat-card">
+        <div class="cn">D</div>
+        <h4>Finance & ops agents</h4>
+        <p>Reconciles invoices, flags anomalies, chases overdue payments, and keeps books current between accountant check-ins.</p>
+        <div class="ex">bookkeeping copilot, not replacement</div>
+      </div>
+      <div class="cat-card">
+        <div class="cn">E</div>
+        <h4>Internal knowledge agents</h4>
+        <p>Answers "where's the doc for X" against your own wiki, contracts, and past decisions instead of a colleague's memory.</p>
+        <div class="ex">RAG over internal docs</div>
+      </div>
+      <div class="cat-card">
+        <div class="cn">F</div>
+        <h4>QA & monitoring agents</h4>
+        <p>Watches logs, uptime, or output quality and opens a ticket — or fixes the obvious cases — before a customer notices.</p>
+        <div class="ex">on-call agent for small teams</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-index">05 — SEQUENCE</div>
+      <h2 class="sec-title">The order to actually build in</h2>
+      <p class="sec-sub">Same sequence whether the budget is $0 or $20,000 — only the tooling at each step changes.</p>
+    </div>
+    <div class="roadmap">
+      <div class="rstep" data-n="1">
+        <h4>Pick one narrow job, not a "platform"</h4>
+        <p>Define a single task with a clear success condition before touching a framework. Broad "does everything" agents are where most builds stall.</p>
+      </div>
+      <div class="rstep" data-n="2">
+        <h4>Wire the loop by hand first</h4>
+        <p>A model call, one or two tools, and a while-loop teach you more about failure modes than any framework's abstractions will.</p>
+      </div>
+      <div class="rstep" data-n="3">
+        <h4>Add memory only once the task needs it</h4>
+        <p>Most early agents don't need a vector database. Add persistence when you can point at the specific step that requires recall.</p>
+      </div>
+      <div class="rstep" data-n="4">
+        <h4>Introduce a framework once the loop outgrows hand-rolling</h4>
+        <p>Move to LangGraph, CrewAI, or a provider SDK when state, retries, and multi-step planning get too fiddly to manage manually.</p>
+      </div>
+      <div class="rstep" data-n="5">
+        <h4>Put guardrails in before real usage</h4>
+        <p>Spend limits, human approval on irreversible actions, and logging — all before the agent touches a live customer or a real account.</p>
+      </div>
+      <div class="rstep" data-n="6">
+        <h4>Deploy small, watch closely, then scale the budget</h4>
+        <p>Run it on the cheap tier under real conditions first. Only move to managed infrastructure once volume or reliability actually demands it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>Tool and pricing details reflect the landscape as of 2026 and shift quickly — check current pricing before committing a budget. Treat every "self-sustained business" category above as an idea worth testing small, not a guaranteed outcome.</p>
+  </div>
+</footer>
+
+</body>
+</html>
